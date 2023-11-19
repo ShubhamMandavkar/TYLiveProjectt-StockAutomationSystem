@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 import sys
-
+from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtWidgets import QDialog
 
@@ -10,7 +10,9 @@ from PySide6.QtWidgets import QDialog
 #     pyside2-uic form.ui -o ui_form.py
 
 from UIFiles.ui_home import Ui_Home
-from UIFiles.ui_searchDialog import Ui_dlgSearch
+from ProjectPages.searchDlg import SearchDlg
+from ProjectPages.myAlertsMW import MyAlerts
+from ProjectPages.holdingsMW import Holdings
 from workers import AlertWorker, HoldingsWorker
 
 import mysql.connector
@@ -53,20 +55,15 @@ class MainWindow(QMainWindow):
         self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
 
     def showSearchDialog(self):
-        self.dlgSearch = QDialog()
-        self.dlgSearchUi = Ui_dlgSearch()
-        self.dlgSearchUi.setupUi(self.dlgSearch)
+        self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
     
     def showMyAlertsWindow(self):
-        self.myAlerts = QMainWindow()
-        self.myAlertsUi = Ui_myAlerts()
-        self.myAlertsUi.setupUi(self.myAlerts)
-        self.myAlertsUi.addAlertsToList()
+        self.myAlerts = MyAlerts()
         self.myAlerts.show()
     
     def showHoldingsWindow(self):
-        self.holdings = HoldingsMW()
+        self.holdings = Holdings()
         self.holdings.show()
     
     def closeEvent(self, event):
