@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1042</width>
-    <height>613</height>
+    <width>1131</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,32 +29,29 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QPushButton" name="btnMyAlerts">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>231</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>MyAlerts</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnHoldings">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>231</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Holdings</string>
-       </property>
-      </widget>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="btnMyAlerts">
+         <property name="text">
+          <string>MyAlerts</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QPushButton" name="btnHoldings">
+         <property name="text">
+          <string>Holdings</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="btnCustomDetails">
+         <property name="text">
+          <string>CustomDetails</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
@@ -211,10 +208,10 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="0" column="0">
-              <widget class="QLabel" name="lblTotalInvVal">
+             <item row="1" column="0">
+              <widget class="QLabel" name="lblToltalInv">
                <property name="text">
-                <string>0</string>
+                <string>Total Investment</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -231,16 +228,6 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lblToltalInv">
-               <property name="text">
-                <string>Total Investment</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="2">
               <widget class="QLabel" name="lblPandLVal">
                <property name="text">
@@ -251,10 +238,10 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="lblCurrentValue">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lblTotalInvVal">
                <property name="text">
-                <string>Current Value</string>
+                <string>0</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -265,6 +252,16 @@
               <widget class="QLabel" name="lblPandL">
                <property name="text">
                 <string>P &amp; L</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="lblCurrentValue">
+               <property name="text">
+                <string>Current Value</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -372,7 +369,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1042</width>
+     <width>1131</width>
      <height>25</height>
     </rect>
    </property>

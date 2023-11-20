@@ -15,17 +15,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QFormLayout, QFrame,
-    QHBoxLayout, QLabel, QLineEdit, QMainWindow,
-    QMenuBar, QPushButton, QRadioButton, QSizePolicy,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDoubleSpinBox, QFormLayout,
+    QFrame, QHBoxLayout, QLabel, QLineEdit,
+    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
     QSpinBox, QStatusBar, QVBoxLayout, QWidget)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(971, 586)
-        self.centralwidget = QWidget(MainWindow)
+class Ui_customDetails(object):
+    def setupUi(self, customDetails):
+        if not customDetails.objectName():
+            customDetails.setObjectName(u"customDetails")
+        customDetails.resize(971, 586)
+        self.centralwidget = QWidget(customDetails)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -85,10 +85,10 @@ class Ui_MainWindow(object):
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.leApiKey)
 
-        self.lblApiSecreteKey = QLabel(self.frame_5)
-        self.lblApiSecreteKey.setObjectName(u"lblApiSecreteKey")
+        self.lblApiSecretKey = QLabel(self.frame_5)
+        self.lblApiSecretKey.setObjectName(u"lblApiSecretKey")
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lblApiSecreteKey)
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lblApiSecretKey)
 
         self.lbProfitThrld = QLabel(self.frame_5)
         self.lbProfitThrld.setObjectName(u"lbProfitThrld")
@@ -105,15 +105,15 @@ class Ui_MainWindow(object):
 
         self.formLayout.setWidget(4, QFormLayout.LabelRole, self.lblQuantity)
 
-        self.leApiSecreteKey = QLineEdit(self.frame_5)
-        self.leApiSecreteKey.setObjectName(u"leApiSecreteKey")
+        self.leApiSecretKey = QLineEdit(self.frame_5)
+        self.leApiSecretKey.setObjectName(u"leApiSecretKey")
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.leApiSecreteKey)
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.leApiSecretKey)
 
-        self.dsbProftitThrld = QDoubleSpinBox(self.frame_5)
-        self.dsbProftitThrld.setObjectName(u"dsbProftitThrld")
+        self.dsbProfitThrld = QDoubleSpinBox(self.frame_5)
+        self.dsbProfitThrld.setObjectName(u"dsbProfitThrld")
 
-        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.dsbProftitThrld)
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.dsbProfitThrld)
 
         self.dsbAverageThrld = QDoubleSpinBox(self.frame_5)
         self.dsbAverageThrld.setObjectName(u"dsbAverageThrld")
@@ -145,24 +145,24 @@ class Ui_MainWindow(object):
 
         self.formLayout.setWidget(7, QFormLayout.FieldRole, self.leWhatsappNo)
 
-        self.rbDesktopNoti = QRadioButton(self.frame_5)
-        self.rbDesktopNoti.setObjectName(u"rbDesktopNoti")
+        self.cbDesktopNoti = QCheckBox(self.frame_5)
+        self.cbDesktopNoti.setObjectName(u"cbDesktopNoti")
 
-        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.rbDesktopNoti)
+        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.cbDesktopNoti)
 
-        self.rbWhatsappNoti = QRadioButton(self.frame_5)
-        self.rbWhatsappNoti.setObjectName(u"rbWhatsappNoti")
+        self.cbWhatsappNoti = QCheckBox(self.frame_5)
+        self.cbWhatsappNoti.setObjectName(u"cbWhatsappNoti")
 
-        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.rbWhatsappNoti)
+        self.formLayout.setWidget(6, QFormLayout.FieldRole, self.cbWhatsappNoti)
 
 
         self.verticalLayout_2.addWidget(self.frame_5)
 
-        self.pushButton = QPushButton(self.frame_4)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setMaximumSize(QSize(100, 30))
+        self.btnSave = QPushButton(self.frame_4)
+        self.btnSave.setObjectName(u"btnSave")
+        self.btnSave.setMaximumSize(QSize(100, 30))
 
-        self.verticalLayout_2.addWidget(self.pushButton)
+        self.verticalLayout_2.addWidget(self.btnSave)
 
 
         self.verticalLayout.addWidget(self.frame_4)
@@ -170,33 +170,33 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.frame_2)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(MainWindow)
+        customDetails.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(customDetails)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 971, 25))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(MainWindow)
+        customDetails.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(customDetails)
         self.statusbar.setObjectName(u"statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        customDetails.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(customDetails)
 
-        QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(customDetails)
     # setupUi
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.lblHeading.setText(QCoreApplication.translate("MainWindow", u"Custom Details", None))
-        self.lblApiKey.setText(QCoreApplication.translate("MainWindow", u"API Key : ", None))
-        self.lblApiSecreteKey.setText(QCoreApplication.translate("MainWindow", u"API Secrete Key : ", None))
-        self.lbProfitThrld.setText(QCoreApplication.translate("MainWindow", u"Profit Threshold : ", None))
-        self.lblAverageThrld.setText(QCoreApplication.translate("MainWindow", u"Average Threshold : ", None))
-        self.lblQuantity.setText(QCoreApplication.translate("MainWindow", u"Quantity : ", None))
-        self.lblDesktopNoti.setText(QCoreApplication.translate("MainWindow", u"Desktop Notification : ", None))
-        self.lblWhatsappNoti.setText(QCoreApplication.translate("MainWindow", u"Whatsapp Notification : ", None))
-        self.lblWhatsappNo.setText(QCoreApplication.translate("MainWindow", u"Whatsapp No : ", None))
-        self.rbDesktopNoti.setText(QCoreApplication.translate("MainWindow", u"RadioButton", None))
-        self.rbWhatsappNoti.setText(QCoreApplication.translate("MainWindow", u"RadioButton", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+    def retranslateUi(self, customDetails):
+        customDetails.setWindowTitle(QCoreApplication.translate("customDetails", u"MainWindow", None))
+        self.lblHeading.setText(QCoreApplication.translate("customDetails", u"Custom Details", None))
+        self.lblApiKey.setText(QCoreApplication.translate("customDetails", u"API Key : ", None))
+        self.lblApiSecretKey.setText(QCoreApplication.translate("customDetails", u"API Secret Key : ", None))
+        self.lbProfitThrld.setText(QCoreApplication.translate("customDetails", u"Profit Threshold : ", None))
+        self.lblAverageThrld.setText(QCoreApplication.translate("customDetails", u"Average Threshold : ", None))
+        self.lblQuantity.setText(QCoreApplication.translate("customDetails", u"Quantity : ", None))
+        self.lblDesktopNoti.setText(QCoreApplication.translate("customDetails", u"Desktop Notification : ", None))
+        self.lblWhatsappNoti.setText(QCoreApplication.translate("customDetails", u"Whatsapp Notification : ", None))
+        self.lblWhatsappNo.setText(QCoreApplication.translate("customDetails", u"Whatsapp No : ", None))
+        self.cbDesktopNoti.setText(QCoreApplication.translate("customDetails", u"CheckBox", None))
+        self.cbWhatsappNoti.setText(QCoreApplication.translate("customDetails", u"CheckBox", None))
+        self.btnSave.setText(QCoreApplication.translate("customDetails", u"Save", None))
     # retranslateUi
 

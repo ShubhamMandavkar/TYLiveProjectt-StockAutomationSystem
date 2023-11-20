@@ -14,6 +14,7 @@ from UIFiles.ui_home import Ui_Home
 from ProjectPages.searchDlg import SearchDlg
 from ProjectPages.myAlertsMW import MyAlerts
 from ProjectPages.holdingsMW import Holdings
+from ProjectPages.customDetailsMW import CustomDetails
 from workers import AlertWorker, HoldingsWorker
 
 import mysql.connector
@@ -54,6 +55,7 @@ class MainWindow(QMainWindow):
         self.ui.btnSearch.clicked.connect(self.showSearchDialog)
         self.ui.btnMyAlerts.clicked.connect(self.showMyAlertsWindow)
         self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
+        self.ui.btnCustomDetails.clicked.connect(self.showCustomDetails)
 
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
@@ -64,12 +66,12 @@ class MainWindow(QMainWindow):
         self.myAlerts.show()
     
     def showHoldingsWindow(self):
-        try:
-            self.holdings = Holdings()
-            self.holdings.show()
-        except EXCEPTION as e:
-            print(e)
-
+        self.holdings = Holdings()
+        self.holdings.show()
+      
+    def showCustomDetails(self):
+        self.customDetails = CustomDetails()
+        self.customDetails.show()
 
 
 if __name__ == "__main__":

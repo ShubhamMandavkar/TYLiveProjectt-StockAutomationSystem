@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QLabel, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFormLayout, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_Home(object):
     def setupUi(self, Home):
         if not Home.objectName():
             Home.setObjectName(u"Home")
-        Home.resize(1042, 613)
+        Home.resize(1131, 597)
         self.centralwidget = QWidget(Home)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -33,12 +34,23 @@ class Ui_Home(object):
         self.frmNavBar.setMaximumSize(QSize(250, 16777215))
         self.frmNavBar.setFrameShape(QFrame.StyledPanel)
         self.frmNavBar.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frmNavBar)
+        self.formLayout.setObjectName(u"formLayout")
         self.btnMyAlerts = QPushButton(self.frmNavBar)
         self.btnMyAlerts.setObjectName(u"btnMyAlerts")
-        self.btnMyAlerts.setGeometry(QRect(10, 10, 231, 29))
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnMyAlerts)
+
         self.btnHoldings = QPushButton(self.frmNavBar)
         self.btnHoldings.setObjectName(u"btnHoldings")
-        self.btnHoldings.setGeometry(QRect(10, 50, 231, 29))
+
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnHoldings)
+
+        self.btnCustomDetails = QPushButton(self.frmNavBar)
+        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnCustomDetails)
+
 
         self.horizontalLayout.addWidget(self.frmNavBar)
 
@@ -128,11 +140,11 @@ class Ui_Home(object):
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.gridLayout_2 = QGridLayout(self.frame_5)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.lblTotalInvVal = QLabel(self.frame_5)
-        self.lblTotalInvVal.setObjectName(u"lblTotalInvVal")
-        self.lblTotalInvVal.setAlignment(Qt.AlignCenter)
+        self.lblToltalInv = QLabel(self.frame_5)
+        self.lblToltalInv.setObjectName(u"lblToltalInv")
+        self.lblToltalInv.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lblTotalInvVal, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.lblToltalInv, 1, 0, 1, 1)
 
         self.lbalCurrentValueVal = QLabel(self.frame_5)
         self.lbalCurrentValueVal.setObjectName(u"lbalCurrentValueVal")
@@ -140,29 +152,29 @@ class Ui_Home(object):
 
         self.gridLayout_2.addWidget(self.lbalCurrentValueVal, 0, 1, 1, 1)
 
-        self.lblToltalInv = QLabel(self.frame_5)
-        self.lblToltalInv.setObjectName(u"lblToltalInv")
-        self.lblToltalInv.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.lblToltalInv, 1, 0, 1, 1)
-
         self.lblPandLVal = QLabel(self.frame_5)
         self.lblPandLVal.setObjectName(u"lblPandLVal")
         self.lblPandLVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblPandLVal, 0, 2, 1, 1)
 
-        self.lblCurrentValue = QLabel(self.frame_5)
-        self.lblCurrentValue.setObjectName(u"lblCurrentValue")
-        self.lblCurrentValue.setAlignment(Qt.AlignCenter)
+        self.lblTotalInvVal = QLabel(self.frame_5)
+        self.lblTotalInvVal.setObjectName(u"lblTotalInvVal")
+        self.lblTotalInvVal.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.lblCurrentValue, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.lblTotalInvVal, 0, 0, 1, 1)
 
         self.lblPandL = QLabel(self.frame_5)
         self.lblPandL.setObjectName(u"lblPandL")
         self.lblPandL.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblPandL, 1, 2, 1, 1)
+
+        self.lblCurrentValue = QLabel(self.frame_5)
+        self.lblCurrentValue.setObjectName(u"lblCurrentValue")
+        self.lblCurrentValue.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lblCurrentValue, 1, 1, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.frame_5)
@@ -227,7 +239,7 @@ class Ui_Home(object):
         Home.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Home)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1042, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1131, 25))
         Home.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Home)
         self.statusbar.setObjectName(u"statusbar")
@@ -242,6 +254,7 @@ class Ui_Home(object):
         Home.setWindowTitle(QCoreApplication.translate("Home", u"MainWindow", None))
         self.btnMyAlerts.setText(QCoreApplication.translate("Home", u"MyAlerts", None))
         self.btnHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
         self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
         self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
         self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))
@@ -251,12 +264,12 @@ class Ui_Home(object):
         self.lblRejectedVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblRejected.setText(QCoreApplication.translate("Home", u"Rejected", None))
         self.lblHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
-        self.lblTotalInvVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lbalCurrentValueVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblToltalInv.setText(QCoreApplication.translate("Home", u"Total Investment", None))
+        self.lbalCurrentValueVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblPandLVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblCurrentValue.setText(QCoreApplication.translate("Home", u"Current Value", None))
+        self.lblTotalInvVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblPandL.setText(QCoreApplication.translate("Home", u"P & L", None))
+        self.lblCurrentValue.setText(QCoreApplication.translate("Home", u"Current Value", None))
         self.lblPositions.setText(QCoreApplication.translate("Home", u"Positions", None))
         self.lblTotalPandL.setText(QCoreApplication.translate("Home", u"Total P & L", None))
         self.lblTotalPandLVal.setText(QCoreApplication.translate("Home", u"0 ", None))
