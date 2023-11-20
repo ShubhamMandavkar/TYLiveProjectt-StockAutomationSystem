@@ -80,7 +80,7 @@ if __name__ == "__main__":
     alertWorker.moveToThread(alertThread)
     alertWorker.isRunning = True 
 
-    alertThread.started.connect(alertWorker.getAlertList)
+    alertThread.started.connect(AlertWorker.getAlertList)
     alertThread.started.connect(alertWorker.processAlerts)
 
     holdingsWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)

@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMainWindow
 import mysql.connector
 from mysql.connector import errorcode
 from UIFiles.ui_myAlerts import Ui_myAlerts
+from workers import AlertWorker
 
 
 class ListModel(QAbstractListModel):
@@ -56,9 +57,14 @@ class MyAlerts(QMainWindow):
             for (symbol,name, type, cond, tf, val, len1, len2, msg) in cursor: #cursor returns tuple
                 string = name + ' ' + cond + ' ' + str(val)
                 data.append([symbol, name, type, cond, tf, val, len1, len2, msg, string])
-
+            
+            #show updated alerts list
             model = ListModel(data)    
             self.ui.lsvMyAlerts.setModel(model)
+
+            #After deleting the alert get updated list
+            AlertWorker.getAlertList()
+
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -80,7 +86,7 @@ class MyAlerts(QMainWindow):
             cursor.execute(query)
 
             data = []
-            for (symbol,name, type, cond, tf, val,len1, len2, msg) in cursor: #cursor returns tuple
+            for (symbol, name, type, cond, tf, val,len1, len2, msg) in cursor: #cursor returns tuple
                 string = name + ' ' + cond + ' ' + str(val)
                 data.append([symbol, name, type, cond, tf, val, len1, len2, msg, string])
 

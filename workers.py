@@ -25,13 +25,14 @@ class AlertWorker(QObject):
     # noti.setAudio(audio=zroya.Audio.Alarm)
     
     tf = {'Daily' : '1d', 'Monthly' : '1mo', 'Weekly' : '1wk'}
-    def getAlertList(self):
+    def getAlertList():
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             query = f"""select * from alerts"""
             cursor.execute(query)
+            alerts = []
             for (sym, name, type, condition, tf, val, len1, len2, msg) in cursor:
                 alert = dict()
                 alert['stkSymbol'] = sym
@@ -44,8 +45,8 @@ class AlertWorker(QObject):
                 alert['len2'] = len2
                 alert['alertMsg'] = msg
 
-                self.alertList.append(alert)
-                # print(alert)
+                alerts.append(alert)
+            AlertWorker.alertList = alerts
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -74,7 +75,7 @@ class AlertWorker(QObject):
 
     def processAlerts(self):
         while(self.isRunning):
-            for alert in self.alertList:
+            for alert in AlertWorker.alertList:
                 currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
                 match alert['alertCond']:
                     case 'Greater Than':
@@ -183,7 +184,7 @@ class AlertWorker(QObject):
                             zroya.show(self.noti)
 
             time.sleep(5)
-            self.getAlertList()
+            # self.getAlertList()
             print("processAlerts Called")
     
     

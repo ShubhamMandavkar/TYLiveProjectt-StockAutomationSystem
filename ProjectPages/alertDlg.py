@@ -7,6 +7,7 @@ from mysql.connector import errorcode
 
 from UIFiles.ui_alertDialog import Ui_dlgAlert
 from APIMethods import getQuote2, getQuote
+from workers import AlertWorker
 
 class AlertDlg(QDialog):
     def __init__(self, stkSym, stkName, parent=None):
@@ -113,7 +114,7 @@ class AlertDlg(QDialog):
         alertType = self.ui.cmbAlertType.currentText()
         alertCond = self.ui.cmbAlertCond.currentText()
         timeFrame = self.ui.cmbTimeFrame.currentText()
-        alertVal = self.ui.dsbAlertVal.value()  
+        alertVal = round(self.ui.dsbAlertVal.value(), 2)
         len1 = self.ui.sbLen1.value() 
         len2 = self.ui.sbLen2.value() 
         alertMsg = self.ui.txteMsg.toPlainText()   
@@ -126,6 +127,9 @@ class AlertDlg(QDialog):
             print(query)
             cursor.execute(query)
             con.commit()
+
+            #add alert to alertlist in AlertWorker for processing
+            AlertWorker.alertList.append({'stkSymbol' : self.stkSymbol, 'stkName' : self.stkName, 'alertType' : alertType, 'alertCond' : alertCond, 'timeFrame' : timeFrame, 'alertVal' : alertVal, 'len1' : len1, 'len2' : len2, 'alertMsg' : alertMsg})
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
