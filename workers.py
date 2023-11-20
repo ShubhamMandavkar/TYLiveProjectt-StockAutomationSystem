@@ -192,6 +192,7 @@ class AlertWorker(QObject):
 class HoldingsWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
     noti = zroya.Template(zroya.TemplateType.Text2)
+    # noti.setAudio(audio=zroya.Audio.Alarm)
 
     isRunning = True
     holdings = json.dumps({ "status": "success", "data": []})   #static variable to share holdings for all objects

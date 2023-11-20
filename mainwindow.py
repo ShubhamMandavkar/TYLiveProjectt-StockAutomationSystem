@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 import sys
+from tkinter import EXCEPTION
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtWidgets import QDialog
@@ -63,12 +64,12 @@ class MainWindow(QMainWindow):
         self.myAlerts.show()
     
     def showHoldingsWindow(self):
-        self.holdings = Holdings()
-        self.holdings.show()
-    
-    def closeEvent(self, event):
-        print('closing window')
-        event.accept()
+        try:
+            self.holdings = Holdings()
+            self.holdings.show()
+        except EXCEPTION as e:
+            print(e)
+
 
 
 if __name__ == "__main__":

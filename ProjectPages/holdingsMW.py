@@ -45,26 +45,34 @@ class TableModel(QAbstractTableModel):
 
 class Holdings(QMainWindow):
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self.ui = Ui_holdings()
-        self.ui.setupUi(self)
+        try:
+            super().__init__(parent)
+            self.ui = Ui_holdings()
+            self.ui.setupUi(self)
 
-        self.holdingsWorker = HoldingsWorker()
-        self.holdingsThread = QThread()
-        self.holdingsWorker.moveToThread(self.holdingsThread)
+            self.holdingsWorker = HoldingsWorker()
+            self.holdingsThread = QThread()
+            self.holdingsWorker.moveToThread(self.holdingsThread)
 
-        self.holdingsWorker.isHoldingsPage = True
-        self.holdingsThread.started.connect(self.holdingsWorker.getHoldingsTableModel)
-        self.holdingsWorker.sigChngHoldData.connect(self.showHoldings)
-        self.holdingsThread.start()
+            self.holdingsWorker.isHoldingsPage = True
+            self.holdingsThread.started.connect(self.holdingsWorker.getHoldingsTableModel)
+            self.holdingsWorker.sigChngHoldData.connect(self.showHoldings)
+            self.holdingsThread.start()
+        except Exception as e:
+            print(e)
 
     def closeEvent(self, event):
         print('closing holding window')
-        self.holdingsThread.quit()
         self.holdingsWorker.isHoldingsPage = False
         TableModel.order = None
         TableModel.Ncol = None
+        self.holdingsThread.quit()
+        res = self.holdingsThread.wait()
         event.accept()
+        print('called closeWindow', res)
+    
+    def closeWindow(self):
+        self.close()
         
     def showHoldings(self, dfHoldings):
         model = TableModel(dfHoldings)
