@@ -56,7 +56,7 @@ class SearchDlg(QDialog):
     
     def addConnectors(self):
         self.ui.leSearch.textChanged.connect(self.showSuggestions)
-        self.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
+        # self.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
 
     def showSuggestions(self):
         stkName = self.ui.leSearch.text()

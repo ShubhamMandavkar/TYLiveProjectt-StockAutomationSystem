@@ -49,7 +49,12 @@ class Ui_Home(object):
         self.btnCustomDetails = QPushButton(self.frmNavBar)
         self.btnCustomDetails.setObjectName(u"btnCustomDetails")
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnCustomDetails)
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnCustomDetails)
+
+        self.btnWatchlists = QPushButton(self.frmNavBar)
+        self.btnWatchlists.setObjectName(u"btnWatchlists")
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnWatchlists)
 
 
         self.horizontalLayout.addWidget(self.frmNavBar)
@@ -255,6 +260,7 @@ class Ui_Home(object):
         self.btnMyAlerts.setText(QCoreApplication.translate("Home", u"MyAlerts", None))
         self.btnHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
         self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
+        self.btnWatchlists.setText(QCoreApplication.translate("Home", u"Watchlists", None))
         self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
         self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
         self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))

@@ -22,6 +22,7 @@ class StockDetails(QMainWindow):
     def addConnectors(self):
         self.ui.btnAlert.clicked.connect(self.showAlertDialog)
         self.ui.btnChart.clicked.connect(self.showChartWindow)
+        self.ui.btnBuy.clicked.connect(self.getBuyDetails)
 
     def showDetails(self):
         stk = json.loads(getQuote2('',self.stkSymbol, 'tc', 'NSE'))
@@ -38,6 +39,9 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkLowVal.setText(str(stk['data']['yearly_low_price']))
         self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
 
+    def getBuyDetails(self):
+        pass
+    
     def showAlertDialog(self):
         self.dlgAlert = AlertDlg(self.stkSymbol, self.stkName)
         self.dlgAlert.show()

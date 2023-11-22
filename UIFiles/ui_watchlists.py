@@ -16,16 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
-    QHeaderView, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QTableView, QVBoxLayout,
-    QWidget)
+    QHeaderView, QLabel, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QTableView,
+    QVBoxLayout, QWidget)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1005, 614)
-        self.centralwidget = QWidget(MainWindow)
+class Ui_watchlists(object):
+    def setupUi(self, watchlists):
+        if not watchlists.objectName():
+            watchlists.setObjectName(u"watchlists")
+        watchlists.resize(1005, 614)
+        self.centralwidget = QWidget(watchlists)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -66,35 +66,55 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.cmbWatchlists)
 
-        self.frame_5 = QFrame(self.frame_3)
-        self.frame_5.setObjectName(u"frame_5")
-        self.frame_5.setFrameShape(QFrame.StyledPanel)
-        self.frame_5.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_2 = QHBoxLayout(self.frame_5)
+        self.frmWLContent = QFrame(self.frame_3)
+        self.frmWLContent.setObjectName(u"frmWLContent")
+        self.frmWLContent.setFrameShape(QFrame.StyledPanel)
+        self.frmWLContent.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_2 = QHBoxLayout(self.frmWLContent)
         self.horizontalLayout_2.setSpacing(4)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
+        self.frame_5 = QFrame(self.frmWLContent)
+        self.frame_5.setObjectName(u"frame_5")
+        self.frame_5.setFrameShape(QFrame.StyledPanel)
+        self.frame_5.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_3 = QVBoxLayout(self.frame_5)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.lblMsg = QLabel(self.frame_5)
+        self.lblMsg.setObjectName(u"lblMsg")
+        self.lblMsg.setMaximumSize(QSize(16777215, 20))
+        font = QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        self.lblMsg.setFont(font)
+        self.lblMsg.setWordWrap(True)
+
+        self.verticalLayout_3.addWidget(self.lblMsg)
+
         self.tbvWatchlist = QTableView(self.frame_5)
         self.tbvWatchlist.setObjectName(u"tbvWatchlist")
 
-        self.horizontalLayout_2.addWidget(self.tbvWatchlist)
+        self.verticalLayout_3.addWidget(self.tbvWatchlist)
 
-        self.frame_6 = QFrame(self.frame_5)
-        self.frame_6.setObjectName(u"frame_6")
-        self.frame_6.setMinimumSize(QSize(100, 0))
-        self.frame_6.setFrameShape(QFrame.StyledPanel)
-        self.frame_6.setFrameShadow(QFrame.Raised)
-        self.btnAddToWL = QPushButton(self.frame_6)
+
+        self.horizontalLayout_2.addWidget(self.frame_5)
+
+        self.frmWLOperations = QFrame(self.frmWLContent)
+        self.frmWLOperations.setObjectName(u"frmWLOperations")
+        self.frmWLOperations.setMinimumSize(QSize(100, 0))
+        self.frmWLOperations.setFrameShape(QFrame.StyledPanel)
+        self.frmWLOperations.setFrameShadow(QFrame.Raised)
+        self.btnAddToWL = QPushButton(self.frmWLOperations)
         self.btnAddToWL.setObjectName(u"btnAddToWL")
         self.btnAddToWL.setGeometry(QRect(10, 10, 83, 29))
-        self.btnDeleteFrmWL = QPushButton(self.frame_6)
+        self.btnDeleteFrmWL = QPushButton(self.frmWLOperations)
         self.btnDeleteFrmWL.setObjectName(u"btnDeleteFrmWL")
         self.btnDeleteFrmWL.setGeometry(QRect(10, 50, 83, 29))
 
-        self.horizontalLayout_2.addWidget(self.frame_6)
+        self.horizontalLayout_2.addWidget(self.frmWLOperations)
 
 
-        self.verticalLayout_2.addWidget(self.frame_5)
+        self.verticalLayout_2.addWidget(self.frmWLContent)
 
         self.frame_7 = QFrame(self.frame_3)
         self.frame_7.setObjectName(u"frame_7")
@@ -113,24 +133,25 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.frame_2)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(MainWindow)
+        watchlists.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(watchlists)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1005, 25))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(MainWindow)
+        watchlists.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(watchlists)
         self.statusbar.setObjectName(u"statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        watchlists.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(watchlists)
 
-        QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(watchlists)
     # setupUi
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.btnAddToWL.setText(QCoreApplication.translate("MainWindow", u"Add", None))
-        self.btnDeleteFrmWL.setText(QCoreApplication.translate("MainWindow", u"Delete", None))
-        self.btnCreateWL.setText(QCoreApplication.translate("MainWindow", u"Create", None))
+    def retranslateUi(self, watchlists):
+        watchlists.setWindowTitle(QCoreApplication.translate("watchlists", u"MainWindow", None))
+        self.lblMsg.setText(QCoreApplication.translate("watchlists", u"No Stocks in Watchlist", None))
+        self.btnAddToWL.setText(QCoreApplication.translate("watchlists", u"Add", None))
+        self.btnDeleteFrmWL.setText(QCoreApplication.translate("watchlists", u"Delete", None))
+        self.btnCreateWL.setText(QCoreApplication.translate("watchlists", u"Create", None))
     # retranslateUi
 

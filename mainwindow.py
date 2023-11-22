@@ -1,6 +1,5 @@
 # This Python file uses the following encoding: utf-8
 import sys
-from tkinter import EXCEPTION
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtWidgets import QDialog
@@ -14,6 +13,7 @@ from UIFiles.ui_home import Ui_Home
 from ProjectPages.searchDlg import SearchDlg
 from ProjectPages.myAlertsMW import MyAlerts
 from ProjectPages.holdingsMW import Holdings
+from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
 from workers import AlertWorker, HoldingsWorker
 
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
         self.ui.btnSearch.clicked.connect(self.showSearchDialog)
         self.ui.btnMyAlerts.clicked.connect(self.showMyAlertsWindow)
         self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
+        self.ui.btnWatchlists.clicked.connect(self.showWatchlists)
         self.ui.btnCustomDetails.clicked.connect(self.showCustomDetails)
 
     def showSearchDialog(self):
@@ -68,6 +69,10 @@ class MainWindow(QMainWindow):
     def showHoldingsWindow(self):
         self.holdings = Holdings()
         self.holdings.show()
+    
+    def showWatchlists(self):
+        self.watchlists = Watchlists()
+        self.watchlists.show()
       
     def showCustomDetails(self):
         self.customDetails = CustomDetails()

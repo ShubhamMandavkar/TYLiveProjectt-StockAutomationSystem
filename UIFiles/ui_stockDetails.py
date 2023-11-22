@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFormLayout, QFrame, QHBoxLayout,
-    QLabel, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFormLayout, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_stockDetails(object):
     def setupUi(self, stockDetails):
         if not stockDetails.objectName():
             stockDetails.setObjectName(u"stockDetails")
-        stockDetails.resize(956, 600)
+        stockDetails.resize(838, 639)
         self.centralwidget = QWidget(stockDetails)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -196,17 +197,29 @@ class Ui_stockDetails(object):
         self.frame_7.setMaximumSize(QSize(16777215, 50))
         self.frame_7.setFrameShape(QFrame.StyledPanel)
         self.frame_7.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_3 = QHBoxLayout(self.frame_7)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.gridLayout = QGridLayout(self.frame_7)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.btnBuy = QPushButton(self.frame_7)
+        self.btnBuy.setObjectName(u"btnBuy")
+
+        self.gridLayout.addWidget(self.btnBuy, 0, 0, 1, 1)
+
         self.btnAlert = QPushButton(self.frame_7)
         self.btnAlert.setObjectName(u"btnAlert")
+        self.btnAlert.setMaximumSize(QSize(100, 16777215))
 
-        self.horizontalLayout_3.addWidget(self.btnAlert)
+        self.gridLayout.addWidget(self.btnAlert, 0, 2, 1, 1)
 
         self.btnChart = QPushButton(self.frame_7)
         self.btnChart.setObjectName(u"btnChart")
+        self.btnChart.setMaximumSize(QSize(100, 16777215))
 
-        self.horizontalLayout_3.addWidget(self.btnChart)
+        self.gridLayout.addWidget(self.btnChart, 0, 3, 1, 1)
+
+        self.btnSell = QPushButton(self.frame_7)
+        self.btnSell.setObjectName(u"btnSell")
+
+        self.gridLayout.addWidget(self.btnSell, 0, 1, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.frame_7)
@@ -220,7 +233,7 @@ class Ui_stockDetails(object):
         stockDetails.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(stockDetails)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 956, 25))
+        self.menubar.setGeometry(QRect(0, 0, 838, 25))
         stockDetails.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(stockDetails)
         self.statusbar.setObjectName(u"statusbar")
@@ -256,7 +269,9 @@ class Ui_stockDetails(object):
         self.lblVolume.setText(QCoreApplication.translate("stockDetails", u"Volume : ", None))
         self.lblVolumeVal.setText(QCoreApplication.translate("stockDetails", u"TextLabel", None))
         self.lblExchangeVal.setText(QCoreApplication.translate("stockDetails", u"TextLabel", None))
+        self.btnBuy.setText(QCoreApplication.translate("stockDetails", u"Buy", None))
         self.btnAlert.setText(QCoreApplication.translate("stockDetails", u"Add Alert", None))
         self.btnChart.setText(QCoreApplication.translate("stockDetails", u"Chart", None))
+        self.btnSell.setText(QCoreApplication.translate("stockDetails", u"Sell", None))
     # retranslateUi
 
