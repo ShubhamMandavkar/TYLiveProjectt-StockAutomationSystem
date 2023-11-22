@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QTableView,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
+    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_watchlists(object):
     def setupUi(self, watchlists):
@@ -93,6 +93,9 @@ class Ui_watchlists(object):
 
         self.tbvWatchlist = QTableView(self.frame_5)
         self.tbvWatchlist.setObjectName(u"tbvWatchlist")
+        self.tbvWatchlist.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tbvWatchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbvWatchlist.verticalHeader().setVisible(False)
 
         self.verticalLayout_3.addWidget(self.tbvWatchlist)
 

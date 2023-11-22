@@ -1,1 +1,0 @@
-database='ty_live_proj_stock_automation_sys'

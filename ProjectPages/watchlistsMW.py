@@ -52,14 +52,17 @@ class Watchlists(QMainWindow):
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
 
+        # myDict = {'Symbol' : [], 'Name' : [], 'Open': [], 'High': [], 'Low' : [], 'Close':[]}
+        # self.watchlistData = pd.DataFrame(myDict)
         self.watchlistData = pd.DataFrame({})
 
-        self.showWatchlists()
         self.addConnectors()
+        self.showWatchlists()
     
     def addConnectors(self):
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
+        self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
 
     def showWatchlists(self):
         self.count = 0
@@ -149,6 +152,12 @@ class Watchlists(QMainWindow):
                 self.watchlistData = pd.concat([self.watchlistData, data], ignore_index=True)
                 model = TableModel(self.watchlistData)
                 self.ui.tbvWatchlist.setModel(model)
+
+                #hide the msg label if visibel
+                if not self.ui.lblMsg.isHidden():
+                    self.ui.lblMsg.hide()
+                    print('called')
+
             else: #if no stocks in watchlist
                 self.ui.tbvWatchlist.hide()
                 self.ui.lblMsg.setVisible(True)
@@ -224,9 +233,47 @@ class Watchlists(QMainWindow):
                 print("error:",err)
         else:
             con.close()
+        
+        if self.watchlistData.size != 0:
+            self.ui.lblMsg.hide()
+            self.ui.tbvWatchlist.setVisible(True)
 
     def showSearchDlg(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.addToWatchlist)
         self.dlgSearch.show()
 
+    def deleteStockFrmWL(self):
+        modelIndexls = self.ui.tbvWatchlist.selectedIndexes() #return list of QModelIndices i.e. columns in a row
+        stkSym = modelIndexls[0].data(0)
+        stkName = modelIndexls[1].data(0)
+        
+        #delete from database
+        tblName = self.ui.cmbWatchlists.currentText()
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            cursor = con.cursor()
+            query = f"""delete from {tblName} where stkSymbol = '{stkSym}'"""
+            cursor.execute(query)
+            con.commit()
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        else:
+            con.close()
+
+        # print(self.watchlistData.head())
+        index = self.watchlistData.index[self.watchlistData['Symbol'] == stkSym]
+        self.watchlistData.drop(index, axis= 0, inplace= True)
+
+        if self.watchlistData.size != 0:
+            model = TableModel(self.watchlistData)
+            self.ui.tbvWatchlist.setModel(model)
+            # print(self.watchlistData.head())
+        else: #if watchlist becomes empty hide table and show the msg
+            self.ui.tbvWatchlist.hide()
+            self.ui.lblMsg.setVisible(True)
