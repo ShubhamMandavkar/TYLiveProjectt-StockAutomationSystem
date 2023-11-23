@@ -52,28 +52,63 @@ class Watchlists(QMainWindow):
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
 
-        # myDict = {'Symbol' : [], 'Name' : [], 'Open': [], 'High': [], 'Low' : [], 'Close':[]}
-        # self.watchlistData = pd.DataFrame(myDict)
         self.watchlistData = pd.DataFrame({})
 
         self.addConnectors()
-        self.showWatchlists()
+        self.loadWatchlists()
+
+        count = self.ui.cmbWatchlists.count()
+        if count != 0: #if there are 1 or more watchlist show the data of 1st
+            WLName = self.ui.cmbWatchlists.currentText()
+            self.showWatchlistData(WLName)
+        else: #no watchlist is created
+            self.ui.cmbWatchlists.hide()
+            self.ui.frmWLContent.hide()
+        
+        self.manageVisibility()
+
     
     def addConnectors(self):
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
 
-    def showWatchlists(self):
-        self.count = 0
+        self.ui.cmbWatchlists.currentTextChanged.connect(lambda: self.showWatchlistData(self.ui.cmbWatchlists.currentText()))
+
+    def loadWatchlists(self):
+        count = 0
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000")
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
             cursor = con.cursor()
-            query = f"""select count(*) as count from information_schema.tables where table_schema = 'watchlists_db';"""
-            print(query)
+            query = f"""show tables;"""
             cursor.execute(query)
-            for cnt, in cursor:
-                self.count = cnt
+            for tableName, in cursor:
+                self.ui.cmbWatchlists.addItem(tableName)
+                count += 1
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        else:
+            con.close() 
+
+    def showWatchlistData(self, watchlist): 
+        stkSymbols = []
+        stkNames = []
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            cursor = con.cursor()
+            query = f"""select * from {watchlist}"""
+            cursor.execute(query)
+
+            for stkSym, stkName in cursor:
+                stkSymbols.append(stkSym)
+                stkNames.append(stkName)
+
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -84,89 +119,33 @@ class Watchlists(QMainWindow):
         else:
             con.close()
 
-        if self.count != 0:
-            #show the list of tables in a combobox
-            try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
-                cursor = con.cursor()
-                query = f"""show tables;"""
-                cursor.execute(query)
-                for tableName, in cursor:
-                    self.ui.cmbWatchlists.addItem(tableName)
+        if len(stkSymbols ) != 0:#there are 1 or more stocks in watchlist
+            #fetch data to show in table
+            data = []
+            for i in range(len(stkSymbols)):
+                #importing data from yfinance
+                stk = yf.Ticker(stkSymbols[i]+".NS")
+                hist = stk.history(period = '1d', interval = '1d')
 
-            except mysql.connector.Error as err:
-                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                    print("Something is wrong with your user name or password")
-                elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                    print("Database does not exist")
-                else:
-                    print("error:",err)
-            else:
-                con.close()
+                #item method is used to retrieve data only else it return data with index
+                open =  round(hist['Open'].item(), 2)
+                high =  round(hist['High'].item(), 2)
+                low =  round(hist['Low'].item(), 2)
+                close =  round(hist['Close'].item(), 2)
+                data.append([stkSymbols[i], stkNames[i], open, high, low, close])
             
+            # print(data)
+            data = pd.DataFrame(data)
+            data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
 
-            stkSymbols = []
-            stkNames = []
+            self.watchlistData = data
+            model = TableModel(self.watchlistData)
+            self.ui.tbvWatchlist.setModel(model)
 
-            #get the list of stkSymbols in watchlist table
-            watchlist = self.ui.cmbWatchlists.currentText()
-            try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
-                cursor = con.cursor()
-                query = f"""select * from {watchlist}"""
-                cursor.execute(query)
-
-                for stkSym, stkName in cursor:
-                    stkSymbols.append(stkSym)
-                    stkNames.append(stkName)
-
-            except mysql.connector.Error as err:
-                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                    print("Something is wrong with your user name or password")
-                elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                    print("Database does not exist")
-                else:
-                    print("error:",err)
-            else:
-                con.close()
-
-            if len(stkSymbols ) != 0:#there are 1 or more stocks in watchlist
-                #fetch data to show in table
-                data = []
-                for i in range(len(stkSymbols)):
-                    #importing data from yfinance
-                    stk = yf.Ticker(stkSymbols[i]+".NS")
-                    hist = stk.history(period = '1d', interval = '1d')
-
-                    #item method is used to retrieve data only else it return data with index
-                    open =  round(hist['Open'].item(), 2)
-                    high =  round(hist['High'].item(), 2)
-                    low =  round(hist['Low'].item(), 2)
-                    close =  round(hist['Close'].item(), 2)
-                    data.append([stkSymbols[i], stkNames[i], open, high, low, close])
-                
-                # print(data)
-                data = pd.DataFrame(data)
-                data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
-
-                self.watchlistData = pd.concat([self.watchlistData, data], ignore_index=True)
-                model = TableModel(self.watchlistData)
-                self.ui.tbvWatchlist.setModel(model)
-
-                #hide the msg label if visibel
-                if not self.ui.lblMsg.isHidden():
-                    self.ui.lblMsg.hide()
-                    print('called')
-
-            else: #if no stocks in watchlist
-                self.ui.tbvWatchlist.hide()
-                self.ui.lblMsg.setVisible(True)
         else:
-            self.ui.cmbWatchlists.hide()
-            self.ui.frmWLContent.hide()
+            self.watchlistData = pd.DataFrame({})
+        self.manageVisibility()
         
-
-
     def getWatchlistDetails(self):
         self.watchlistDetails = WatchlistDetailsDlg()
         self.watchlistDetails.ui.btnCreate.clicked.connect(self.createWatchlist)
@@ -182,6 +161,11 @@ class Watchlists(QMainWindow):
             print(query)
             cursor.execute(query)
             con.commit()
+
+            #display stocks in the watchlist 
+            self.showWatchlistData(name)
+            self.ui.cmbWatchlists.addItem(name)
+            self.ui.cmbWatchlists.setCurrentText(name)
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -192,9 +176,8 @@ class Watchlists(QMainWindow):
         else:
             con.close()
 
-        self.watchlistDetails.close()
+        self.watchlistDetails.close() #close the watchlistDetails dialog
 
-        self.showWatchlists()
 
     def addToWatchlist(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
@@ -234,9 +217,7 @@ class Watchlists(QMainWindow):
         else:
             con.close()
         
-        if self.watchlistData.size != 0:
-            self.ui.lblMsg.hide()
-            self.ui.tbvWatchlist.setVisible(True)
+        self.manageVisibility()
 
     def showSearchDlg(self):
         self.dlgSearch = SearchDlg()
@@ -266,14 +247,19 @@ class Watchlists(QMainWindow):
         else:
             con.close()
 
-        # print(self.watchlistData.head())
         index = self.watchlistData.index[self.watchlistData['Symbol'] == stkSym]
         self.watchlistData.drop(index, axis= 0, inplace= True)
 
         if self.watchlistData.size != 0:
             model = TableModel(self.watchlistData)
             self.ui.tbvWatchlist.setModel(model)
-            # print(self.watchlistData.head())
-        else: #if watchlist becomes empty hide table and show the msg
+
+        self.manageVisibility()
+    
+    def manageVisibility(self): #manages the visibility of watchlist table and msg label
+        if self.watchlistData.size != 0:
+            self.ui.lblMsg.hide()
+            self.ui.tbvWatchlist.setVisible(True)
+        else:
             self.ui.tbvWatchlist.hide()
             self.ui.lblMsg.setVisible(True)
