@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QTableView, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFormLayout, QFrame,
+    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_holdings(object):
     def setupUi(self, holdings):
@@ -29,14 +29,41 @@ class Ui_holdings(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.frame = QFrame(self.centralwidget)
-        self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(250, 0))
-        self.frame.setMaximumSize(QSize(250, 16777215))
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
+        self.frmNavBar = QFrame(self.centralwidget)
+        self.frmNavBar.setObjectName(u"frmNavBar")
+        self.frmNavBar.setMinimumSize(QSize(250, 0))
+        self.frmNavBar.setMaximumSize(QSize(250, 16777215))
+        self.frmNavBar.setFrameShape(QFrame.StyledPanel)
+        self.frmNavBar.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frmNavBar)
+        self.formLayout.setObjectName(u"formLayout")
+        self.btnMyAlerts = QPushButton(self.frmNavBar)
+        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
 
-        self.horizontalLayout.addWidget(self.frame)
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
+
+        self.btnHoldings = QPushButton(self.frmNavBar)
+        self.btnHoldings.setObjectName(u"btnHoldings")
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
+
+        self.btnCustomDetails = QPushButton(self.frmNavBar)
+        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+
+        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
+
+        self.btnWatchlists = QPushButton(self.frmNavBar)
+        self.btnWatchlists.setObjectName(u"btnWatchlists")
+
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
+
+        self.btnHome = QPushButton(self.frmNavBar)
+        self.btnHome.setObjectName(u"btnHome")
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
+
+
+        self.horizontalLayout.addWidget(self.frmNavBar)
 
         self.frame_2 = QFrame(self.centralwidget)
         self.frame_2.setObjectName(u"frame_2")
@@ -105,6 +132,11 @@ class Ui_holdings(object):
 
     def retranslateUi(self, holdings):
         holdings.setWindowTitle(QCoreApplication.translate("holdings", u"MainWindow", None))
+        self.btnMyAlerts.setText(QCoreApplication.translate("holdings", u"MyAlerts", None))
+        self.btnHoldings.setText(QCoreApplication.translate("holdings", u"Holdings", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("holdings", u"CustomDetails", None))
+        self.btnWatchlists.setText(QCoreApplication.translate("holdings", u"Watchlists", None))
+        self.btnHome.setText(QCoreApplication.translate("holdings", u"Home", None))
         self.lblStkName.setText(QCoreApplication.translate("holdings", u"Holdings", None))
     # retranslateUi
 

@@ -15,26 +15,55 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFormLayout, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QMainWindow,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QVBoxLayout, QWidget)
 
 class Ui_Chart(object):
     def setupUi(self, Chart):
         if not Chart.objectName():
             Chart.setObjectName(u"Chart")
-        Chart.resize(951, 478)
+        Chart.resize(937, 529)
         self.centralwidget = QWidget(Chart)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.frmNav = QFrame(self.centralwidget)
-        self.frmNav.setObjectName(u"frmNav")
-        self.frmNav.setMaximumSize(QSize(250, 16777215))
-        self.frmNav.setFrameShape(QFrame.StyledPanel)
-        self.frmNav.setFrameShadow(QFrame.Raised)
+        self.frmNavBar = QFrame(self.centralwidget)
+        self.frmNavBar.setObjectName(u"frmNavBar")
+        self.frmNavBar.setMinimumSize(QSize(250, 0))
+        self.frmNavBar.setMaximumSize(QSize(250, 16777215))
+        self.frmNavBar.setFrameShape(QFrame.StyledPanel)
+        self.frmNavBar.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frmNavBar)
+        self.formLayout.setObjectName(u"formLayout")
+        self.btnMyAlerts = QPushButton(self.frmNavBar)
+        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
 
-        self.horizontalLayout.addWidget(self.frmNav)
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
+
+        self.btnHoldings = QPushButton(self.frmNavBar)
+        self.btnHoldings.setObjectName(u"btnHoldings")
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
+
+        self.btnCustomDetails = QPushButton(self.frmNavBar)
+        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+
+        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
+
+        self.btnWatchlists = QPushButton(self.frmNavBar)
+        self.btnWatchlists.setObjectName(u"btnWatchlists")
+
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
+
+        self.btnHome = QPushButton(self.frmNavBar)
+        self.btnHome.setObjectName(u"btnHome")
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
+
+
+        self.horizontalLayout.addWidget(self.frmNavBar)
 
         self.frame_2 = QFrame(self.centralwidget)
         self.frame_2.setObjectName(u"frame_2")
@@ -184,7 +213,7 @@ class Ui_Chart(object):
         Chart.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Chart)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 951, 25))
+        self.menubar.setGeometry(QRect(0, 0, 937, 25))
         Chart.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Chart)
         self.statusbar.setObjectName(u"statusbar")
@@ -200,6 +229,11 @@ class Ui_Chart(object):
 
     def retranslateUi(self, Chart):
         Chart.setWindowTitle(QCoreApplication.translate("Chart", u"MainWindow", None))
+        self.btnMyAlerts.setText(QCoreApplication.translate("Chart", u"MyAlerts", None))
+        self.btnHoldings.setText(QCoreApplication.translate("Chart", u"Holdings", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("Chart", u"CustomDetails", None))
+        self.btnWatchlists.setText(QCoreApplication.translate("Chart", u"Watchlists", None))
+        self.btnHome.setText(QCoreApplication.translate("Chart", u"Home", None))
         self.lblTimeFrame.setText(QCoreApplication.translate("Chart", u"Time Frame", None))
         self.cmbTimeFrame.setItemText(0, QCoreApplication.translate("Chart", u"1 minute", None))
         self.cmbTimeFrame.setItemText(1, QCoreApplication.translate("Chart", u"2 minute", None))

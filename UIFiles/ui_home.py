@@ -24,7 +24,7 @@ class Ui_Home(object):
     def setupUi(self, Home):
         if not Home.objectName():
             Home.setObjectName(u"Home")
-        Home.resize(1131, 597)
+        Home.resize(1156, 604)
         self.centralwidget = QWidget(Home)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -39,22 +39,27 @@ class Ui_Home(object):
         self.btnMyAlerts = QPushButton(self.frmNavBar)
         self.btnMyAlerts.setObjectName(u"btnMyAlerts")
 
-        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnMyAlerts)
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
 
         self.btnHoldings = QPushButton(self.frmNavBar)
         self.btnHoldings.setObjectName(u"btnHoldings")
 
-        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnHoldings)
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
 
         self.btnCustomDetails = QPushButton(self.frmNavBar)
         self.btnCustomDetails.setObjectName(u"btnCustomDetails")
 
-        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnCustomDetails)
+        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
 
         self.btnWatchlists = QPushButton(self.frmNavBar)
         self.btnWatchlists.setObjectName(u"btnWatchlists")
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnWatchlists)
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
+
+        self.btnHome = QPushButton(self.frmNavBar)
+        self.btnHome.setObjectName(u"btnHome")
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
 
 
         self.horizontalLayout.addWidget(self.frmNavBar)
@@ -90,6 +95,7 @@ class Ui_Home(object):
 
         self.frame_3 = QFrame(self.frame_2)
         self.frame_3.setObjectName(u"frame_3")
+        self.frame_3.setMaximumSize(QSize(600, 16777215))
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame_3)
@@ -141,6 +147,7 @@ class Ui_Home(object):
 
         self.frame_5 = QFrame(self.frame_2)
         self.frame_5.setObjectName(u"frame_5")
+        self.frame_5.setMaximumSize(QSize(600, 16777215))
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.gridLayout_2 = QGridLayout(self.frame_5)
@@ -192,6 +199,7 @@ class Ui_Home(object):
 
         self.frame_4 = QFrame(self.frame_2)
         self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setMaximumSize(QSize(600, 16777215))
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
         self.gridLayout_3 = QGridLayout(self.frame_4)
@@ -244,7 +252,7 @@ class Ui_Home(object):
         Home.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Home)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1131, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1156, 25))
         Home.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Home)
         self.statusbar.setObjectName(u"statusbar")
@@ -261,6 +269,7 @@ class Ui_Home(object):
         self.btnHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
         self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
         self.btnWatchlists.setText(QCoreApplication.translate("Home", u"Watchlists", None))
+        self.btnHome.setText(QCoreApplication.translate("Home", u"Home", None))
         self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
         self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
         self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))

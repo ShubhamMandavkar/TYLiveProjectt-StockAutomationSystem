@@ -29,14 +29,41 @@ class Ui_customDetails(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.frame = QFrame(self.centralwidget)
-        self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(250, 0))
-        self.frame.setMaximumSize(QSize(250, 16777215))
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
+        self.frmNavBar = QFrame(self.centralwidget)
+        self.frmNavBar.setObjectName(u"frmNavBar")
+        self.frmNavBar.setMinimumSize(QSize(250, 0))
+        self.frmNavBar.setMaximumSize(QSize(250, 16777215))
+        self.frmNavBar.setFrameShape(QFrame.StyledPanel)
+        self.frmNavBar.setFrameShadow(QFrame.Raised)
+        self.formLayout_2 = QFormLayout(self.frmNavBar)
+        self.formLayout_2.setObjectName(u"formLayout_2")
+        self.btnMyAlerts = QPushButton(self.frmNavBar)
+        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
 
-        self.horizontalLayout.addWidget(self.frame)
+        self.formLayout_2.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
+
+        self.btnHoldings = QPushButton(self.frmNavBar)
+        self.btnHoldings.setObjectName(u"btnHoldings")
+
+        self.formLayout_2.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
+
+        self.btnCustomDetails = QPushButton(self.frmNavBar)
+        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+
+        self.formLayout_2.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
+
+        self.btnWatchlists = QPushButton(self.frmNavBar)
+        self.btnWatchlists.setObjectName(u"btnWatchlists")
+
+        self.formLayout_2.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
+
+        self.btnHome = QPushButton(self.frmNavBar)
+        self.btnHome.setObjectName(u"btnHome")
+
+        self.formLayout_2.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
+
+
+        self.horizontalLayout.addWidget(self.frmNavBar)
 
         self.frame_2 = QFrame(self.centralwidget)
         self.frame_2.setObjectName(u"frame_2")
@@ -186,6 +213,11 @@ class Ui_customDetails(object):
 
     def retranslateUi(self, customDetails):
         customDetails.setWindowTitle(QCoreApplication.translate("customDetails", u"MainWindow", None))
+        self.btnMyAlerts.setText(QCoreApplication.translate("customDetails", u"MyAlerts", None))
+        self.btnHoldings.setText(QCoreApplication.translate("customDetails", u"Holdings", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("customDetails", u"CustomDetails", None))
+        self.btnWatchlists.setText(QCoreApplication.translate("customDetails", u"Watchlists", None))
+        self.btnHome.setText(QCoreApplication.translate("customDetails", u"Home", None))
         self.lblHeading.setText(QCoreApplication.translate("customDetails", u"Custom Details", None))
         self.lblApiKey.setText(QCoreApplication.translate("customDetails", u"API Key : ", None))
         self.lblApiSecretKey.setText(QCoreApplication.translate("customDetails", u"API Secret Key : ", None))
