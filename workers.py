@@ -253,6 +253,41 @@ class HoldingsWorker(QObject):
                 self.sigChngHoldData.emit(dfHoldings)
             else:
                 self.sigNoHoldData.emit()
-
+ 
             time.sleep(5)
             print("Holding function ")
+
+class WatchlistWorker(QObject):
+    isRunning = False
+    isWLChanged = False
+    watchlistData = pd.DataFrame({})
+
+    sigChngWLData = Signal(list)
+
+    def getWatchlistTableModel(self):
+        while(self.isRunning):
+            data = []
+            for i in self.watchlistData.index:
+                stk = yf.Ticker(self.watchlistData['Symbol'][i]+".NS")
+                hist = stk.history(period = '1d', interval = '1d')
+
+                #item method is used to retrieve data only else it return data with index
+                open =  round(hist['Open'].item(), 2)
+                high =  round(hist['High'].item(), 2)
+                low =  round(hist['Low'].item(), 2)
+                close =  round(hist['Close'].item(), 2)
+                data.append([self.watchlistData['Symbol'][i], self.watchlistData['Name'][i], open, high, low, close])
+
+                if(self.isRunning == False or self.isWLChanged): # if watchlist is changed or watchlist page is closed stop execution
+                    break
+            
+            if self.isWLChanged or not self.isRunning:
+                    self.isWLChanged = False
+                    continue
+
+            self.sigChngWLData.emit(data)
+            print('in watchlist worker')
+            time.sleep(5)
+    
+    def setWatchlistChanged(self):
+        self.isWLChanged = True

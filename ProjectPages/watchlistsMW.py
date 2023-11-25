@@ -1,14 +1,16 @@
-from PySide6.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt, QThread
 from PySide6.QtWidgets import QMainWindow, QHeaderView
 from ProjectPages.watchlistDetailsDlg import WatchlistDetailsDlg
 from ProjectPages.searchDlg import SearchDlg
 from UIFiles.ui_watchlists import Ui_watchlists
+from workers import WatchlistWorker
 
 import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
 import yfinance as yf
 
+# TODOO: add synchronization to self.watchlistData because when we change the watchlist watchlist data changes
 
 class TableModel(QAbstractTableModel):
     def __init__(self, data):
@@ -54,6 +56,15 @@ class Watchlists(QMainWindow):
 
         self.watchlistData = pd.DataFrame({})
 
+        self.watchlistWorker = WatchlistWorker()
+        self.watchlistThread = QThread()
+        self.watchlistWorker.moveToThread(self.watchlistThread)
+
+        self.watchlistWorker.isRunning = True
+        self.watchlistWorker.watchlistData = self.watchlistData
+        self.watchlistThread.started.connect(self.watchlistWorker.getWatchlistTableModel)
+        self.watchlistWorker.sigChngWLData.connect(self.changeWLData)
+
         self.addConnectors()
         self.loadWatchlists()
 
@@ -66,14 +77,16 @@ class Watchlists(QMainWindow):
             self.ui.frmWLContent.hide()
         
         self.manageVisibility()
-
+        self.watchlistThread.start() #a lot to work on this
     
     def addConnectors(self):
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
 
+        self.ui.cmbWatchlists.currentTextChanged.connect(self.watchlistWorker.setWatchlistChanged)
         self.ui.cmbWatchlists.currentTextChanged.connect(lambda: self.showWatchlistData(self.ui.cmbWatchlists.currentText()))
+        
 
     def loadWatchlists(self):
         count = 0
@@ -95,7 +108,7 @@ class Watchlists(QMainWindow):
                 print("error:",err)
         else:
             con.close() 
-
+        
     def showWatchlistData(self, watchlist): 
         stkSymbols = []
         stkNames = []
@@ -139,21 +152,28 @@ class Watchlists(QMainWindow):
             data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
 
             self.watchlistData = data
+            # print(self.watchlistData.head())
             model = TableModel(self.watchlistData)
             self.ui.tbvWatchlist.setModel(model)
 
         else:
             self.watchlistData = pd.DataFrame({})
+        
+        self.watchlistWorker.watchlistData = self.watchlistData
         self.manageVisibility()
         
     def getWatchlistDetails(self):
+
+        #get watchlist details
         self.watchlistDetails = WatchlistDetailsDlg()
-        self.watchlistDetails.ui.btnCreate.clicked.connect(self.createWatchlist)
+        self.watchlistDetails.ui.btnCreate.clicked.connect(self.createWatchlistInDB)
+        self.watchlistDetails.ui.btnCreate.clicked.connect(lambda: self.watchlistDetails.close()) #close the watchlistDetails dialog
+
         self.watchlistDetails.show()
     
-    def createWatchlist(self):
+    def createWatchlistInDB(self):
         name = self.watchlistDetails.ui.leName.text()
-        # TODOO:you can create single table in Db and just add the extra column of watchlistName
+        # TODOO : you can create single table in Db and just add the extra column of watchlistName
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
             cursor = con.cursor()
@@ -175,9 +195,8 @@ class Watchlists(QMainWindow):
                 print("error:",err)
         else:
             con.close()
-
-        self.watchlistDetails.close() #close the watchlistDetails dialog
-
+        
+        # self.watchlistDetails.close() #close the watchlistDetails dialog
 
     def addToWatchlist(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
@@ -203,6 +222,9 @@ class Watchlists(QMainWindow):
             low =  round(hist['Low'].item(), 2)
             close =  round(hist['Close'].item(), 2)
             self.watchlistData = pd.concat([ self.watchlistData, pd.DataFrame([[stkSym,stkName,open,high,low, close]], columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close'])], ignore_index= True)
+
+            #change data in worker to get live updates
+            self.watchlistWorker.watchlistData = self.watchlistData
             
             model = TableModel(self.watchlistData)
             self.ui.tbvWatchlist.setModel(model)
@@ -249,6 +271,7 @@ class Watchlists(QMainWindow):
 
         index = self.watchlistData.index[self.watchlistData['Symbol'] == stkSym]
         self.watchlistData.drop(index, axis= 0, inplace= True)
+        self.watchlistWorker.watchlistData.drop(index, axis= 0, inplace= True) #delete from worker's watchlist data
 
         if self.watchlistData.size != 0:
             model = TableModel(self.watchlistData)
@@ -263,3 +286,15 @@ class Watchlists(QMainWindow):
         else:
             self.ui.tbvWatchlist.hide()
             self.ui.lblMsg.setVisible(True)
+    
+    def changeWLData(self, data):
+        model = TableModel(pd.DataFrame(data, columns=['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']))
+        self.ui.tbvWatchlist.setModel(model)
+    
+    def closeEvent(self, event):
+        print('closing watchlist window')
+        self.watchlistWorker.isRunning = False
+        self.watchlistThread.quit()
+        res = self.watchlistThread.wait()
+        event.accept()
+        print('called closeWindow', res)
