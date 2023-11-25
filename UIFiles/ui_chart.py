@@ -24,7 +24,7 @@ class Ui_Chart(object):
     def setupUi(self, Chart):
         if not Chart.objectName():
             Chart.setObjectName(u"Chart")
-        Chart.resize(937, 529)
+        Chart.resize(1159, 492)
         self.centralwidget = QWidget(Chart)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -113,6 +113,9 @@ class Ui_Chart(object):
         self.cmbIndicatorsAdded = QComboBox(self.frame_3)
         self.cmbIndicatorsAdded.setObjectName(u"cmbIndicatorsAdded")
         self.cmbIndicatorsAdded.setGeometry(QRect(660, 20, 191, 28))
+        self.btnSearch = QPushButton(self.frame_3)
+        self.btnSearch.setObjectName(u"btnSearch")
+        self.btnSearch.setGeometry(QRect(710, 60, 141, 29))
 
         self.verticalLayout.addWidget(self.frame_3)
 
@@ -213,7 +216,7 @@ class Ui_Chart(object):
         Chart.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Chart)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 937, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1159, 25))
         Chart.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Chart)
         self.statusbar.setObjectName(u"statusbar")
@@ -255,6 +258,7 @@ class Ui_Chart(object):
         self.cmbIndicators.setItemText(3, QCoreApplication.translate("Chart", u"RSI", None))
 
         self.lblIndicatorsAdded.setText(QCoreApplication.translate("Chart", u"Indicators Added", None))
+        self.btnSearch.setText(QCoreApplication.translate("Chart", u"Search", None))
         self.lblClose.setText(QCoreApplication.translate("Chart", u"C", None))
         self.lblOpenVal.setText(QCoreApplication.translate("Chart", u"0.0", None))
         self.lblLow.setText(QCoreApplication.translate("Chart", u"L", None))

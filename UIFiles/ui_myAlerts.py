@@ -70,14 +70,17 @@ class Ui_myAlerts(object):
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.verticalLayout = QVBoxLayout(self.frame_2)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.frame_3 = QFrame(self.frame_2)
-        self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setMinimumSize(QSize(0, 100))
-        self.frame_3.setMaximumSize(QSize(16777215, 100))
-        self.frame_3.setFrameShape(QFrame.StyledPanel)
-        self.frame_3.setFrameShadow(QFrame.Raised)
+        self.frame = QFrame(self.frame_2)
+        self.frame.setObjectName(u"frame")
+        self.frame.setMinimumSize(QSize(0, 100))
+        self.frame.setMaximumSize(QSize(16777215, 100))
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.btnSearch = QPushButton(self.frame)
+        self.btnSearch.setObjectName(u"btnSearch")
+        self.btnSearch.setGeometry(QRect(490, 40, 141, 29))
 
-        self.verticalLayout.addWidget(self.frame_3)
+        self.verticalLayout.addWidget(self.frame)
 
         self.frame_4 = QFrame(self.frame_2)
         self.frame_4.setObjectName(u"frame_4")
@@ -129,6 +132,7 @@ class Ui_myAlerts(object):
         self.btnCustomDetails.setText(QCoreApplication.translate("myAlerts", u"CustomDetails", None))
         self.btnWatchlists.setText(QCoreApplication.translate("myAlerts", u"Watchlists", None))
         self.btnHome.setText(QCoreApplication.translate("myAlerts", u"Home", None))
+        self.btnSearch.setText(QCoreApplication.translate("myAlerts", u"Search", None))
         self.btnDelete.setText(QCoreApplication.translate("myAlerts", u"Delete", None))
     # retranslateUi
 

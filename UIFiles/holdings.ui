@@ -99,7 +99,7 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="QFrame" name="frame_3">
+        <widget class="QFrame" name="frame">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -118,6 +118,19 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
+         <widget class="QPushButton" name="btnSearch">
+          <property name="geometry">
+           <rect>
+            <x>490</x>
+            <y>40</y>
+            <width>141</width>
+            <height>29</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Search</string>
+          </property>
+         </widget>
         </widget>
        </item>
        <item>

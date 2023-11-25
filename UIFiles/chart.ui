@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>529</height>
+    <width>1159</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -270,6 +270,19 @@
            </rect>
           </property>
          </widget>
+         <widget class="QPushButton" name="btnSearch">
+          <property name="geometry">
+           <rect>
+            <x>710</x>
+            <y>60</y>
+            <width>141</width>
+            <height>29</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Search</string>
+          </property>
+         </widget>
         </widget>
        </item>
        <item>
@@ -454,7 +467,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>937</width>
+     <width>1159</width>
      <height>25</height>
     </rect>
    </property>
