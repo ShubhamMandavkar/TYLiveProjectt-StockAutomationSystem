@@ -5,7 +5,6 @@ import pandas as pd
 import mysql.connector
 from mysql.connector import errorcode
 from UIFiles.ui_searchDialog import Ui_dlgSearch
-from ProjectPages.stockDetailsMW import StockDetails
 
 
 class TableModel(QAbstractTableModel):
@@ -56,7 +55,6 @@ class SearchDlg(QDialog):
     
     def addConnectors(self):
         self.ui.leSearch.textChanged.connect(self.showSuggestions)
-        # self.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
 
     def showSuggestions(self):
         stkName = self.ui.leSearch.text()
@@ -86,11 +84,3 @@ class SearchDlg(QDialog):
         finally:
             cursor.close()
             con.close()
-    
-    def showStkDetails(self):
-        modelIndexls = self.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
-        stkSym = modelIndexls[0].data(0)
-        stkName = modelIndexls[1].data(0)
-
-        self.stkDetails = StockDetails(stkSym, stkName)
-        self.stkDetails.show()

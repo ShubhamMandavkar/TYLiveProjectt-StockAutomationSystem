@@ -15,6 +15,7 @@ from ProjectPages.myAlertsMW import MyAlerts
 from ProjectPages.holdingsMW import Holdings
 from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
+from ProjectPages.stockDetailsMW import StockDetails
 from workers import AlertWorker, HoldingsWorker
 
 import mysql.connector
@@ -61,7 +62,16 @@ class MainWindow(QMainWindow):
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
-    
+        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
+
+    def showStkDetails(self):
+        modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
+        stkSym = modelIndexls[0].data(0)
+        stkName = modelIndexls[1].data(0)
+
+        self.stkDetails = StockDetails(stkSym, stkName)
+        self.stkDetails.show()
+
     def showMyAlertsWindow(self):
         self.myAlerts = MyAlerts()
         self.myAlerts.show()
