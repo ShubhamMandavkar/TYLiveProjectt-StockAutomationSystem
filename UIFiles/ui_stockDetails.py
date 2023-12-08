@@ -29,42 +29,6 @@ class Ui_stockDetails(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.frmNavBar = QFrame(self.centralwidget)
-        self.frmNavBar.setObjectName(u"frmNavBar")
-        self.frmNavBar.setMinimumSize(QSize(250, 0))
-        self.frmNavBar.setMaximumSize(QSize(250, 16777215))
-        self.frmNavBar.setFrameShape(QFrame.StyledPanel)
-        self.frmNavBar.setFrameShadow(QFrame.Raised)
-        self.formLayout = QFormLayout(self.frmNavBar)
-        self.formLayout.setObjectName(u"formLayout")
-        self.btnMyAlerts = QPushButton(self.frmNavBar)
-        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
-
-        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
-
-        self.btnHoldings = QPushButton(self.frmNavBar)
-        self.btnHoldings.setObjectName(u"btnHoldings")
-
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
-
-        self.btnCustomDetails = QPushButton(self.frmNavBar)
-        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
-
-        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
-
-        self.btnWatchlists = QPushButton(self.frmNavBar)
-        self.btnWatchlists.setObjectName(u"btnWatchlists")
-
-        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
-
-        self.btnHome = QPushButton(self.frmNavBar)
-        self.btnHome.setObjectName(u"btnHome")
-
-        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
-
-
-        self.horizontalLayout.addWidget(self.frmNavBar)
-
         self.frame_2 = QFrame(self.centralwidget)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
@@ -277,11 +241,6 @@ class Ui_stockDetails(object):
 
     def retranslateUi(self, stockDetails):
         stockDetails.setWindowTitle(QCoreApplication.translate("stockDetails", u"MainWindow", None))
-        self.btnMyAlerts.setText(QCoreApplication.translate("stockDetails", u"MyAlerts", None))
-        self.btnHoldings.setText(QCoreApplication.translate("stockDetails", u"Holdings", None))
-        self.btnCustomDetails.setText(QCoreApplication.translate("stockDetails", u"CustomDetails", None))
-        self.btnWatchlists.setText(QCoreApplication.translate("stockDetails", u"Watchlists", None))
-        self.btnHome.setText(QCoreApplication.translate("stockDetails", u"Home", None))
         self.btnSearch.setText(QCoreApplication.translate("stockDetails", u"Search", None))
         self.lblStkName.setText(QCoreApplication.translate("stockDetails", u"TextLabel", None))
         self.lblSymbol.setText(QCoreApplication.translate("stockDetails", u"Symbol : ", None))

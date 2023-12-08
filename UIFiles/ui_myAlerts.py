@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFormLayout, QFrame, QHBoxLayout,
-    QListView, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QListView,
+    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
+    QStatusBar, QVBoxLayout, QWidget)
 
 class Ui_myAlerts(object):
     def setupUi(self, myAlerts):
@@ -28,61 +28,7 @@ class Ui_myAlerts(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.frmNavBar = QFrame(self.centralwidget)
-        self.frmNavBar.setObjectName(u"frmNavBar")
-        self.frmNavBar.setMinimumSize(QSize(250, 0))
-        self.frmNavBar.setMaximumSize(QSize(250, 16777215))
-        self.frmNavBar.setFrameShape(QFrame.StyledPanel)
-        self.frmNavBar.setFrameShadow(QFrame.Raised)
-        self.formLayout = QFormLayout(self.frmNavBar)
-        self.formLayout.setObjectName(u"formLayout")
-        self.btnMyAlerts = QPushButton(self.frmNavBar)
-        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
-
-        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
-
-        self.btnHoldings = QPushButton(self.frmNavBar)
-        self.btnHoldings.setObjectName(u"btnHoldings")
-
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
-
-        self.btnCustomDetails = QPushButton(self.frmNavBar)
-        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
-
-        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
-
-        self.btnWatchlists = QPushButton(self.frmNavBar)
-        self.btnWatchlists.setObjectName(u"btnWatchlists")
-
-        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
-
-        self.btnHome = QPushButton(self.frmNavBar)
-        self.btnHome.setObjectName(u"btnHome")
-
-        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
-
-
-        self.horizontalLayout.addWidget(self.frmNavBar)
-
-        self.frame_2 = QFrame(self.centralwidget)
-        self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Raised)
-        self.verticalLayout = QVBoxLayout(self.frame_2)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.frame = QFrame(self.frame_2)
-        self.frame.setObjectName(u"frame")
-        self.frame.setMinimumSize(QSize(0, 100))
-        self.frame.setMaximumSize(QSize(16777215, 100))
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
-        self.btnSearch = QPushButton(self.frame)
-        self.btnSearch.setObjectName(u"btnSearch")
-        self.btnSearch.setGeometry(QRect(490, 40, 141, 29))
-
-        self.verticalLayout.addWidget(self.frame)
-
-        self.frame_4 = QFrame(self.frame_2)
+        self.frame_4 = QFrame(self.centralwidget)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
@@ -106,10 +52,7 @@ class Ui_myAlerts(object):
         self.verticalLayout_2.addWidget(self.btnDelete)
 
 
-        self.verticalLayout.addWidget(self.frame_4)
-
-
-        self.horizontalLayout.addWidget(self.frame_2)
+        self.horizontalLayout.addWidget(self.frame_4)
 
         myAlerts.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(myAlerts)
@@ -127,12 +70,6 @@ class Ui_myAlerts(object):
 
     def retranslateUi(self, myAlerts):
         myAlerts.setWindowTitle(QCoreApplication.translate("myAlerts", u"MainWindow", None))
-        self.btnMyAlerts.setText(QCoreApplication.translate("myAlerts", u"MyAlerts", None))
-        self.btnHoldings.setText(QCoreApplication.translate("myAlerts", u"Holdings", None))
-        self.btnCustomDetails.setText(QCoreApplication.translate("myAlerts", u"CustomDetails", None))
-        self.btnWatchlists.setText(QCoreApplication.translate("myAlerts", u"Watchlists", None))
-        self.btnHome.setText(QCoreApplication.translate("myAlerts", u"Home", None))
-        self.btnSearch.setText(QCoreApplication.translate("myAlerts", u"Search", None))
         self.btnDelete.setText(QCoreApplication.translate("myAlerts", u"Delete", None))
     # retranslateUi
 
