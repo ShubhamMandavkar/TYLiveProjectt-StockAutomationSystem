@@ -21,12 +21,45 @@ from workers import AlertWorker, HoldingsWorker
 import mysql.connector
 from mysql.connector import errorcode
 
+class Navigation:
+    def showSearchDialog(self):
+        self.dlgSearch = SearchDlg()
+        self.dlgSearch.show()
+        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
+
+    def showStkDetails(self):
+        modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
+        stkSym = modelIndexls[0].data(0)
+        stkName = modelIndexls[1].data(0)
+
+        self.stkDetails = StockDetails(stkSym, stkName)
+        self.stkDetails.show()
+         
+    def showMyAlertsWindow(self):
+        self.myAlerts = MyAlerts()
+        self.myAlerts.show()
+
+    def showHoldingsWindow(self):
+        self.holdings = Holdings()
+        self.holdings.show()
+    
+    def showWatchlists(self):
+        self.watchlists = Watchlists()
+        self.watchlists.show()
+      
+    def showCustomDetails(self):
+        self.customDetails = CustomDetails()
+        self.customDetails.show()
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_Home()
         self.ui.setupUi(self)
- 
+
+        #navigation class
+        self.nav = Navigation()
+
         self.addConnectors()
         self.getUserDetails()
     
@@ -53,11 +86,18 @@ class MainWindow(QMainWindow):
             con.close()
 
     def addConnectors(self):
-        self.ui.btnSearch.clicked.connect(self.showSearchDialog)
-        self.ui.btnMyAlerts.clicked.connect(self.showMyAlertsWindow)
-        self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
-        self.ui.btnWatchlists.clicked.connect(self.showWatchlists)
-        self.ui.btnCustomDetails.clicked.connect(self.showCustomDetails)
+        #navigation code
+        self.ui.btnSearch.clicked.connect(self.nav.showSearchDialog)
+        self.ui.btnMyAlerts.clicked.connect(self.nav.showMyAlertsWindow)
+        self.ui.btnHoldings.clicked.connect(self.nav.showHoldingsWindow)
+        self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlists)
+        self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetails)
+
+        # self.ui.btnSearch.clicked.connect(self.showSearchDialog)
+        # self.ui.btnMyAlerts.clicked.connect(self.showMyAlertsWindow)
+        # self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
+        # self.ui.btnWatchlists.clicked.connect(self.showWatchlists)
+        # self.ui.btnCustomDetails.clicked.connect(self.showCustomDetails)
 
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
