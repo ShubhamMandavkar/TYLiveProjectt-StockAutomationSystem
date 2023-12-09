@@ -295,6 +295,6 @@ class Watchlists(QMainWindow):
         print('closing watchlist window')
         self.watchlistWorker.isRunning = False
         self.watchlistThread.quit()
-        res = self.watchlistThread.wait()
+        self.watchlistThread.wait()
         event.accept()
-        print('called closeWindow', res)
+        print('called closeWindow')
