@@ -44,8 +44,9 @@ class Navigation:
         self.holdings.show()
     
     def showWatchlists(self):
-        self.watchlists = Watchlists()
-        self.watchlists.show()
+        # self.watchlists = Watchlists()
+        # self.watchlists.show()
+        pass
       
     def showCustomDetails(self):
         self.customDetails = CustomDetails()

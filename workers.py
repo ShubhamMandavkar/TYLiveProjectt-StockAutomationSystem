@@ -97,11 +97,12 @@ class AlertWorker(QObject):
                                 zroya.show(self.noti)
                                 
                     case 'Less Than':
-                        if currPrice < alert['alertVal']:
-                            print(alert['stkName'], 'price is less than ', alert['alertVal'])
-                            self.noti.setFirstLine(alert['stkName']) 
-                            self.noti.setSecondLine(str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal'])))
-                            zroya.show(self.noti)
+                        if alert['alertType'] == 'Price':
+                            if currPrice < alert['alertVal']:
+                                print(alert['stkName'], 'price is less than ', alert['alertVal'])
+                                self.noti.setFirstLine(alert['stkName']) 
+                                self.noti.setSecondLine(str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal'])))
+                                zroya.show(self.noti)
                         
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -279,15 +280,19 @@ class WatchlistWorker(QObject):
                 data.append([self.watchlistData['Symbol'][i], self.watchlistData['Name'][i], open, high, low, close])
 
                 if(self.isRunning == False or self.isWLChanged): # if watchlist is changed or watchlist page is closed stop execution
+                    print('watchlists closed or changed')
                     break
+                
+                print(i)
             
             if self.isWLChanged or not self.isRunning:
-                    self.isWLChanged = False
-                    continue
+                self.isWLChanged = False
+                break
 
             self.sigChngWLData.emit(data)
             print('in watchlist worker')
             time.sleep(5)
-    
+        print('watchlist execution stopped')
+
     def setWatchlistChanged(self):
         self.isWLChanged = True

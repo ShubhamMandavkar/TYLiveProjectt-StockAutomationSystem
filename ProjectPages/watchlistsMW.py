@@ -9,6 +9,7 @@ import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
 import yfinance as yf
+import time
 
 # TODOO: add synchronization to self.watchlistData because when we change the watchlist watchlist data changes
 
@@ -63,6 +64,7 @@ class Watchlists(QMainWindow):
         self.watchlistWorker.isRunning = True
         self.watchlistWorker.watchlistData = self.watchlistData
         self.watchlistThread.started.connect(self.watchlistWorker.getWatchlistTableModel)
+        self.watchlistThread.finished.connect(self.closeWindow)
         self.watchlistWorker.sigChngWLData.connect(self.changeWLData)
 
         self.addConnectors()
@@ -291,10 +293,14 @@ class Watchlists(QMainWindow):
         model = TableModel(pd.DataFrame(data, columns=['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']))
         self.ui.tbvWatchlist.setModel(model)
     
+    #this function causing crash  to the system don't know why
     def closeEvent(self, event):
         print('closing watchlist window')
         self.watchlistWorker.isRunning = False
+    
+    def closeWindow(self):
+        print('', self.watchlistThread.isFinished())
         self.watchlistThread.quit()
-        self.watchlistThread.wait()
-        event.accept()
-        print('called closeWindow')
+        self.close()
+        
+        
