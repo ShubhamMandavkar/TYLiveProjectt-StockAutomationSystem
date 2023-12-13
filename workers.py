@@ -1,4 +1,5 @@
 
+from logging import exception
 from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
@@ -13,7 +14,7 @@ import numpy as np
 import yfinance as yf
 import pandas as pd
 from algomojo.pyapi import *
-
+import logging
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
@@ -218,6 +219,7 @@ class HoldingsWorker(QObject):
             # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
             HoldingsWorker.holdings = getHoldings2() #testing purpose only
 
+            print('HoldingsfetchingThread called')
             time.sleep(5)
 
     def myAction(nId, actionId):
@@ -243,7 +245,7 @@ class HoldingsWorker(QObject):
                         zroya.show(self.noti)
 
             time.sleep(5)
-            print("Holding function ")                            
+            print("process Holdings called")                            
 
     def getHoldingsTableModel(self):
         while(self.isHoldingsPage):
@@ -266,33 +268,51 @@ class WatchlistWorker(QObject):
     sigChngWLData = Signal(list)
 
     def getWatchlistTableModel(self):
+        # Add this at the beginning of your module
+        logging.basicConfig(level=logging.DEBUG)
         while(self.isRunning):
             data = []
             for i in self.watchlistData.index:
-                stk = yf.Ticker(self.watchlistData['Symbol'][i]+".NS")
-                hist = stk.history(period = '1d', interval = '1d')
-
-                #item method is used to retrieve data only else it return data with index
-                open =  round(hist['Open'].item(), 2)
-                high =  round(hist['High'].item(), 2)
-                low =  round(hist['Low'].item(), 2)
-                close =  round(hist['Close'].item(), 2)
-                data.append([self.watchlistData['Symbol'][i], self.watchlistData['Name'][i], open, high, low, close])
-
                 if(self.isRunning == False or self.isWLChanged): # if watchlist is changed or watchlist page is closed stop execution
-                    print('watchlists closed or changed')
+                    logging.info('Watchlist closed or changed')
+                    # print('watchlists closed or changed')
                     break
-                
+
                 print(i)
-            
-            if self.isWLChanged or not self.isRunning:
+                logging.debug(f"Processing {i}")
+                stkSymbol = self.watchlistData['Symbol'][i]
+                stkName = self.watchlistData['Name'][i]
+                logging.debug(f"{stkSymbol} in getWatchlistTableModel")
+                # print(stkSymbol , 'in getWatchlistTableModel')
+                try:
+                    stk = yf.Ticker(stkSymbol+".NS")
+
+                    hist = stk.history(period = '1d', interval = '1d') #this line is causing crash
+
+                    logging.debug("Successfully fetched historical data")
+                    # Process the historical data as needed
+                except Exception as e:
+                    logging.error(f"An error occurred fetching history for {stkSymbol}: {e}")
+
+
+                # # item method is used to retrieve data only else it return data with index
+                # open =  round(hist['Open'].item(), 2)
+                # high =  round(hist['High'].item(), 2)
+                # low =  round(hist['Low'].item(), 2)
+                # close =  round(hist['Close'].item(), 2)
+                # data.append([stkSymbol, stkName, open, high, low, close])
+
+            if self.isWLChanged or self.isRunning == False:
                 self.isWLChanged = False
                 break
-
-            self.sigChngWLData.emit(data)
-            print('in watchlist worker')
+            
+            # self.sigChngWLData.emit(data)
             time.sleep(5)
-        print('watchlist execution stopped')
+            # print('in watchlist worker')
+            logging.debug('In watchlist worker')
+        # print('watchlist execution stopped')
+        logging.info('Watchlist execution stopped')
+            
 
     def setWatchlistChanged(self):
         self.isWLChanged = True

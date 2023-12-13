@@ -64,8 +64,8 @@ class Watchlists(QMainWindow):
         self.watchlistWorker.isRunning = True
         self.watchlistWorker.watchlistData = self.watchlistData
         self.watchlistThread.started.connect(self.watchlistWorker.getWatchlistTableModel)
-        self.watchlistThread.finished.connect(self.closeWindow)
         self.watchlistWorker.sigChngWLData.connect(self.changeWLData)
+        # self.watchlistThread.finished.connect(self.closeWindow)
 
         self.addConnectors()
         self.loadWatchlists()
@@ -297,6 +297,10 @@ class Watchlists(QMainWindow):
     def closeEvent(self, event):
         print('closing watchlist window')
         self.watchlistWorker.isRunning = False
+        self.watchlistThread.quit()
+        res = self.watchlistThread.wait()
+        print('called closeWindow', res)
+        event.accept()
     
     def closeWindow(self):
         print('', self.watchlistThread.isFinished())

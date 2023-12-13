@@ -44,8 +44,8 @@ class Navigation:
         self.holdings.show()
     
     def showWatchlists(self):
-        # self.watchlists = Watchlists()
-        # self.watchlists.show()
+        self.watchlists = Watchlists()
+        self.watchlists.show()
         pass
       
     def showCustomDetails(self):
@@ -119,8 +119,9 @@ class MainWindow(QMainWindow):
         self.holdings.show()
     
     def showWatchlists(self):
-        self.watchlists = Watchlists()
-        self.watchlists.show()
+        # self.watchlists = Watchlists()
+        # self.watchlists.show()
+        pass
       
     def showCustomDetails(self):
         self.customDetails = CustomDetails()
@@ -139,14 +140,24 @@ if __name__ == "__main__":
     alertThread.started.connect(AlertWorker.getAlertList)
     alertThread.started.connect(alertWorker.processAlerts)
 
-    holdingsWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)
-    holdingsThread = QThread()
-    holdingsWorker.moveToThread(holdingsThread)
+    #worker to fetch holdings details
+    holdingsFetchingWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)
 
-    holdingsThread.started.connect(holdingsWorker.fetchHoldings)
-    holdingsThread.started.connect(holdingsWorker.processHoldings)
+    #Thread to fetch holdings continuously
+    holdingsFetchingThread = QThread()
+    holdingsFetchingWorker.moveToThread(holdingsFetchingThread)
+
+    holdingsFetchingThread.started.connect(holdingsFetchingWorker.fetchHoldings)
+
+    #worker to process holdings
+    holdingsProcessWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)
+    #Thread to process holdings
+    holdingsProcessThread = QThread()
+    holdingsProcessWorker.moveToThread(holdingsProcessThread)
+    holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
     alertThread.start()
-    holdingsThread.start()
+    holdingsFetchingThread.start()
+    holdingsProcessThread.start()
     sys.exit(app.exec())
