@@ -25,6 +25,19 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>My Alerts</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QListView" name="lsvMyAlerts">
          <property name="font">
           <font>
@@ -32,11 +45,17 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
          <property name="isWrapping" stdset="0">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="wordWrap">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>

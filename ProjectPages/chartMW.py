@@ -78,6 +78,8 @@ class StockChart(FigCavas):
         # Add a vertical line to show the current candle
         self.vline = self.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1) 
         self.vline.set_visible(False)
+        print(self.ax)
+        print(self.vline)
         
         print('chart shown')
 
@@ -103,6 +105,10 @@ class StockChart(FigCavas):
         mpf.plot(self.df, type='candle', ax=self.ax)
         plt.draw()
         # plt.pause(0.1) #if called then matplotlib displays it's own figure window
+
+        # Add a vertical line to show the current candle
+        # because the axis has been cleared the line must be redrawn
+        self.vline = self.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1) 
 
         print('chart shown')
     
@@ -330,11 +336,13 @@ class Chart(QMainWindow):
                 cursor.execute(query)
                 con.commit()
 
-                self.ui.cmbIndicatorsAdded.removeItem(ind)
                 self.dlgDeleteIndicator.close()
 
                 #delete from chart
                 self.stkChart.ax.cla()   #clear the axex
+                self.ui.cmbIndicatorsAdded.clear()
+                self.stkChart.vline = self.stkChart.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1)
+
                 mpf.plot(self.stkChart.df,ax=self.stkChart.ax,type='candle') #plot candlestick
                 self.renderChartState() 
                 self.stkChart.showSignals()

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'myAlerts.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QListView,
-    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
-    QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QFrame, QHBoxLayout,
+    QLabel, QListView, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_myAlerts(object):
     def setupUi(self, myAlerts):
@@ -34,14 +35,22 @@ class Ui_myAlerts(object):
         self.frame_4.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame_4)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.lsvMyAlerts = QListView(self.frame_4)
-        self.lsvMyAlerts.setObjectName(u"lsvMyAlerts")
+        self.label = QLabel(self.frame_4)
+        self.label.setObjectName(u"label")
         font = QFont()
         font.setPointSize(14)
         font.setBold(True)
+        self.label.setFont(font)
+
+        self.verticalLayout_2.addWidget(self.label)
+
+        self.lsvMyAlerts = QListView(self.frame_4)
+        self.lsvMyAlerts.setObjectName(u"lsvMyAlerts")
         self.lsvMyAlerts.setFont(font)
-        self.lsvMyAlerts.setProperty("isWrapping", False)
-        self.lsvMyAlerts.setWordWrap(True)
+        self.lsvMyAlerts.setSizeAdjustPolicy(QAbstractScrollArea.AdjustIgnored)
+        self.lsvMyAlerts.setAlternatingRowColors(True)
+        self.lsvMyAlerts.setProperty("isWrapping", True)
+        self.lsvMyAlerts.setWordWrap(False)
 
         self.verticalLayout_2.addWidget(self.lsvMyAlerts)
 
@@ -70,6 +79,7 @@ class Ui_myAlerts(object):
 
     def retranslateUi(self, myAlerts):
         myAlerts.setWindowTitle(QCoreApplication.translate("myAlerts", u"MainWindow", None))
+        self.label.setText(QCoreApplication.translate("myAlerts", u"My Alerts", None))
         self.btnDelete.setText(QCoreApplication.translate("myAlerts", u"Delete", None))
     # retranslateUi
 
