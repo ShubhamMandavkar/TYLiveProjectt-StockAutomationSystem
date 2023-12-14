@@ -58,7 +58,8 @@ class StockChart(FigCavas):
         self.ax = self.fig.subplots()
         mpf.plot(self.df,ax=self.ax,type='candle')
 
-        # self.ax.plot(df['Date'],hist.Close.rolling(20).mean())
+        #scale the graph to the last 100 candles
+        self.ax.set_xlim(len(self.df.index)-100, len(self.df.index))
 
         # Setting labels
         self.ax.set_xlabel('Date')
@@ -84,6 +85,7 @@ class StockChart(FigCavas):
         #Add dateTick on xaxis
         self.dateTick = self.ax.text(0, -0.05, '', color = 'white',  transform = self.ax.get_xaxis_transform(), ha='center', va='top', bbox=dict(facecolor='grey', alpha=1))
         
+        
         print('chart shown')
 
     def setTimeFrame(self, timeFrame):
@@ -108,6 +110,9 @@ class StockChart(FigCavas):
         mpf.plot(self.df, type='candle', ax=self.ax)
         plt.draw()
         # plt.pause(0.1) #if called then matplotlib displays it's own figure window
+
+        #scale the graph to the last 100 candles
+        self.ax.set_xlim(len(self.df.index)-100, len(self.df.index))
 
         # Add a vertical line to show the current candle
         # because the axis has been cleared the line must be redrawn
