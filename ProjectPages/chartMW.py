@@ -41,8 +41,10 @@ class StockChart(FigCavas):
         super().__init__(self.fig)
 
         #importing data from yfinance
+        self.period = 'max'
+        self.timeFrame = '1d'
         stk = yf.Ticker(self.stkSymbol+".NS")
-        hist = stk.history(period="max")
+        hist = stk.history(self.period)
 
         self.df = pd.DataFrame({'Date': hist.index, 'Open': hist['Open'],'High': hist['High'], 'Low':hist['Low'], 'Close':hist['Close']})
         # convert into datetime object
@@ -85,12 +87,12 @@ class StockChart(FigCavas):
         print('chart shown')
 
     def setTimeFrame(self, timeFrame):
-        intervl = self.dictTimeIntervals[timeFrame] 
-        prd = self.dictPeriods[timeFrame]
+        self.timeFrame= self.dictTimeIntervals[timeFrame] 
+        self.period = self.dictPeriods[timeFrame]
         
         '''importing data from yfinance'''
         stk = yf.Ticker(self.stkSymbol+".NS")
-        hist = stk.history(period=prd, interval= intervl)
+        hist = stk.history(period=self.period, interval= self.timeFrame)
 
         self.df = pd.DataFrame({'Date': hist.index, 'Open': hist['Open'],'High': hist['High'], 'Low':hist['Low'], 'Close':hist['Close']})
         # convert into datetime object
@@ -382,14 +384,18 @@ class Chart(QMainWindow):
             self.stkChart.dateTick.set_visible(False) #make dateTick invisible
             
             if math.ceil(event.xdata) >= 0 and math.ceil(event.xdata) < len(self.stkChart.df):
-                xdata = min(math.ceil(event.xdata), len(self.stkChart.df)-1)
+                xdata = min(math.ceil(event.xdata), len(self.stkChart.df)-1)#diplay coordinate of xaxis
 
                 #code to show current date on xaxis 
                 self.stkChart.dateTick.set_visible(True) #make dateTick visible
 
                 currdate = self.stkChart.df.index[xdata] # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
                 ts = pd.Timestamp(currdate) #converted to pandas Timestamp
-                self.stkChart.dateTick.set_text(ts.strftime('%d %b %Y')) #formated date
+                tf = self.stkChart.timeFrame
+                if('mo' in tf or 'wk' in tf or 'd' in tf):
+                    self.stkChart.dateTick.set_text(ts.strftime('%d %b %Y')) #formated date
+                else:
+                    self.stkChart.dateTick.set_text(ts.strftime('%d %b %Y %H:%M')) #formated date
                 self.stkChart.dateTick.set_x(event.xdata)  #display coordinates
                 
                 self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[xdata],'.2f')))
