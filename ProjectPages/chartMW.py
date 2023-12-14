@@ -78,8 +78,9 @@ class StockChart(FigCavas):
         # Add a vertical line to show the current candle
         self.vline = self.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1) 
         self.vline.set_visible(False)
-        print(self.ax)
-        print(self.vline)
+
+        #Add dateTick on xaxis
+        self.dateTick = self.ax.text(0, -0.05, '', color = 'white',  transform = self.ax.get_xaxis_transform(), ha='center', va='top', bbox=dict(facecolor='grey', alpha=1))
         
         print('chart shown')
 
@@ -109,7 +110,10 @@ class StockChart(FigCavas):
         # Add a vertical line to show the current candle
         # because the axis has been cleared the line must be redrawn
         self.vline = self.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1) 
-
+        
+        #Add dateTick on xaxis
+        self.dateTick = self.ax.text(0, -0.05, '', color = 'white',  transform = self.ax.get_xaxis_transform(), ha='center', va='top', bbox=dict(facecolor='grey', alpha=1))
+        
         print('chart shown')
     
     def showSignals(self):
@@ -125,29 +129,29 @@ class StockChart(FigCavas):
         
         PMHSignal = [np.nan, np.nan]  #previous month high signal
         PMLSignal = [np.nan, np.nan]  #previous month Low signal
-        prevHigh = max(self.df['High'][0], self.df['High'][1])
-        prevLow = min(self.df['Low'][0], self.df['Low'][1])
+        prevHigh = max(self.df['High'].iloc[0], self.df['High'].iloc[1])
+        prevLow = min(self.df['Low'].iloc[0], self.df['Low'].iloc[1])
         for i in range(2, len(EMA50)):
             #for uptrend
             if EMA50[i] > EMA50[i-1] and EMA50[i-1]> EMA50[i-2]: 
-                if self.df['High'][i] > prevHigh :
-                    PMHSignal.append(self.df['High'][i])
-                    prevHigh = self.df['High'][i]
+                if self.df['High'].iloc[i] > prevHigh :
+                    PMHSignal.append(self.df['High'].iloc[i])
+                    prevHigh = self.df['High'].iloc[i]
                 else:
                     PMHSignal.append(np.nan)
             else:
-                prevHigh = self.df['High'][i]
+                prevHigh = self.df['High'].iloc[i]
                 PMHSignal.append(np.nan)
 
             #for downtrend
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
-                if self.df['Low'][i] < prevLow :
-                    PMLSignal.append(self.df['Low'][i])
-                    prevLow = self.df['Low'][i]
+                if self.df['Low'].iloc[i] < prevLow :
+                    PMLSignal.append(self.df['Low'].iloc[i])
+                    prevLow = self.df['Low'].iloc[i]
                 else:
                     PMLSignal.append(np.nan)
             else:
-                prevLow = self.df['Low'][i]
+                prevLow = self.df['Low'].iloc[i]
                 PMLSignal.append(np.nan)
 
         #end PMHSignal
@@ -185,8 +189,8 @@ class StockChart(FigCavas):
             case 'Hull Moving Average':
                 HMA = talib.WMA(2*talib.WMA(self.df['Close'], timeperiod = length/2)-talib.WMA(self.df['Close'], timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
                 pltLs.append(mpf.make_addplot(HMA, ax = self.ax))
-
-                HMASignal = [self.df['Close'][i] if (self.df['Close'][i] > HMA[i] and self.df['Open'][i] < HMA[i]) or (self.df['Close'][i-1] < HMA[i-1] and self.df['Open'][i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
+ 
+                HMASignal = [self.df['Close'].iloc[i] if (self.df['Close'].iloc[i] > HMA[i] and self.df['Open'].iloc[i] < HMA[i]) or (self.df['Close'].iloc[i-1] < HMA[i-1] and self.df['Open'].iloc[i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
 
                 HMASignal.insert(0, np.nan)
                 pltLs.append(mpf.make_addplot(HMASignal, ax = self.ax, type = 'scatter', marker = '^', 
@@ -367,22 +371,36 @@ class Chart(QMainWindow):
     def on_mouse_move2(self, event):
         # Check if the cursor is within the axes limits
         if event.inaxes:
+            #make line visible
             self.stkChart.vline.set_visible(True)
-            # Update the vertical line position (optional)
-            self.stkChart.vline.set_xdata(math.ceil(event.xdata))
 
+            # Update the vertical line position (optional)
+            self.stkChart.vline.set_xdata(math.ceil(event.xdata)) #display coordinated
+
+
+            #set dateTick visibility to false if cursor is in the valid range then it will be make visible
+            self.stkChart.dateTick.set_visible(False) #make dateTick invisible
+            
             if math.ceil(event.xdata) >= 0 and math.ceil(event.xdata) < len(self.stkChart.df):
                 xdata = min(math.ceil(event.xdata), len(self.stkChart.df)-1)
 
-                self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'][xdata],'.2f')))
-                self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'][xdata],'.2f')))
-                self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'][xdata],'.2f')))
-                self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'][xdata],'.2f')))
+                #code to show current date on xaxis 
+                self.stkChart.dateTick.set_visible(True) #make dateTick visible
+
+                currdate = self.stkChart.df.index[xdata] # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+                ts = pd.Timestamp(currdate) #converted to pandas Timestamp
+                self.stkChart.dateTick.set_text(ts.strftime('%d %b %Y')) #formated date
+                self.stkChart.dateTick.set_x(event.xdata)  #display coordinates
+                
+                self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[xdata],'.2f')))
+                self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'].iloc[xdata],'.2f')))
+                self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'].iloc[xdata],'.2f')))
+                self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'].iloc[xdata],'.2f')))
             elif math.ceil(event.xdata) >= len(self.stkChart.df):
-                self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'][-1],'.2f')))
-                self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'][-1],'.2f')))
-                self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'][-1],'.2f')))
-                self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'][-1],'.2f')))
+                self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[-1],'.2f')))
+                self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'].iloc[-1],'.2f')))
+                self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'].iloc[-1],'.2f')))
+                self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'].iloc[-1],'.2f')))
             else: #math.ceil(event.xdata) < 0
                 self.ui.lblOpenVal.setText('$')
                 self.ui.lblHighVal.setText('$')
@@ -393,4 +411,5 @@ class Chart(QMainWindow):
             self.stkChart.fig.canvas.draw()
         else:
             self.stkChart.vline.set_visible(False)
+            self.stkChart.dateTick.set_visible(False)
             self.stkChart.fig.canvas.draw()
