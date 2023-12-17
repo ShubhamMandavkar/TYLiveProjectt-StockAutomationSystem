@@ -6,7 +6,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 from UIFiles.ui_alertDialog import Ui_dlgAlert
-from APIMethods import getQuote2, getQuote
+from APIMethods import getQuote2, getQuote, getQuoteFromYfinance
 from workers import AlertWorker
 
 class AlertDlg(QDialog):
@@ -27,8 +27,12 @@ class AlertDlg(QDialog):
         print(self.ui.leStkName.text())
         self.ui.leStkName.setReadOnly(True) 
 
-        stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
-        self.ui.dsbAlertVal.setValue(stk['data']['last_price'])
+        # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
+        # lastPrice = stk['data']['last_price']
+
+        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
+        lastPrice = stkDf['Close'].iloc[-1]
+        self.ui.dsbAlertVal.setValue(lastPrice)
 
         self.ui.lblTimeFrame.hide()
         self.ui.cmbTimeFrame.hide()
@@ -36,11 +40,20 @@ class AlertDlg(QDialog):
         self.ui.lblLen2.hide()
         self.ui.sbLen1.hide()
         self.ui.sbLen2.hide()
+
+        self.generateMsg()
     
     def addConnectors(self):
         self.ui.btnSetAlert.clicked.connect(self.addAlert) #to set alert
         self.ui.cmbAlertCond.currentTextChanged.connect(self.validateCondition)
+        self.ui.cmbAlertCond.currentTextChanged.connect(self.generateMsg)
+
         self.ui.cmbAlertType.currentTextChanged.connect(self.validateType)
+        self.ui.cmbAlertType.currentTextChanged.connect(self.generateMsg)
+
+        self.ui.cmbTimeFrame.currentTextChanged.connect(self.generateMsg)
+        self.ui.sbLen1.valueChanged.connect(self.generateMsg)
+        self.ui.sbLen2.valueChanged.connect(self.generateMsg)
 
     def validateType(self):
         alertType = self.ui.cmbAlertType.currentText()
@@ -69,7 +82,7 @@ class AlertDlg(QDialog):
             self.ui.sbLen2.hide()
         elif alertType == 'Price + EMA' or alertType == 'Price + HMA':
             self.ui.cmbAlertCond.clear()
-            self.ui.cmbAlertCond.ui.addItem('Greater Than')
+            self.ui.cmbAlertCond.addItem('Greater Than')
             self.ui.cmbAlertCond.addItem('Less Than')
             self.ui.cmbAlertCond.addItem('Crossing Up')
             self.ui.cmbAlertCond.addItem('Crossing Down')
@@ -107,9 +120,13 @@ class AlertDlg(QDialog):
             self.ui.lblAlertVal.hide()
             self.ui.dsbAlertVal.hide()
             
-        stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
-        self.ui.dsbAlertVal.setValue(stk['data']['last_price'])
+        # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
+        # lastPrice = stk['data']['last_price']
 
+        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
+        lastPrice = stkDf['Close'].iloc[-1]
+        self.ui.dsbAlertVal.setValue(lastPrice)
+    
     def addAlert(self):
         alertType = self.ui.cmbAlertType.currentText()
         alertCond = self.ui.cmbAlertCond.currentText()
@@ -145,3 +162,28 @@ class AlertDlg(QDialog):
         print("alert added successfully")
         self.close()   #closes window when user successfully set alert
     
+    def generateMsg(self):
+        alertType = self.ui.cmbAlertType.currentText()
+        alertCond = self.ui.cmbAlertCond.currentText()
+        tf = self.ui.cmbTimeFrame.currentText()
+        price = self.ui.dsbAlertVal.value()
+
+        if(alertType == 'Price'):
+            self.alertMsg = '' + self.stkName + "''s price " + alertCond + ' ' + str(price)  
+        elif(alertType == 'MA'):
+            self.alertMsg = '' + self.stkName + "''s price " + alertCond + ' MA' +str(self.ui.sbLen1.value()) + ' on ' + tf + ' time frame' 
+        elif(alertType == 'Price + EMA' or alertType == 'Price + HMA'):
+            if alertType == 'Price + EMA':
+                myMa = 'EMA'
+            else:
+                myMa = 'HMA'
+
+            if(alertCond != 'In Between'):
+                self.alertMsg = '' + self.stkName + "''s price " + alertCond + ' ' + myMa +str(self.ui.sbLen1.value())  + ' on ' + tf + ' time frame'
+            else:
+                self.alertMsg = '' + self.stkName + "''s price " + alertCond + ' ' + myMa +str(self.ui.sbLen1.value()) +' and ' + myMa +str(self.ui.sbLen2.value())  + ' on ' + tf + ' time frame'
+        
+        self.ui.txteMsg.setText(self.alertMsg)
+
+
+

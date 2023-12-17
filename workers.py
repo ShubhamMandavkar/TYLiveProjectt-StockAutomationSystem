@@ -4,7 +4,7 @@ from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
 from mysql.connector import errorcode
-from APIMethods import getQuote2, getQuote, getHoldings2
+from APIMethods import getQuote2, getQuote, getHoldings2, getQuoteFromYfinance
 import json
 import math
 import time
@@ -23,7 +23,7 @@ class AlertWorker(QObject):
 
     zroya.init("StockAutomation", "a", "b", "c", "d")
     noti = zroya.Template(zroya.TemplateType.Text2)
-    # noti.setAudio(audio=zroya.Audio.Alarm)
+    noti.setAudio(audio=zroya.Audio.Alarm)
     
     tf = {'Daily' : '1d', 'Monthly' : '1mo', 'Weekly' : '1wk'}
     def getAlertList():
@@ -77,7 +77,8 @@ class AlertWorker(QObject):
     def processAlerts(self):
         while(self.isRunning):
             for alert in AlertWorker.alertList:
-                currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
+                # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
+                currPrice = getQuoteFromYfinance('shubh',alert['stkSymbol'], 'tc', 'NSE')['Close'].iloc[-1]
                 match alert['alertCond']:
                     case 'Greater Than':
                         if alert['alertType'] == 'Price':

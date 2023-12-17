@@ -13,6 +13,7 @@ import mysql.connector
 from mysql.connector import errorcode
 import matplotlib.dates as mpdates
 from matplotlib.widgets import Cursor
+import matplotlib.animation as animation
 from mpl_interactions import ioff, panhandler, zoom_factory
 from matplotlib.backend_bases import MouseEvent
 
@@ -56,6 +57,7 @@ class StockChart(FigCavas):
         # Interactions library function like panhandler.
         # pan_handler = panhandler(self.fig) #if this is enabled then it stop the zoom in x axis and y axis
        
+        # self.growingCandleAnimation()
 
     def plotChart(self, timeFrame, myPeriod):
         '''importing data from yfinance'''
@@ -73,6 +75,9 @@ class StockChart(FigCavas):
 
         # plotting the data
         self.ax.clear()          #clear the axes
+        #scale the graph to the last 100 candles
+        self.ax.set_xlim(len(self.df.index)-100, len(self.df.index))
+
         mpf.plot(self.df, type='candle', ax=self.ax) #plots candlestick chart
         plt.draw()
         # plt.pause(0.1) #if called then matplotlib displays it's own figure window
@@ -81,8 +86,6 @@ class StockChart(FigCavas):
         self.ax.set_xlabel('Date')
         self.ax.set_ylabel('Price')
         
-        #scale the graph to the last 100 candles
-        self.ax.set_xlim(len(self.df.index)-100, len(self.df.index))
 
         # Add a vertical line to show the current candle
         # because the axis has been cleared the line must be redrawn
@@ -93,6 +96,44 @@ class StockChart(FigCavas):
         self.dateTick = self.ax.text(0, -0.05, '', color = 'white',  transform = self.ax.get_xaxis_transform(), ha='center', va='top', bbox=dict(facecolor='grey', alpha=1))
         
         print('chart shown')
+
+    #get data for daily, weekly, or monthly dataFrame   
+    def getData(self, i):
+        '''importing data from yfinance'''
+        stk = yf.Ticker(self.stkSymbol+".NS")
+        hist = stk.history(period = '1d', interval = '1d')
+
+        df = pd.DataFrame({'Date': hist.index, 'Open': hist['Open'],'High': hist['High']+i, 'Low':hist['Low'], 'Close':hist['Close']+i})
+        # convert into datetime object
+        df['Date'] = pd.to_datetime(hist.index)
+
+        # apply map function
+        df['Date'] = df['Date'].map(mpdates.date2num)
+        print(df['Date'])
+        '''ended importing code'''
+
+        print('data imported')
+        
+        return df
+
+    def growingCandleAnimation(self):
+        resample_map ={'Open' :'first', 'High' :'max', 'Low'  :'min', 'Close':'last' }
+        resample_period = '15T'   
+
+        self.i = 5
+        def animate(ival):
+            df = self.getData(self.i)
+
+            # rs = df.resample(resample_period).agg(resample_map).dropna()
+            self.df = self.df.iloc[:-1]
+            self.df = pd.concat([self.df, df])
+            self.ax.clear()
+            mpf.plot(self.df, ax = self.ax, type='candle')
+            self.i = self.i+ 5
+            print('animation called')
+
+        self.ani = animation.FuncAnimation(self.fig, animate, interval=2500, cache_frame_data=False)
+
 
     def setTimeFrame(self, timeFrame):
         self.timeFrame= self.dictTimeIntervals[timeFrame] 

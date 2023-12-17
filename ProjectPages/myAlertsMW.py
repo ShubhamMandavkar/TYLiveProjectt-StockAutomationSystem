@@ -15,9 +15,9 @@ class ListModel(QAbstractListModel):
     def data(self, index, role):
         if role == Qt.DisplayRole:
             # See below for the data structure.
-            *_ ,text = self._data[index.row()]
+            *_ ,msg = self._data[index.row()]
             # Return the todo text only.
-            return text
+            return msg
 
     def rowCount(self, index):
         return len(self._data)    
@@ -55,8 +55,7 @@ class MyAlerts(QMainWindow):
 
             data = []
             for (symbol,name, type, cond, tf, val, len1, len2, msg) in cursor: #cursor returns tuple
-                string = name + ' ' + cond + ' ' + str(val)
-                data.append([symbol, name, type, cond, tf, val, len1, len2, msg, string])
+                data.append([symbol, name, type, cond, tf, val, len1, len2, msg])
             
             #show updated alerts list
             model = ListModel(data)    
@@ -87,8 +86,7 @@ class MyAlerts(QMainWindow):
 
             data = []
             for (symbol, name, type, cond, tf, val,len1, len2, msg) in cursor: #cursor returns tuple
-                string = name + ' ' + cond + ' ' + str(val)
-                data.append([symbol, name, type, cond, tf, val, len1, len2, msg, string])
+                data.append([symbol, name, type, cond, tf, val, len1, len2, msg])
 
             model = ListModel(data)    
             self.ui.lsvMyAlerts.setModel(model) 

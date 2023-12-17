@@ -79,7 +79,8 @@ class Watchlists(QMainWindow):
             self.ui.frmWLContent.hide()
         
         self.manageVisibility()
-        self.watchlistThread.start() #a lot to work on this
+        # self.watchlistThread.start() #a lot to work on this
+
     
     def addConnectors(self):
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
@@ -91,7 +92,6 @@ class Watchlists(QMainWindow):
         
 
     def loadWatchlists(self):
-        count = 0
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
             cursor = con.cursor()
@@ -99,7 +99,6 @@ class Watchlists(QMainWindow):
             cursor.execute(query)
             for tableName, in cursor:
                 self.ui.cmbWatchlists.addItem(tableName)
-                count += 1
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -137,26 +136,31 @@ class Watchlists(QMainWindow):
         if len(stkSymbols ) != 0:#there are 1 or more stocks in watchlist
             #fetch data to show in table
             data = []
-            for i in range(len(stkSymbols)):
-                #importing data from yfinance
-                stk = yf.Ticker(stkSymbols[i]+".NS")
-                hist = stk.history(period = '1d', interval = '1d')
+            try:
+                for i in range(len(stkSymbols)):
+                    #importing data from yfinance
+                    stk = yf.Ticker(stkSymbols[i]+".NS")
+                    hist = stk.history(period = '1d', interval = '1d')
+                    print(hist)
 
-                #item method is used to retrieve data only else it return data with index
-                open =  round(hist['Open'].item(), 2)
-                high =  round(hist['High'].item(), 2)
-                low =  round(hist['Low'].item(), 2)
-                close =  round(hist['Close'].item(), 2)
-                data.append([stkSymbols[i], stkNames[i], open, high, low, close])
-            
-            # print(data)
-            data = pd.DataFrame(data)
-            data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
+                    #item method is used to retrieve data only else it return data with index
+                    open =  round(hist['Open'].item(), 2)
+                    high =  round(hist['High'].item(), 2)
+                    low =  round(hist['Low'].item(), 2)
+                    close =  round(hist['Close'].item(), 2)
+                    data.append([stkSymbols[i], stkNames[i], open, high, low, close])
+                
+                # print(data)
+                data = pd.DataFrame(data)
+                data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
 
-            self.watchlistData = data
-            # print(self.watchlistData.head())
-            model = TableModel(self.watchlistData)
-            self.ui.tbvWatchlist.setModel(model)
+                self.watchlistData = data
+                # print(self.watchlistData.head())
+                model = TableModel(self.watchlistData)
+                self.ui.tbvWatchlist.setModel(model)
+            except Exception as e:
+                print(e)
+                self.watchlistData = pd.DataFrame({})
 
         else:
             self.watchlistData = pd.DataFrame({})

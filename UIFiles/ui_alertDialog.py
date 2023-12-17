@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'alertDialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,7 +24,7 @@ class Ui_dlgAlert(object):
     def setupUi(self, dlgAlert):
         if not dlgAlert.objectName():
             dlgAlert.setObjectName(u"dlgAlert")
-        dlgAlert.resize(473, 380)
+        dlgAlert.resize(473, 415)
         self.verticalLayout = QVBoxLayout(dlgAlert)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.frame = QFrame(dlgAlert)
@@ -40,6 +40,7 @@ class Ui_dlgAlert(object):
 
         self.sbLen1 = QSpinBox(self.frame)
         self.sbLen1.setObjectName(u"sbLen1")
+        self.sbLen1.setMinimum(1)
         self.sbLen1.setMaximum(5000)
 
         self.gridLayout.addWidget(self.sbLen1, 5, 2, 1, 1)
@@ -104,6 +105,7 @@ class Ui_dlgAlert(object):
 
         self.sbLen2 = QSpinBox(self.frame)
         self.sbLen2.setObjectName(u"sbLen2")
+        self.sbLen2.setMinimum(1)
         self.sbLen2.setMaximum(5000)
 
         self.gridLayout.addWidget(self.sbLen2, 6, 2, 1, 1)
