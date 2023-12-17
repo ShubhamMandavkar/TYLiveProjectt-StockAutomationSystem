@@ -51,6 +51,7 @@ class AlertDlg(QDialog):
         self.ui.cmbAlertType.currentTextChanged.connect(self.validateType)
         self.ui.cmbAlertType.currentTextChanged.connect(self.generateMsg)
 
+        self.ui.dsbAlertVal.valueChanged.connect(self.generateMsg)
         self.ui.cmbTimeFrame.currentTextChanged.connect(self.generateMsg)
         self.ui.sbLen1.valueChanged.connect(self.generateMsg)
         self.ui.sbLen2.valueChanged.connect(self.generateMsg)
@@ -71,6 +72,9 @@ class AlertDlg(QDialog):
 
                 self.ui.lblLen1.setVisible(True)
                 self.ui.sbLen1.setVisible(True)
+
+                self.ui.lblAlertVal.hide()
+                self.ui.dsbAlertVal.hide()
             else:
                 self.ui.lblTimeFrame.hide()
                 self.ui.cmbTimeFrame.hide()
@@ -95,6 +99,9 @@ class AlertDlg(QDialog):
 
             self.ui.lblLen1.setVisible(True)  
             self.ui.sbLen1.setVisible(True)
+
+            self.ui.lblAlertVal.hide()
+            self.ui.dsbAlertVal.hide()
 
             self.ui.lblLen2.hide()
             self.ui.sbLen2.hide()
