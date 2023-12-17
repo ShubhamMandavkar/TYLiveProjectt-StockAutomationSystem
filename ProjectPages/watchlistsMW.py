@@ -93,7 +93,7 @@ class Watchlists(QMainWindow):
 
     def loadWatchlists(self):
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
             query = f"""show tables;"""
             cursor.execute(query)
@@ -114,7 +114,7 @@ class Watchlists(QMainWindow):
         stkSymbols = []
         stkNames = []
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
             query = f"""select * from {watchlist}"""
             cursor.execute(query)
@@ -181,7 +181,7 @@ class Watchlists(QMainWindow):
         name = self.watchlistDetails.ui.leName.text()
         # TODOO : you can create single table in Db and just add the extra column of watchlistName
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
             query = f"""create table {name} (stkSymbol varchar(25) primary key, stkName varchar(75))"""
             print(query)
@@ -212,7 +212,7 @@ class Watchlists(QMainWindow):
         #insert data in database
         tblName = self.ui.cmbWatchlists.currentText()
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
             query = f"""insert into {tblName} values('{stkSym}', '{stkName}')"""
             print(query)
@@ -260,7 +260,7 @@ class Watchlists(QMainWindow):
         #delete from database
         tblName = self.ui.cmbWatchlists.currentText()
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='watchlists_db')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
             query = f"""delete from {tblName} where stkSymbol = '{stkSym}'"""
             cursor.execute(query)

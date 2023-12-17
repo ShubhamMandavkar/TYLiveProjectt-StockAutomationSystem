@@ -28,7 +28,7 @@ class AlertWorker(QObject):
     tf = {'Daily' : '1d', 'Monthly' : '1mo', 'Weekly' : '1wk'}
     def getAlertList():
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             query = f"""select * from alerts"""
@@ -147,7 +147,7 @@ class AlertWorker(QObject):
                         Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
                                 alert['timeFrame'], alert['len1'])
 
-                        currMP = df['Close'][-1]
+                        currMP = df['Close'].iloc[-1]
                         prevHigh = max(df['Close'][-2], df['Close'][-3])
                         if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]: #uptrend
                             if currMP > prevHigh :
@@ -162,7 +162,7 @@ class AlertWorker(QObject):
                         Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
                                 alert['timeFrame'],   alert['len1'])
 
-                        currMP = df['Close'][-1]
+                        currMP = df['Close'].iloc[-1]
                         prevLow = min(df['Close'][-2], df['Close'][-3])
                         if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]: #downtrend
                             if currMP < prevLow :
@@ -179,7 +179,7 @@ class AlertWorker(QObject):
                                 alert['timeFrame'],   alert['len1'])
                         Avg2 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
                                 alert['timeFrame'],   alert['len2'])
-                        currMP = df['Close'][-1] 
+                        currMP = df['Close'].iloc[-1] 
                         if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]):
                             print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
                             self.noti.setFirstLine(alert['stkName']) 

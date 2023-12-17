@@ -289,7 +289,7 @@ class Chart(QMainWindow):
     #This methods addds the indicators to the chart which were added by to user to show the saved state
     def renderChartState(self):     
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             query = f"""select * from chart_state"""
@@ -330,7 +330,7 @@ class Chart(QMainWindow):
 
             #save chart state in Database
             try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
                 cursor = con.cursor()
 
                 query = f"""insert into chart_state values('{indicator}', {length}, 'null') """
@@ -362,7 +362,7 @@ class Chart(QMainWindow):
         #delete from Database
         def deleteIndicatorFrmDB():
             try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
                 cursor = con.cursor()
 
                 query = f"""delete from chart_state where indicator = '{indicator}' and length = {length}"""

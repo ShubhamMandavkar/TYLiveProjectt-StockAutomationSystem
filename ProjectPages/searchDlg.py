@@ -59,7 +59,7 @@ class SearchDlg(QDialog):
     def showSuggestions(self):
         stkName = self.ui.leSearch.text()
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             #get the value of stkSymbol

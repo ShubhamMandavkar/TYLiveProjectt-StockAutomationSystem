@@ -40,7 +40,7 @@ class MyAlerts(QMainWindow):
         alert = self.ui.lsvMyAlerts.model()._data[row]
 
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             #delete alert from table
@@ -64,6 +64,7 @@ class MyAlerts(QMainWindow):
             #After deleting the alert get updated list
             AlertWorker.getAlertList()
 
+            cursor.close()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -72,12 +73,11 @@ class MyAlerts(QMainWindow):
             else:
                 print("error:",err)
         finally:
-            cursor.close()
             con.close()
 
     def addAlertsToList(self):
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             #get the value of stkSymbol
@@ -91,6 +91,7 @@ class MyAlerts(QMainWindow):
             model = ListModel(data)    
             self.ui.lsvMyAlerts.setModel(model) 
 
+            cursor.close()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -99,5 +100,4 @@ class MyAlerts(QMainWindow):
             else:
                 print("error:",err)
         finally:
-            cursor.close()
             con.close()

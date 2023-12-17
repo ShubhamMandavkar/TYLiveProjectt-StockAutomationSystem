@@ -137,7 +137,7 @@ class AlertDlg(QDialog):
         alertMsg = self.ui.txteMsg.toPlainText()   
 
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             query = f"""insert into alerts values('{self.stkSymbol}', '{self.stkName}', '{alertType}', '{alertCond}', '{timeFrame}', {alertVal}, {len1}, {len2}, '{alertMsg}') """

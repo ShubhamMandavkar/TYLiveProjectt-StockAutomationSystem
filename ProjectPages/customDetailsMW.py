@@ -21,7 +21,7 @@ class CustomDetails(QMainWindow):
         print("loaded custm_details")
         con = None
         try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
             query = f"""select apiKey, apiSecretKey, profitThreshold, averageThreshold, quantity, deskNoti, wpNoti, wpNo from customer_details WHERE userId = 'shubh'"""
 
@@ -63,7 +63,7 @@ class CustomDetails(QMainWindow):
                 wpNo = 'NULL'
 
             try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "@Shubh2000", database='ty_live_proj_stock_automation_sys')
+                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
                 cursor = con.cursor()
                 query = f"""UPDATE customer_details SET apiKey = '{apiKey}', apiSecretKey = '{apiSecretKey}',    profitThreshold = {profitTh}, averageThreshold = {avgTh}, quantity = {quantity}, deskNoti = {deskNoti}, wpNoti = {wpNoti}, wpNo = '{wpNo}' WHERE userId = 'shubh'"""
 
