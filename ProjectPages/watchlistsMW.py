@@ -29,6 +29,11 @@ class TableModel(QAbstractTableModel):
 
     def columnCount(self, index):
         return self._data.shape[1]
+    
+    def delRow(self, index):
+        self.layoutAboutToBeChanged.emit()
+        self._data.drop(index, axis = 0, inplace = True)
+        self.layoutChanged.emit()
 
     #essential to overide for custom header
     def headerData(self, section, orientation, role):
@@ -55,31 +60,24 @@ class Watchlists(QMainWindow):
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
 
-        self.watchlistData = pd.DataFrame({})
-
         self.watchlistWorker = WatchlistWorker()
         self.watchlistThread = QThread()
         self.watchlistWorker.moveToThread(self.watchlistThread)
-
-        self.watchlistWorker.isRunning = True
-        self.watchlistWorker.watchlistData = self.watchlistData
-        self.watchlistThread.started.connect(self.watchlistWorker.getWatchlistTableModel)
-        self.watchlistWorker.sigChngWLData.connect(self.changeWLData)
-        # self.watchlistThread.finished.connect(self.closeWindow)
 
         self.addConnectors()
         self.loadWatchlists()
 
         count = self.ui.cmbWatchlists.count()
-        if count != 0: #if there are 1 or more watchlist show the data of 1st
+        if count != 0: #if there are 1 or more watchlist show the data of 1st watchlist
             WLName = self.ui.cmbWatchlists.currentText()
-            self.showWatchlistData(WLName)
-        else: #no watchlist is created
-            self.ui.cmbWatchlists.hide()
-            self.ui.frmWLContent.hide()
+            self.watchlistWorker.currWL = WLName
+            self.watchlistWorker.getWLSymbols(WLName) 
         
         self.manageVisibility()
-        # self.watchlistThread.start() #a lot to work on this
+
+        self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
+        self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData)
+        self.watchlistThread.start()
 
     
     def addConnectors(self):
@@ -87,8 +85,7 @@ class Watchlists(QMainWindow):
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
 
-        self.ui.cmbWatchlists.currentTextChanged.connect(self.watchlistWorker.setWatchlistChanged)
-        self.ui.cmbWatchlists.currentTextChanged.connect(lambda: self.showWatchlistData(self.ui.cmbWatchlists.currentText()))
+        self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))        
         
 
     def loadWatchlists(self):
@@ -110,73 +107,18 @@ class Watchlists(QMainWindow):
         else:
             con.close() 
         
-    def showWatchlistData(self, watchlist): 
-        stkSymbols = []
-        stkNames = []
-        try:
-            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
-            cursor = con.cursor()
-            query = f"""select * from {watchlist}"""
-            cursor.execute(query)
-
-            for stkSym, stkName in cursor:
-                stkSymbols.append(stkSym)
-                stkNames.append(stkName)
-
-        except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
-            else:
-                print("error:",err)
-        else:
-            con.close()
-
-        if len(stkSymbols ) != 0:#there are 1 or more stocks in watchlist
-            #fetch data to show in table
-            data = []
-            try:
-                for i in range(len(stkSymbols)):
-                    #importing data from yfinance
-                    stk = yf.Ticker(stkSymbols[i]+".NS")
-                    hist = stk.history(period = '1d', interval = '1d')
-                    print(hist)
-
-                    #item method is used to retrieve data only else it return data with index
-                    open =  round(hist['Open'].item(), 2)
-                    high =  round(hist['High'].item(), 2)
-                    low =  round(hist['Low'].item(), 2)
-                    close =  round(hist['Close'].item(), 2)
-                    data.append([stkSymbols[i], stkNames[i], open, high, low, close])
-                
-                # print(data)
-                data = pd.DataFrame(data)
-                data.columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']
-
-                self.watchlistData = data
-                # print(self.watchlistData.head())
-                model = TableModel(self.watchlistData)
-                self.ui.tbvWatchlist.setModel(model)
-            except Exception as e:
-                print(e)
-                self.watchlistData = pd.DataFrame({})
-
-        else:
-            self.watchlistData = pd.DataFrame({})
-        
-        self.watchlistWorker.watchlistData = self.watchlistData
-        self.manageVisibility()
+    def showWatchlistData(self, wlData): 
+        print(wlData)
+        self.model = TableModel(wlData)
+        self.ui.tbvWatchlist.setModel(self.model)
         
     def getWatchlistDetails(self):
-
         #get watchlist details
         self.watchlistDetails = WatchlistDetailsDlg()
         self.watchlistDetails.ui.btnCreate.clicked.connect(self.createWatchlistInDB)
         self.watchlistDetails.ui.btnCreate.clicked.connect(lambda: self.watchlistDetails.close()) #close the watchlistDetails dialog
-
         self.watchlistDetails.show()
-    
+
     def createWatchlistInDB(self):
         name = self.watchlistDetails.ui.leName.text()
         # TODOO : you can create single table in Db and just add the extra column of watchlistName
@@ -189,9 +131,9 @@ class Watchlists(QMainWindow):
             con.commit()
 
             #display stocks in the watchlist 
-            self.showWatchlistData(name)
             self.ui.cmbWatchlists.addItem(name)
             self.ui.cmbWatchlists.setCurrentText(name)
+
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -202,38 +144,24 @@ class Watchlists(QMainWindow):
         else:
             con.close()
         
-        # self.watchlistDetails.close() #close the watchlistDetails dialog
-
+    
     def addToWatchlist(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
 
         #insert data in database
-        tblName = self.ui.cmbWatchlists.currentText()
+        watchlist = self.ui.cmbWatchlists.currentText()
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
-            query = f"""insert into {tblName} values('{stkSym}', '{stkName}')"""
+            query = f"""insert into {watchlist} values('{stkSym}', '{stkName}')"""
             print(query)
             cursor.execute(query)
             con.commit()
 
-            #importing data from yfinance
-            stk = yf.Ticker(stkSym+".NS")
-            hist = stk.history(period = '1d', interval = '1d')
-            #item method is used to retrieve data only else it return data with index
-            open =  round(hist['Open'].item(), 2)
-            high =  round(hist['High'].item(), 2)
-            low =  round(hist['Low'].item(), 2)
-            close =  round(hist['Close'].item(), 2)
-            self.watchlistData = pd.concat([ self.watchlistData, pd.DataFrame([[stkSym,stkName,open,high,low, close]], columns = ['Symbol', 'Name', 'Open', 'High', 'Low', 'Close'])], ignore_index= True)
-
-            #change data in worker to get live updates
-            self.watchlistWorker.watchlistData = self.watchlistData
-            
-            model = TableModel(self.watchlistData)
-            self.ui.tbvWatchlist.setModel(model)
+            self.watchlistWorker.stkList[stkSym] = stkName #add stock in worker list
+            print(stkName, 'added to watchlist', watchlist)
             
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -252,19 +180,27 @@ class Watchlists(QMainWindow):
         self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.addToWatchlist)
         self.dlgSearch.show()
 
+    
     def deleteStockFrmWL(self):
         modelIndexls = self.ui.tbvWatchlist.selectedIndexes() #return list of QModelIndices i.e. columns in a row
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
+        rowIndex = self.ui.tbvWatchlist.currentIndex().row()
         
         #delete from database
-        tblName = self.ui.cmbWatchlists.currentText()
+        watchlist = self.ui.cmbWatchlists.currentText()
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
             cursor = con.cursor()
-            query = f"""delete from {tblName} where stkSymbol = '{stkSym}'"""
+            query = f"""delete from {watchlist} where stkSymbol = '{stkSym}'"""
             cursor.execute(query)
             con.commit()
+
+            self.watchlistWorker.stkList.pop(stkSym) #delete from worker list
+            self.model.delRow(rowIndex)
+            # self.showWatchlistData(self.model)
+            print(stkName, 'deleted from watchlist', watchlist)
+
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -272,43 +208,49 @@ class Watchlists(QMainWindow):
                 print("Database does not exist")
             else:
                 print("error:",err)
+        except Exception as e: #If the key is not found in dict then dict.pop might raise a KeyError.
+            print(e)
         else:
             con.close()
-
-        index = self.watchlistData.index[self.watchlistData['Symbol'] == stkSym]
-        self.watchlistData.drop(index, axis= 0, inplace= True)
-        self.watchlistWorker.watchlistData.drop(index, axis= 0, inplace= True) #delete from worker's watchlist data
-
-        if self.watchlistData.size != 0:
-            model = TableModel(self.watchlistData)
-            self.ui.tbvWatchlist.setModel(model)
-
-        self.manageVisibility()
+            
     
     def manageVisibility(self): #manages the visibility of watchlist table and msg label
-        if self.watchlistData.size != 0:
+        count = self.ui.cmbWatchlists.count()
+        if count != 0: #if there is atleast 1 watchlist then show the watchlist frame and list of watchlists in combobox
+            self.ui.cmbWatchlists.setVisible(True)
+            self.ui.frmWLContent.setVisible(True)
+        else: #no watchlist is created
+            self.ui.cmbWatchlists.hide()
+            self.ui.frmWLContent.hide()
+
+        if len(self.watchlistWorker.stkList.keys()) != 0: #if atleast 1 stock in watchlist
             self.ui.lblMsg.hide()
             self.ui.tbvWatchlist.setVisible(True)
         else:
             self.ui.tbvWatchlist.hide()
             self.ui.lblMsg.setVisible(True)
+        print('callled manageVisibility')
     
-    def changeWLData(self, data):
-        model = TableModel(pd.DataFrame(data, columns=['Symbol', 'Name', 'Open', 'High', 'Low', 'Close']))
-        self.ui.tbvWatchlist.setModel(model)
     
     #this function causing crash  to the system don't know why
-    def closeEvent(self, event):
+    '''def closeEvent(self, event):
         print('closing watchlist window')
         self.watchlistWorker.isRunning = False
-        self.watchlistThread.quit()
-        res = self.watchlistThread.wait()
+        try:
+            self.watchlistThread.quit()
+            print('called1')
+            res = self.watchlistThread.wait()
+            print('called2')
+        except Exception as e:
+            print('myException: ',e)
+
         print('called closeWindow', res)
-        event.accept()
+        event.accept()'''
     
+    '''
     def closeWindow(self):
         print('', self.watchlistThread.isFinished())
         self.watchlistThread.quit()
-        self.close()
+        self.close()'''
         
         

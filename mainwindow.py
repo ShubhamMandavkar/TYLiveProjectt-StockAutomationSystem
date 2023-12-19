@@ -97,35 +97,6 @@ class MainWindow(QMainWindow):
         self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlists)
         self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetails)
 
-    def showSearchDialog(self):
-        self.dlgSearch = SearchDlg()
-        self.dlgSearch.show()
-        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
-
-    def showStkDetails(self):
-        modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
-        stkSym = modelIndexls[0].data(0)
-        stkName = modelIndexls[1].data(0)
-
-        self.stkDetails = StockDetails(stkSym, stkName)
-        self.stkDetails.show()
-
-    def showMyAlertsWindow(self):
-        self.myAlerts = MyAlerts()
-        self.myAlerts.show()
-    
-    def showHoldingsWindow(self):
-        self.holdings = Holdings()
-        self.holdings.show()
-    
-    def showWatchlists(self):
-        # self.watchlists = Watchlists()
-        # self.watchlists.show()
-        pass
-      
-    def showCustomDetails(self):
-        self.customDetails = CustomDetails()
-        self.customDetails.show()
 
 
 if __name__ == "__main__":

@@ -262,58 +262,88 @@ class HoldingsWorker(QObject):
             print("Holding function ")
 
 class WatchlistWorker(QObject):
-    isRunning = False
-    isWLChanged = False
-    watchlistData = pd.DataFrame({})
+    
+    sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
+    def __init__(self):
+        super().__init__()
+        self.isRunning = True
+        self.isWLChanged = False
+        self.stkList = {}
+        self.currWL = None
 
-    sigChngWLData = Signal(list)
+    def getWLSymbols(self, watchlist):
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
+            cursor = con.cursor()
+            query = f"""select * from {watchlist}"""
+            cursor.execute(query)
 
-    def getWatchlistTableModel(self):
-        # Add this at the beginning of your module
-        logging.basicConfig(level=logging.DEBUG)
-        while(self.isRunning):
-            data = []
-            for i in self.watchlistData.index:
-                if(self.isRunning == False or self.isWLChanged): # if watchlist is changed or watchlist page is closed stop execution
-                    logging.info('Watchlist closed or changed')
-                    # print('watchlists closed or changed')
+            for stkSym, stkName in cursor:
+                self.stkList[stkSym] = stkName
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        else:
+            con.close()
+
+    def fetchWLData(self):    
+        data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
+        
+        stkList = self.stkList
+        try:
+            for key in stkList.keys():
+                if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
                     break
 
-                print(i)
-                logging.debug(f"Processing {i}")
-                stkSymbol = self.watchlistData['Symbol'][i]
-                stkName = self.watchlistData['Name'][i]
-                logging.debug(f"{stkSymbol} in getWatchlistTableModel")
-                # print(stkSymbol , 'in getWatchlistTableModel')
-                try:
-                    stk = yf.Ticker(stkSymbol+".NS")
+                #importing data from yfinance
+                stk = yf.Ticker(key+".NS")
+                hist = stk.history(period = '1d', interval = '1d')
+                print(hist)
 
-                    hist = stk.history(period = '1d', interval = '1d') #this line is causing crash
+                #item method is used to retrieve data only else it return data with index
+                open =  round(hist['Open'].item(), 2)
+                high =  round(hist['High'].item(), 2)
+                low =  round(hist['Low'].item(), 2)
+                close =  round(hist['Close'].item(), 2)
 
-                    logging.debug("Successfully fetched historical data")
-                    # Process the historical data as needed
-                except Exception as e:
-                    logging.error(f"An error occurred fetching history for {stkSymbol}: {e}")
+                data['Symbol'].append(key)
+                data['Name'].append(stkList[key])
+                data['Open'].append(open)
+                data['High'].append(high)
+                data['Low'].append(low)
+                data['Close'].append(close)
+            
+        except Exception as e:
+            print(e)
 
+        return pd.DataFrame(data)
+        
+    def updateWL(self):
+        while(self.isRunning):
+            data = self.fetchWLData()
 
-                # # item method is used to retrieve data only else it return data with index
-                # open =  round(hist['Open'].item(), 2)
-                # high =  round(hist['High'].item(), 2)
-                # low =  round(hist['Low'].item(), 2)
-                # close =  round(hist['Close'].item(), 2)
-                # data.append([stkSymbol, stkName, open, high, low, close])
-
-            if self.isWLChanged or self.isRunning == False:
+            if(self.isRunning == False): #watchlist closed
+                continue
+            
+            if(self.isWLChanged): #if watchlist changed
+                self.stkList.clear()
+                self.getWLSymbols(self.currWL)
                 self.isWLChanged = False
-                break
-            
-            # self.sigChngWLData.emit(data)
-            time.sleep(5)
-            # print('in watchlist worker')
-            logging.debug('In watchlist worker')
-        # print('watchlist execution stopped')
-        logging.info('Watchlist execution stopped')
-            
+                continue
 
-    def setWatchlistChanged(self):
-        self.isWLChanged = True
+            self.sigShowWLData.emit(data)
+            time.sleep(5)
+
+            print('update WL called')
+        print('-------------------thread ended------------------')
+    
+    def setWatchlistChanged(self, wlName):
+        self.isWLChanged  = True
+        self.currWL = wlName
+        self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
+        
