@@ -77,7 +77,7 @@ class Watchlists(QMainWindow):
 
         self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
         self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData)
-        self.watchlistThread.start()
+        # self.watchlistThread.start()
 
     
     def addConnectors(self):

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'searchDialog.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDialog, QFrame,
-    QHBoxLayout, QHeaderView, QLineEdit, QPushButton,
-    QSizePolicy, QTableView, QVBoxLayout, QWidget)
+    QHBoxLayout, QHeaderView, QLineEdit, QSizePolicy,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_dlgSearch(object):
     def setupUi(self, dlgSearch):
@@ -38,12 +38,6 @@ class Ui_dlgSearch(object):
         self.leSearch.setMinimumSize(QSize(0, 50))
 
         self.horizontalLayout.addWidget(self.leSearch)
-
-        self.btnSearch = QPushButton(self.frame)
-        self.btnSearch.setObjectName(u"btnSearch")
-        self.btnSearch.setMinimumSize(QSize(100, 40))
-
-        self.horizontalLayout.addWidget(self.btnSearch)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -93,6 +87,8 @@ class Ui_dlgSearch(object):
 
     def retranslateUi(self, dlgSearch):
         dlgSearch.setWindowTitle(QCoreApplication.translate("dlgSearch", u"Dialog", None))
-        self.btnSearch.setText(QCoreApplication.translate("dlgSearch", u"Search", None))
+        self.leSearch.setInputMask("")
+        self.leSearch.setText("")
+        self.leSearch.setPlaceholderText(QCoreApplication.translate("dlgSearch", u"Search", None))
     # retranslateUi
 

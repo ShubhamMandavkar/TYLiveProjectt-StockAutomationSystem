@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>966</width>
-    <height>615</height>
+    <width>936</width>
+    <height>617</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,35 +37,6 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="QFrame" name="frame">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <widget class="QPushButton" name="btnSearch">
-          <property name="geometry">
-           <rect>
-            <x>490</x>
-            <y>40</y>
-            <width>141</width>
-            <height>29</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Search</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
         <widget class="QFrame" name="frame_4">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -91,8 +62,17 @@
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLabel" name="lblStkName">
+               <property name="font">
+                <font>
+                 <pointsize>18</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -100,7 +80,17 @@
            </widget>
           </item>
           <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QFrame" name="frame_6">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -108,155 +98,298 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QFormLayout" name="formLayout_2">
-             <item row="0" column="0">
+             <property name="labelAlignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <item row="2" column="0">
               <widget class="QLabel" name="lblSymbol">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
                <property name="text">
-                <string>Symbol : </string>
+                <string>Symbol :</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="2" column="1">
               <widget class="QLabel" name="lblSymbolVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="lblCompany">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Company Name :</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="lblCompanyVal">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lblExchange">
-               <property name="text">
-                <string>Exchange : </string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="lblOpen">
-               <property name="text">
-                <string>Open : </string>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="1">
-              <widget class="QLabel" name="lblOpenVal">
+              <widget class="QLabel" name="lblCompanyVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QLabel" name="lblHigh">
+              <widget class="QLabel" name="lblExchange">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>High : </string>
+                <string>Exchange : </string>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QLabel" name="lblHighVal">
+              <widget class="QLabel" name="lblExchangeVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="5" column="0">
-              <widget class="QLabel" name="lblLow">
+              <widget class="QLabel" name="lblOpen">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>Low : </string>
+                <string>Open : </string>
                </property>
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QLabel" name="lblLowVal">
+              <widget class="QLabel" name="lblOpenVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="6" column="0">
-              <widget class="QLabel" name="lblClose">
+              <widget class="QLabel" name="lblHigh">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>Close : </string>
+                <string>High : </string>
                </property>
               </widget>
              </item>
              <item row="6" column="1">
-              <widget class="QLabel" name="lblCloseVal">
+              <widget class="QLabel" name="lblHighVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="7" column="0">
-              <widget class="QLabel" name="lblChange">
+              <widget class="QLabel" name="lblLow">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>Change : </string>
+                <string>Low : </string>
                </property>
               </widget>
              </item>
              <item row="7" column="1">
-              <widget class="QLabel" name="lblChangeVal">
+              <widget class="QLabel" name="lblLowVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="8" column="0">
-              <widget class="QLabel" name="lbl52wkHigh">
+              <widget class="QLabel" name="lblClose">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>52 Week High : </string>
+                <string>Close : </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
              <item row="8" column="1">
-              <widget class="QLabel" name="lbl52wkHighVal">
+              <widget class="QLabel" name="lblCloseVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="9" column="0">
-              <widget class="QLabel" name="lbl52wkLow">
+              <widget class="QLabel" name="lblChange">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>52 Week Low : </string>
+                <string>Change : </string>
                </property>
               </widget>
              </item>
              <item row="9" column="1">
-              <widget class="QLabel" name="lbl52wkLowVal">
+              <widget class="QLabel" name="lblChangeVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="10" column="0">
-              <widget class="QLabel" name="lblVolume">
+              <widget class="QLabel" name="lbl52wkHigh">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
-                <string>Volume : </string>
+                <string>52 Week High : </string>
                </property>
               </widget>
              </item>
              <item row="10" column="1">
-              <widget class="QLabel" name="lblVolumeVal">
+              <widget class="QLabel" name="lbl52wkHighVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="lblExchangeVal">
+             <item row="11" column="0">
+              <widget class="QLabel" name="lbl52wkLow">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>52 Week Low : </string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="1">
+              <widget class="QLabel" name="lbl52wkLowVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QLabel" name="lblVolume">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="text">
+                <string>Volume : </string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="1">
+              <widget class="QLabel" name="lblVolumeVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -270,7 +403,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>50</height>
+              <height>80</height>
              </size>
             </property>
             <property name="frameShape">
@@ -282,6 +415,18 @@
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
               <widget class="QPushButton" name="btnBuy">
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Buy</string>
                </property>
@@ -294,6 +439,12 @@
                  <width>100</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
                </property>
                <property name="text">
                 <string>Add Alert</string>
@@ -308,6 +459,12 @@
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Chart</string>
                </property>
@@ -315,6 +472,18 @@
              </item>
              <item row="0" column="1">
               <widget class="QPushButton" name="btnSell">
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Sell</string>
                </property>
@@ -336,7 +505,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>966</width>
+     <width>936</width>
      <height>25</height>
     </rect>
    </property>

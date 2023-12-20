@@ -129,6 +129,6 @@ if __name__ == "__main__":
 
     widget.show()
     alertThread.start()
-    holdingsFetchingThread.start()
-    holdingsProcessThread.start()
+    # holdingsFetchingThread.start()
+    # holdingsProcessThread.start()
     sys.exit(app.exec())

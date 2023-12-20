@@ -16,6 +16,8 @@ from matplotlib.widgets import Cursor
 import matplotlib.animation as animation
 from mpl_interactions import ioff, panhandler, zoom_factory
 from matplotlib.backend_bases import MouseEvent
+import datetime
+from dateutil.relativedelta import relativedelta  
 
 from UIFiles.ui_chart import Ui_Chart
 from ProjectPages.indicatorDetailsDlg import IndicatorDetailsDlg
@@ -66,6 +68,7 @@ class StockChart(FigCavas):
 
         self.df = pd.DataFrame({'Date': hist.index, 'Open': hist['Open'],'High': hist['High'], 'Low':hist['Low'], 'Close':hist['Close']})
         # convert into datetime object
+        self.dates = pd.to_datetime(hist.index)
         self.df['Date'] = pd.to_datetime(hist.index)
 
         # apply map function
@@ -148,18 +151,92 @@ class StockChart(FigCavas):
         #EMAs        
         EMA9 = talib.EMA(self.df['Close'].to_numpy(), timeperiod=9)
         EMA14 = talib.EMA(self.df['Close'].to_numpy(), timeperiod=14)
-        EMA50 = talib.EMA(self.df['Close'].to_numpy(), timeperiod=50)  
 
         signal1 =[low if ((low < e1 and low > e2) or (low > e1 and low < e2)) else np.nan for low, e1, e2 in zip(self.df['Low'], EMA9,EMA14)]
 
         
-        PMHSignal = [np.nan, np.nan]  #previous month high signal
+        PMHSignal = []  #previous month high signal
         PMLSignal = [np.nan, np.nan]  #previous month Low signal
-        prevHigh = max(self.df['High'].iloc[0], self.df['High'].iloc[1])
-        prevLow = min(self.df['Low'].iloc[0], self.df['Low'].iloc[1])
-        for i in range(2, len(EMA50)):
+
+        self.monthDf = pd.DataFrame({'Date': [], 'Open': [],'High': [], 'Low': [], 'Close': []})
+        stk = yf.Ticker(self.stkSymbol+".NS")
+        hist = stk.history(period = 'max', interval = '1mo')
+
+        self.monthDf = pd.DataFrame({'Date': pd.to_datetime(hist.index), 'Open': hist['Open'],'High': hist['High'], 'Low':hist['Low'], 'Close':hist['Close']})
+
+        
+        EMA50 = talib.EMA(self.monthDf['Close'].to_numpy(), timeperiod=50)  
+            
+        # prevHigh = self.monthDf['High'].iloc[0]
+        prevLow = self.df['Low'].iloc[0]
+
+        i = 0
+        j= 0
+
+        m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+        m1 = int(m1)
+        year1 = int(year1)
+        m2, year2 = str(datetime.datetime.strftime(self.dates[j], '%m %Y')).split(' ')
+        m2 = int(m2)
+        year2 = int(year2)
+
+        if(year1 == year2):
+            while(m2 > m1 and m1 != m2-1):
+                i = i+1
+                m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+        else:
+            if(m2 == 1):
+                while(year1 != year2-1):
+                    i = i+1
+                    m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+                    m1 = int(m1)
+                    year1 = int(year1)
+                while(m1 != 12):
+                    i = i+1
+                    m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+            else:
+                while(year1 != year2):
+                    i = i+1
+                    m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+                    m1 = int(m1)
+                    year1 = int(year1)
+                while(m2 > m1 and m1 != m2-1):
+                    i = i+1
+                    m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m')) 
+
+        while(j < len(self.df)):
+            m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+            m2 = int(datetime.datetime.strftime(self.dates[j], '%m'))
+
+            while(m1 == m2):
+                j = j+1
+                if(j == len(self.df)):
+                    break
+
+                m2 = int(datetime.datetime.strftime(self.dates[j], '%m'))
+                PMHSignal.append(np.nan)
+            
+            while(abs(m1 - m2) > 1):
+                i = i+1
+                m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+                # print('myCalled--------------------', m1, year1, m2, year2, j)
+
+            # print(EMA50[i], EMA50[i-1], EMA50[i-2], i)
+
+            if EMA50[i] > EMA50[i-1] and EMA50[i-1] > EMA50[i-2]: 
+                print(self.df['High'].iloc[j], self.monthDf['High'].iloc[i])
+                if self.df['High'].iloc[j] > self.monthDf['High'].iloc[i]:
+                    PMHSignal.append(self.df['High'].iloc[j])
+                else:
+                    PMHSignal.append(np.nan)
+            else:
+                PMHSignal.append(np.nan)
+            
+            j = j+1
+
+        for i in range(1, len(EMA50)):
             #for uptrend
-            if EMA50[i] > EMA50[i-1] and EMA50[i-1]> EMA50[i-2]: 
+            '''if EMA50[i] > EMA50[i-1] and EMA50[i-1]> EMA50[i-2]: 
                 if self.df['High'].iloc[i] > prevHigh :
                     PMHSignal.append(self.df['High'].iloc[i])
                     prevHigh = self.df['High'].iloc[i]
@@ -167,7 +244,7 @@ class StockChart(FigCavas):
                     PMHSignal.append(np.nan)
             else:
                 prevHigh = self.df['High'].iloc[i]
-                PMHSignal.append(np.nan)
+                PMHSignal.append(np.nan)'''
 
             #for downtrend
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
@@ -186,8 +263,8 @@ class StockChart(FigCavas):
                         markersize = 50, color = 'r')) 
         pltLs.append(mpf.make_addplot(PMHSignal, ax = self.ax, type = 'scatter', marker = 'D', 
                         markersize = 50, color = 'g')) 
-        pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
-                        markersize = 50, color = 'r')) 
+        # pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
+        #                 markersize = 50, color = 'r')) 
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
         plt.draw()
@@ -284,7 +361,7 @@ class Chart(QMainWindow):
         self.chartVerticalLayout.addWidget(self.toolbar)
 
         self.renderChartState()
-        self.stkChart.showSignals()   
+        # self.stkChart.showSignals()   
 
     #This methods addds the indicators to the chart which were added by to user to show the saved state
     def renderChartState(self):     
@@ -313,7 +390,7 @@ class Chart(QMainWindow):
     def changeTimeFrame(self):
         self.stkChart.setTimeFrame(self.ui.cmbTimeFrame.currentText())
         self.renderChartState()
-        self.stkChart.showSignals()
+        # self.stkChart.showSignals()
     
     def showIndicatorsDetailsDlg(self):
         if self.ui.cmbIndicators.currentText() == 'None':
@@ -373,7 +450,7 @@ class Chart(QMainWindow):
 
                 self.stkChart.plotChart(self.stkChart.timeFrame, self.stkChart.period)
                 self.renderChartState() 
-                self.stkChart.showSignals()
+                # self.stkChart.showSignals()
 
             except mysql.connector.Error as err:
                 if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

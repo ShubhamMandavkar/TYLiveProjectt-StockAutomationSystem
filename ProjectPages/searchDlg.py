@@ -57,18 +57,18 @@ class SearchDlg(QDialog):
         self.ui.leSearch.textChanged.connect(self.showSuggestions)
 
     def showSuggestions(self):
-        stkName = self.ui.leSearch.text()
+        stkSym = self.ui.leSearch.text()
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
             #get the value of stkSymbol
-            query = f"""select * from stocks where stkName like '{stkName}%'"""
+            query = f"""select * from stocks where stkSymbol like '{stkSym}%'"""
             cursor.execute(query)
 
             data = []
-            for symbol,name, sector, *_ in cursor: #cursor returns tuple
-                data.append([symbol,name,sector])
+            for symbol,name, *_ in cursor: #cursor returns tuple
+                data.append([symbol,name])
 
             data = pd.DataFrame(data)
             model = TableModel(data)    
