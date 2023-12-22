@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMainWindow
 import mysql.connector
 from mysql.connector import errorcode
 from UIFiles.ui_myAlerts import Ui_myAlerts
+from ProjectPages.alertDlg import AlertDlg
 from workers import AlertWorker
 
 
@@ -15,7 +16,7 @@ class ListModel(QAbstractListModel):
     def data(self, index, role):
         if role == Qt.DisplayRole:
             # See below for the data structure.
-            *_ ,msg = self._data[index.row()]
+            *_ ,msg, _ = self._data[index.row()]
             # Return the todo text only.
             return msg
 
@@ -33,6 +34,12 @@ class MyAlerts(QMainWindow):
     
     def addConnectors(self):
         self.ui.btnDelete.clicked.connect(self.deleteAlert)  
+        self.ui.lsvMyAlerts.doubleClicked.connect(self.editAlert)
+
+    def editAlert(self):
+        # self.dlgAlert = AlertDlg(stkSymbol, stkName)
+        # self.dlgAlert.show()
+        print('clicked editAlert')
 
     def deleteAlert(self):
         modelIndexls = self.ui.lsvMyAlerts.selectedIndexes()
@@ -54,8 +61,8 @@ class MyAlerts(QMainWindow):
             cursor.execute(query)
 
             data = []
-            for (symbol,name, type, cond, tf, val, len1, len2, msg) in cursor: #cursor returns tuple
-                data.append([symbol, name, type, cond, tf, val, len1, len2, msg])
+            for (symbol,name, type, cond, tf, val, len1, len2, msg, isPaused) in cursor: #cursor returns tuple
+                data.append([symbol, name, type, cond, tf, val, len1, len2, msg, isPaused])
             
             #show updated alerts list
             model = ListModel(data)    
@@ -85,8 +92,8 @@ class MyAlerts(QMainWindow):
             cursor.execute(query)
 
             data = []
-            for (symbol, name, type, cond, tf, val,len1, len2, msg) in cursor: #cursor returns tuple
-                data.append([symbol, name, type, cond, tf, val, len1, len2, msg])
+            for (symbol, name, type, cond, tf, val,len1, len2, msg, isPaused) in cursor: #cursor returns tuple
+                data.append([symbol, name, type, cond, tf, val, len1, len2, msg, isPaused])
 
             model = ListModel(data)    
             self.ui.lsvMyAlerts.setModel(model) 

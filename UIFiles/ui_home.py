@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'home.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -38,26 +38,34 @@ class Ui_Home(object):
         self.formLayout.setObjectName(u"formLayout")
         self.btnMyAlerts = QPushButton(self.frmNavBar)
         self.btnMyAlerts.setObjectName(u"btnMyAlerts")
+        font = QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        self.btnMyAlerts.setFont(font)
 
         self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
 
         self.btnHoldings = QPushButton(self.frmNavBar)
         self.btnHoldings.setObjectName(u"btnHoldings")
+        self.btnHoldings.setFont(font)
 
         self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
 
         self.btnCustomDetails = QPushButton(self.frmNavBar)
         self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+        self.btnCustomDetails.setFont(font)
 
         self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
 
         self.btnWatchlists = QPushButton(self.frmNavBar)
         self.btnWatchlists.setObjectName(u"btnWatchlists")
+        self.btnWatchlists.setFont(font)
 
         self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
 
         self.btnHome = QPushButton(self.frmNavBar)
         self.btnHome.setObjectName(u"btnHome")
+        self.btnHome.setFont(font)
 
         self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
 
@@ -77,7 +85,8 @@ class Ui_Home(object):
         self.frame.setFrameShadow(QFrame.Raised)
         self.btnSearch = QPushButton(self.frame)
         self.btnSearch.setObjectName(u"btnSearch")
-        self.btnSearch.setGeometry(QRect(490, 40, 141, 29))
+        self.btnSearch.setGeometry(QRect(640, 30, 141, 41))
+        self.btnSearch.setFont(font)
 
         self.verticalLayout.addWidget(self.frame)
 
@@ -90,6 +99,10 @@ class Ui_Home(object):
         self.lblOrders = QLabel(self.frame_2)
         self.lblOrders.setObjectName(u"lblOrders")
         self.lblOrders.setMaximumSize(QSize(16777215, 40))
+        font1 = QFont()
+        font1.setPointSize(14)
+        font1.setBold(True)
+        self.lblOrders.setFont(font1)
 
         self.verticalLayout_2.addWidget(self.lblOrders)
 
@@ -102,36 +115,42 @@ class Ui_Home(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.lblClosed = QLabel(self.frame_3)
         self.lblClosed.setObjectName(u"lblClosed")
+        self.lblClosed.setFont(font)
         self.lblClosed.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblClosed, 2, 1, 1, 1)
 
         self.lblPendings = QLabel(self.frame_3)
         self.lblPendings.setObjectName(u"lblPendings")
+        self.lblPendings.setFont(font)
         self.lblPendings.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblPendings, 2, 0, 1, 1)
 
         self.lblPendingsVal = QLabel(self.frame_3)
         self.lblPendingsVal.setObjectName(u"lblPendingsVal")
+        self.lblPendingsVal.setFont(font)
         self.lblPendingsVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblPendingsVal, 0, 0, 1, 1)
 
         self.lblClosedVal = QLabel(self.frame_3)
         self.lblClosedVal.setObjectName(u"lblClosedVal")
+        self.lblClosedVal.setFont(font)
         self.lblClosedVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblClosedVal, 0, 1, 1, 1)
 
         self.lblRejectedVal = QLabel(self.frame_3)
         self.lblRejectedVal.setObjectName(u"lblRejectedVal")
+        self.lblRejectedVal.setFont(font)
         self.lblRejectedVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblRejectedVal, 0, 2, 1, 1)
 
         self.lblRejected = QLabel(self.frame_3)
         self.lblRejected.setObjectName(u"lblRejected")
+        self.lblRejected.setFont(font)
         self.lblRejected.setAlignment(Qt.AlignCenter)
 
         self.gridLayout.addWidget(self.lblRejected, 2, 2, 1, 1)
@@ -142,6 +161,7 @@ class Ui_Home(object):
         self.lblHoldings = QLabel(self.frame_2)
         self.lblHoldings.setObjectName(u"lblHoldings")
         self.lblHoldings.setMaximumSize(QSize(16777215, 40))
+        self.lblHoldings.setFont(font1)
 
         self.verticalLayout_2.addWidget(self.lblHoldings)
 
@@ -154,36 +174,42 @@ class Ui_Home(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.lblToltalInv = QLabel(self.frame_5)
         self.lblToltalInv.setObjectName(u"lblToltalInv")
+        self.lblToltalInv.setFont(font)
         self.lblToltalInv.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblToltalInv, 1, 0, 1, 1)
 
         self.lbalCurrentValueVal = QLabel(self.frame_5)
         self.lbalCurrentValueVal.setObjectName(u"lbalCurrentValueVal")
+        self.lbalCurrentValueVal.setFont(font)
         self.lbalCurrentValueVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lbalCurrentValueVal, 0, 1, 1, 1)
 
         self.lblPandLVal = QLabel(self.frame_5)
         self.lblPandLVal.setObjectName(u"lblPandLVal")
+        self.lblPandLVal.setFont(font)
         self.lblPandLVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblPandLVal, 0, 2, 1, 1)
 
         self.lblTotalInvVal = QLabel(self.frame_5)
         self.lblTotalInvVal.setObjectName(u"lblTotalInvVal")
+        self.lblTotalInvVal.setFont(font)
         self.lblTotalInvVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblTotalInvVal, 0, 0, 1, 1)
 
         self.lblPandL = QLabel(self.frame_5)
         self.lblPandL.setObjectName(u"lblPandL")
+        self.lblPandL.setFont(font)
         self.lblPandL.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblPandL, 1, 2, 1, 1)
 
         self.lblCurrentValue = QLabel(self.frame_5)
         self.lblCurrentValue.setObjectName(u"lblCurrentValue")
+        self.lblCurrentValue.setFont(font)
         self.lblCurrentValue.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_2.addWidget(self.lblCurrentValue, 1, 1, 1, 1)
@@ -194,6 +220,7 @@ class Ui_Home(object):
         self.lblPositions = QLabel(self.frame_2)
         self.lblPositions.setObjectName(u"lblPositions")
         self.lblPositions.setMaximumSize(QSize(16777215, 40))
+        self.lblPositions.setFont(font1)
 
         self.verticalLayout_2.addWidget(self.lblPositions)
 
@@ -206,36 +233,42 @@ class Ui_Home(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.lblTotalPandL = QLabel(self.frame_4)
         self.lblTotalPandL.setObjectName(u"lblTotalPandL")
+        self.lblTotalPandL.setFont(font)
         self.lblTotalPandL.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblTotalPandL, 1, 1, 1, 1)
 
         self.lblTotalPandLVal = QLabel(self.frame_4)
         self.lblTotalPandLVal.setObjectName(u"lblTotalPandLVal")
+        self.lblTotalPandLVal.setFont(font)
         self.lblTotalPandLVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblTotalPandLVal, 0, 1, 1, 1)
 
         self.lblOpenPos = QLabel(self.frame_4)
         self.lblOpenPos.setObjectName(u"lblOpenPos")
+        self.lblOpenPos.setFont(font)
         self.lblOpenPos.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblOpenPos, 1, 0, 1, 1)
 
         self.lblOpenPosVal = QLabel(self.frame_4)
         self.lblOpenPosVal.setObjectName(u"lblOpenPosVal")
+        self.lblOpenPosVal.setFont(font)
         self.lblOpenPosVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblOpenPosVal, 0, 0, 1, 1)
 
         self.lblDayMTMVal = QLabel(self.frame_4)
         self.lblDayMTMVal.setObjectName(u"lblDayMTMVal")
+        self.lblDayMTMVal.setFont(font)
         self.lblDayMTMVal.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblDayMTMVal, 0, 2, 1, 1)
 
         self.lblDayMTM = QLabel(self.frame_4)
         self.lblDayMTM.setObjectName(u"lblDayMTM")
+        self.lblDayMTM.setFont(font)
         self.lblDayMTM.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_3.addWidget(self.lblDayMTM, 1, 2, 1, 1)

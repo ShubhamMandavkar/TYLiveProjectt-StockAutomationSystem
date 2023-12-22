@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QDialog
 #     pyside6-uic form.ui -o ui_form.py, or
 #     pyside2-uic form.ui -o ui_form.py 
 
+
 from UIFiles.ui_home import Ui_Home
 from ProjectPages.searchDlg import SearchDlg
 from ProjectPages.myAlertsMW import MyAlerts
@@ -128,7 +129,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    alertThread.start()
+    # alertThread.start()
     # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
     sys.exit(app.exec())

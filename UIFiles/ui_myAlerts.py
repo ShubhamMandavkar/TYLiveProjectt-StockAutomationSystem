@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QFrame, QHBoxLayout,
-    QLabel, QListView, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QFormLayout, QFrame,
+    QHBoxLayout, QLabel, QListView, QMainWindow,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QVBoxLayout, QWidget)
 
 class Ui_myAlerts(object):
     def setupUi(self, myAlerts):
@@ -54,11 +54,26 @@ class Ui_myAlerts(object):
 
         self.verticalLayout_2.addWidget(self.lsvMyAlerts)
 
-        self.btnDelete = QPushButton(self.frame_4)
+        self.frame = QFrame(self.frame_4)
+        self.frame.setObjectName(u"frame")
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frame)
+        self.formLayout.setObjectName(u"formLayout")
+        self.btnDelete = QPushButton(self.frame)
         self.btnDelete.setObjectName(u"btnDelete")
         self.btnDelete.setMaximumSize(QSize(100, 16777215))
 
-        self.verticalLayout_2.addWidget(self.btnDelete)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.btnDelete)
+
+        self.btnPause = QPushButton(self.frame)
+        self.btnPause.setObjectName(u"btnPause")
+        self.btnPause.setMaximumSize(QSize(100, 16777215))
+
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.btnPause)
+
+
+        self.verticalLayout_2.addWidget(self.frame)
 
 
         self.horizontalLayout.addWidget(self.frame_4)
@@ -81,5 +96,6 @@ class Ui_myAlerts(object):
         myAlerts.setWindowTitle(QCoreApplication.translate("myAlerts", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("myAlerts", u"My Alerts", None))
         self.btnDelete.setText(QCoreApplication.translate("myAlerts", u"Delete", None))
+        self.btnPause.setText(QCoreApplication.translate("myAlerts", u"Pause", None))
     # retranslateUi
 

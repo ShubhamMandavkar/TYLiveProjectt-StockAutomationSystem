@@ -34,7 +34,7 @@ class AlertWorker(QObject):
             query = f"""select * from alerts"""
             cursor.execute(query)
             alerts = []
-            for (sym, name, type, condition, tf, val, len1, len2, msg) in cursor:
+            for (sym, name, type, condition, tf, val, len1, len2, msg, isPaused) in cursor:
                 alert = dict()
                 alert['stkSymbol'] = sym
                 alert['stkName'] = name
@@ -45,6 +45,7 @@ class AlertWorker(QObject):
                 alert['len1'] = len1
                 alert['len2'] = len2
                 alert['alertMsg'] = msg
+                alert['isPaused'] = isPaused
 
                 alerts.append(alert)
             AlertWorker.alertList = alerts
@@ -77,6 +78,9 @@ class AlertWorker(QObject):
     def processAlerts(self):
         while(self.isRunning):
             for alert in AlertWorker.alertList:
+                if(alert['isPaused']):
+                    continue
+                
                 # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
                 currPrice = getQuoteFromYfinance('shubh',alert['stkSymbol'], 'tc', 'NSE')['Close'].iloc[-1]
                 match alert['alertCond']:

@@ -32,6 +32,12 @@
       <layout class="QFormLayout" name="formLayout">
        <item row="1" column="0" colspan="2">
         <widget class="QPushButton" name="btnMyAlerts">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>MyAlerts</string>
          </property>
@@ -39,6 +45,12 @@
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QPushButton" name="btnHoldings">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Holdings</string>
          </property>
@@ -46,6 +58,12 @@
        </item>
        <item row="4" column="0" colspan="2">
         <widget class="QPushButton" name="btnCustomDetails">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>CustomDetails</string>
          </property>
@@ -53,6 +71,12 @@
        </item>
        <item row="3" column="0" colspan="2">
         <widget class="QPushButton" name="btnWatchlists">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Watchlists</string>
          </property>
@@ -60,6 +84,12 @@
        </item>
        <item row="0" column="0" colspan="2">
         <widget class="QPushButton" name="btnHome">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Home</string>
          </property>
@@ -94,11 +124,17 @@
          <widget class="QPushButton" name="btnSearch">
           <property name="geometry">
            <rect>
-            <x>490</x>
-            <y>40</y>
+            <x>640</x>
+            <y>30</y>
             <width>141</width>
-            <height>29</height>
+            <height>41</height>
            </rect>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
            <string>Search</string>
@@ -123,6 +159,12 @@
               <height>40</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
              <string>Orders</string>
             </property>
@@ -145,6 +187,12 @@
             <layout class="QGridLayout" name="gridLayout">
              <item row="2" column="1">
               <widget class="QLabel" name="lblClosed">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Closed</string>
                </property>
@@ -155,6 +203,12 @@
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="lblPendings">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Pendings</string>
                </property>
@@ -165,6 +219,12 @@
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="lblPendingsVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -175,6 +235,12 @@
              </item>
              <item row="0" column="1">
               <widget class="QLabel" name="lblClosedVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -185,6 +251,12 @@
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="lblRejectedVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -195,6 +267,12 @@
              </item>
              <item row="2" column="2">
               <widget class="QLabel" name="lblRejected">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Rejected</string>
                </property>
@@ -213,6 +291,12 @@
               <width>16777215</width>
               <height>40</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
              <string>Holdings</string>
@@ -236,6 +320,12 @@
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="1" column="0">
               <widget class="QLabel" name="lblToltalInv">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Total Investment</string>
                </property>
@@ -246,6 +336,12 @@
              </item>
              <item row="0" column="1">
               <widget class="QLabel" name="lbalCurrentValueVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -256,6 +352,12 @@
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="lblPandLVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -266,6 +368,12 @@
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="lblTotalInvVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -276,6 +384,12 @@
              </item>
              <item row="1" column="2">
               <widget class="QLabel" name="lblPandL">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>P &amp; L</string>
                </property>
@@ -286,6 +400,12 @@
              </item>
              <item row="1" column="1">
               <widget class="QLabel" name="lblCurrentValue">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Current Value</string>
                </property>
@@ -304,6 +424,12 @@
               <width>16777215</width>
               <height>40</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
              <string>Positions</string>
@@ -327,6 +453,12 @@
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="1" column="1">
               <widget class="QLabel" name="lblTotalPandL">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Total P &amp; L</string>
                </property>
@@ -337,6 +469,12 @@
              </item>
              <item row="0" column="1">
               <widget class="QLabel" name="lblTotalPandLVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0 </string>
                </property>
@@ -347,6 +485,12 @@
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="lblOpenPos">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Open Positions</string>
                </property>
@@ -357,6 +501,12 @@
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="lblOpenPosVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -367,6 +517,12 @@
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="lblDayMTMVal">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>0</string>
                </property>
@@ -377,6 +533,12 @@
              </item>
              <item row="1" column="2">
               <widget class="QLabel" name="lblDayMTM">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Day MTM</string>
                </property>

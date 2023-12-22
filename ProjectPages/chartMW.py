@@ -156,7 +156,7 @@ class StockChart(FigCavas):
 
         
         PMHSignal = []  #previous month high signal
-        PMLSignal = [np.nan, np.nan]  #previous month Low signal
+        PMLSignal = []  #previous month Low signal
 
         self.monthDf = pd.DataFrame({'Date': [], 'Open': [],'High': [], 'Low': [], 'Close': []})
         stk = yf.Ticker(self.stkSymbol+".NS")
@@ -215,8 +215,10 @@ class StockChart(FigCavas):
 
                 m2 = int(datetime.datetime.strftime(self.dates[j], '%m'))
                 PMHSignal.append(np.nan)
+                PMLSignal.append(np.nan)
+
             
-            while(abs(m1 - m2) > 1):
+            while(abs(m1 - m2) > 1 and (m1+1)%12 != m2):
                 i = i+1
                 m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
                 # print('myCalled--------------------', m1, year1, m2, year2, j)
@@ -226,30 +228,15 @@ class StockChart(FigCavas):
             if EMA50[i] > EMA50[i-1] and EMA50[i-1] > EMA50[i-2]: 
                 print(self.df['High'].iloc[j], self.monthDf['High'].iloc[i])
                 if self.df['High'].iloc[j] > self.monthDf['High'].iloc[i]:
-                    PMHSignal.append(self.df['High'].iloc[j])
+                    PMHSignal.append(self.df['High'].iloc[j] + 5) # +5 added to show signal little bit above candle
                 else:
                     PMHSignal.append(np.nan)
             else:
                 PMHSignal.append(np.nan)
             
-            j = j+1
-
-        for i in range(1, len(EMA50)):
-            #for uptrend
-            '''if EMA50[i] > EMA50[i-1] and EMA50[i-1]> EMA50[i-2]: 
-                if self.df['High'].iloc[i] > prevHigh :
-                    PMHSignal.append(self.df['High'].iloc[i])
-                    prevHigh = self.df['High'].iloc[i]
-                else:
-                    PMHSignal.append(np.nan)
-            else:
-                prevHigh = self.df['High'].iloc[i]
-                PMHSignal.append(np.nan)'''
-
-            #for downtrend
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
                 if self.df['Low'].iloc[i] < prevLow :
-                    PMLSignal.append(self.df['Low'].iloc[i])
+                    PMLSignal.append(self.df['Low'].iloc[i] + 5) # +5 added to show signal little bit above candle
                     prevLow = self.df['Low'].iloc[i]
                 else:
                     PMLSignal.append(np.nan)
@@ -257,14 +244,17 @@ class StockChart(FigCavas):
                 prevLow = self.df['Low'].iloc[i]
                 PMLSignal.append(np.nan)
 
+            j = j+1
+
+
         #end PMHSignal
         # line1, = plt.plot(self.df['Date'], self.df['Close'], color='black')
         pltLs.append(mpf.make_addplot(signal1, ax = self.ax, type = 'scatter', marker = '^', 
                         markersize = 50, color = 'r')) 
         pltLs.append(mpf.make_addplot(PMHSignal, ax = self.ax, type = 'scatter', marker = 'D', 
                         markersize = 50, color = 'g')) 
-        # pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
-        #                 markersize = 50, color = 'r')) 
+        pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
+                        markersize = 50, color = 'r')) 
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
         plt.draw()
@@ -296,8 +286,8 @@ class StockChart(FigCavas):
                 HMASignal = [self.df['Close'].iloc[i] if (self.df['Close'].iloc[i] > HMA[i] and self.df['Open'].iloc[i] < HMA[i]) or (self.df['Close'].iloc[i-1] < HMA[i-1] and self.df['Open'].iloc[i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
 
                 HMASignal.insert(0, np.nan)
-                pltLs.append(mpf.make_addplot(HMASignal, ax = self.ax, type = 'scatter', marker = '^', 
-                        markersize = 50, color = 'b'))
+                # pltLs.append(mpf.make_addplot(HMASignal, ax = self.ax, type = 'scatter', marker = '^', 
+                #         markersize = 50, color = 'b')) temporarily commented for the seminar purpose
                 print('Hull Moving Average')
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
@@ -390,7 +380,7 @@ class Chart(QMainWindow):
     def changeTimeFrame(self):
         self.stkChart.setTimeFrame(self.ui.cmbTimeFrame.currentText())
         self.renderChartState()
-        # self.stkChart.showSignals()
+        self.stkChart.showSignals()
     
     def showIndicatorsDetailsDlg(self):
         if self.ui.cmbIndicators.currentText() == 'None':
