@@ -129,7 +129,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    # alertThread.start()
+    alertThread.start()
     # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
     sys.exit(app.exec())

@@ -18,29 +18,13 @@ class AlertDlg(QDialog):
         self.stkSymbol = stkSym
         self.stkName = stkName
 
-        # self.dlgAlert = dlgAlert #pointer to alert window stored. To close it when user a set alert successfully.
-
         self.addConnectors()
 
         self.ui.dsbAlertVal.setMaximum(sys.float_info.max)
         self.ui.leStkName.setText(self.stkName)
-        print(self.ui.leStkName.text())
         self.ui.leStkName.setReadOnly(True) 
 
-        # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
-        # lastPrice = stk['data']['last_price']
-
-        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
-        lastPrice = stkDf['Close'].iloc[-1]
-        self.ui.dsbAlertVal.setValue(lastPrice)
-
-        self.ui.lblTimeFrame.hide()
-        self.ui.cmbTimeFrame.hide()
-        self.ui.lblLen1.hide()
-        self.ui.lblLen2.hide()
-        self.ui.sbLen1.hide()
-        self.ui.sbLen2.hide()
-
+        self.validateType() #by default type is set to price
         self.generateMsg()
     
     def addConnectors(self):

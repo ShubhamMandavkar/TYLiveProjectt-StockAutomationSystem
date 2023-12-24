@@ -1,6 +1,6 @@
 
 from PySide6.QtWidgets import QMainWindow
-from APIMethods import getQuote, getQuote2
+from APIMethods import getQuote2, getQuote, getQuoteFromYfinance
 import json
 import yfinance as yf
 
@@ -43,12 +43,13 @@ class StockDetails(QMainWindow):
 
         stk = yf.Ticker(self.stkSymbol +".NS")
         stkInfo = stk.info
+        stkDf = getQuoteFromYfinance('', self.stkSymbol,'tc','NSE')
         self.ui.lblCompanyVal.setText(stkInfo['longName'])
         self.ui.lblExchangeVal.setText('NSE')
-        self.ui.lblOpenVal.setText(str(stkInfo['open']))
-        self.ui.lblHighVal.setText(str(stkInfo['dayHigh']))
-        self.ui.lblLowVal.setText(str(stkInfo['dayLow']))
-        self.ui.lblCloseVal.setText(str(stkInfo['previousClose']))
+        self.ui.lblOpenVal.setText(str(round(stkDf['Open'].iloc[0], 2)))
+        self.ui.lblHighVal.setText(str(round(stkDf['High'].iloc[0], 2)))
+        self.ui.lblLowVal.setText(str(round(stkDf['Low'].iloc[0], 2)))
+        self.ui.lblCloseVal.setText(str(round(stkDf['Close'].iloc[0], 2)))
         self.ui.lblChange.hide()
         self.ui.lblChangeVal.hide()
         # self.ui.lblChangeVal.setText(str(stkInfo['longName']))
@@ -61,6 +62,13 @@ class StockDetails(QMainWindow):
     
     def showAlertDialog(self):
         self.dlgAlert = AlertDlg(self.stkSymbol, self.stkName)
+
+        # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
+        # lastPrice = stk['data']['last_price']
+
+        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
+        lastPrice = stkDf['Close'].iloc[-1]
+        self.dlgAlert.ui.dsbAlertVal.setValue(lastPrice)
         self.dlgAlert.show()
     
     def showChartWindow(self):
