@@ -1,3 +1,6 @@
+from cProfile import label
+from re import S
+from turtle import width
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigCavas
@@ -92,12 +95,12 @@ class StockChart(FigCavas):
 
         # Add a vertical line to show the current candle
         # because the axis has been cleared the line must be redrawn
-        self.vline = self.ax.axvline(x=0, color='r', linestyle='--', label='Vertical Line', linewidth=1) 
+        self.vline = self.ax.axvline(x=0, color='r', linestyle='--', linewidth=1) 
         self.vline.set_visible(False)
         
         #Add dateTick on xaxis
         self.dateTick = self.ax.text(0, -0.05, '', color = 'white',  transform = self.ax.get_xaxis_transform(), ha='center', va='top', bbox=dict(facecolor='grey', alpha=1))
-        
+
         print('chart shown')
 
     #get data for daily, weekly, or monthly dataFrame   
@@ -226,7 +229,6 @@ class StockChart(FigCavas):
             # print(EMA50[i], EMA50[i-1], EMA50[i-2], i)
 
             if EMA50[i] > EMA50[i-1] and EMA50[i-1] > EMA50[i-2]: 
-                print(self.df['High'].iloc[j], self.monthDf['High'].iloc[i])
                 if self.df['High'].iloc[j] > self.monthDf['High'].iloc[i]:
                     PMHSignal.append(self.df['High'].iloc[j] + 5) # +5 added to show signal little bit above candle
                 else:
@@ -252,14 +254,14 @@ class StockChart(FigCavas):
         pltLs.append(mpf.make_addplot(signal1, ax = self.ax, type = 'scatter', marker = '^', 
                         markersize = 50, color = 'r')) 
         pltLs.append(mpf.make_addplot(PMHSignal, ax = self.ax, type = 'scatter', marker = 'D', 
-                        markersize = 50, color = 'g')) 
+                        markersize = 50, color = 'g', label = 'PMHSignal')) 
         pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
-                        markersize = 50, color = 'r')) 
+                        markersize = 50, color = 'r', label = 'PMLSignal')) 
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
         plt.draw()
 
-    def addIndicator(self, indicator, length):
+    def addIndicator(self, indicator, length, wdth = 1, colour = 'red'):
         pltLs = []
         match indicator:
             case 'RSI':                                                 #work in progress(incomplete)
@@ -276,12 +278,12 @@ class StockChart(FigCavas):
             case 'Exponential Moving Average':
                 EMA = talib.EMA(self.df['Close'].to_numpy(), timeperiod= length)
 
-                pltLs.append(mpf.make_addplot(EMA, ax = self.ax))
+                pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA' + str(length)))
                 print('Exponential moving average plotted')
 
             case 'Hull Moving Average':
                 HMA = talib.WMA(2*talib.WMA(self.df['Close'], timeperiod = length/2)-talib.WMA(self.df['Close'], timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
-                pltLs.append(mpf.make_addplot(HMA, ax = self.ax))
+                pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA' + str(length)))
  
                 HMASignal = [self.df['Close'].iloc[i] if (self.df['Close'].iloc[i] > HMA[i] and self.df['Open'].iloc[i] < HMA[i]) or (self.df['Close'].iloc[i-1] < HMA[i-1] and self.df['Open'].iloc[i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
 
@@ -351,7 +353,9 @@ class Chart(QMainWindow):
         self.chartVerticalLayout.addWidget(self.toolbar)
 
         self.renderChartState()
-        # self.stkChart.showSignals()   
+        self.stkChart.showSignals() 
+        self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
+        
 
     #This methods addds the indicators to the chart which were added by to user to show the saved state
     def renderChartState(self):     
@@ -362,10 +366,11 @@ class Chart(QMainWindow):
             query = f"""select * from chart_state"""
             cursor.execute(query)
             self.ui.cmbIndicatorsAdded.clear()
-            for indicator, len, color in cursor:
-                self.stkChart.addIndicator(indicator, len)
+            for indicator, len, width, color in cursor:
+                self.stkChart.addIndicator(indicator, len, width, color)
                 self.ui.cmbIndicatorsAdded.addItem(indicator + '.' + str(len))
 
+            cursor.close()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -374,13 +379,14 @@ class Chart(QMainWindow):
             else:
                 print("error:",err)
         finally:
-            cursor.close()
             con.close()
     
     def changeTimeFrame(self):
         self.stkChart.setTimeFrame(self.ui.cmbTimeFrame.currentText())
         self.renderChartState()
         self.stkChart.showSignals()
+        #show legend
+        self.stkChart.ax.legend(loc = 'upper left', fontsize="9") #needs to be called when entire chart has been ploted else it doesn't loc the legend
     
     def showIndicatorsDetailsDlg(self):
         if self.ui.cmbIndicators.currentText() == 'None':
@@ -390,17 +396,21 @@ class Chart(QMainWindow):
         self.dlgIndicatorDetails.show()
 
         def saveDetails():
-            length = self.dlgIndicatorDetails.ui.sbLen.value()
             indicator = self.ui.cmbIndicators.currentText()
+            length = self.dlgIndicatorDetails.ui.sbLen.value()
+            width = self.dlgIndicatorDetails.ui.dsbWidth.value()
+            color = self.dlgIndicatorDetails.color.name()
 
-            self.stkChart.addIndicator(indicator, length)
+            self.stkChart.addIndicator(indicator, length, width, color)
+            #show legend
+            self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
 
             #save chart state in Database
             try:
                 con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
                 cursor = con.cursor()
 
-                query = f"""insert into chart_state values('{indicator}', {length}, 'null') """
+                query = f"""insert into chart_state values('{indicator}', {length}, {width}, '{color}') """
                 cursor.execute(query)
                 con.commit()
 
@@ -440,7 +450,9 @@ class Chart(QMainWindow):
 
                 self.stkChart.plotChart(self.stkChart.timeFrame, self.stkChart.period)
                 self.renderChartState() 
-                # self.stkChart.showSignals()
+                self.stkChart.showSignals()
+                #show legend
+                self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
 
             except mysql.connector.Error as err:
                 if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

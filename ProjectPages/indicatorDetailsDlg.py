@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QDialog
+import PySide6.QtGui
+from PySide6.QtWidgets import QDialog, QColorDialog
 from UIFiles.ui_indicatorDetailsDlg import Ui_dlgIndicatorDetails
 
 class IndicatorDetailsDlg(QDialog):
@@ -6,3 +7,28 @@ class IndicatorDetailsDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgIndicatorDetails()
         self.ui.setupUi(self)
+
+        self.colorDlg = QColorDialog()
+        self.colorDlg.setCurrentColor('blue')
+        self.color = self.colorDlg.currentColor()
+        self.ui.btnColor.setStyleSheet(f"background-color: { self.color.name() }")
+        self.addConnectors()
+
+    def addConnectors(self):
+        self.ui.bbOkCancel.clicked.connect(self.closeDlg)
+
+        self.ui.btnColor.clicked.connect(self.colorDlg.show)
+        self.colorDlg.colorSelected.connect(self.setColor)
+
+    def setColor(self):
+        self.color = self.colorDlg.currentColor()
+        self.ui.btnColor.setStyleSheet(f"background-color: {self.color.name()};")
+    
+    def closeEvent(self, arg__1: PySide6.QtGui.QCloseEvent) -> None:
+        self.colorDlg.close()
+        return super().closeEvent(arg__1)
+
+    def closeDlg(self):
+        self.colorDlg.close()
+        self.close()
+
