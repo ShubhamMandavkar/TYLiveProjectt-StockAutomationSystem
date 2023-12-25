@@ -61,8 +61,6 @@ class StockChart(FigCavas):
        
         # self.growingCandleAnimation()
 
-        self.indicators = {}
-
     def plotChart(self, timeFrame, myPeriod):
         '''importing data from yfinance'''
         stk = yf.Ticker(self.stkSymbol+".NS")
@@ -279,8 +277,6 @@ class StockChart(FigCavas):
                 pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA' + str(length) + ' $'))
                 print('Exponential moving average plotted')
 
-                self.indicators['EMA' + str(length)] = EMA
-
             case 'Hull Moving Average':
                 HMA = talib.WMA(2*talib.WMA(self.df['Close'], timeperiod = length/2)-talib.WMA(self.df['Close'], timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
                 pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA' + str(length) + ' $'))
@@ -291,8 +287,6 @@ class StockChart(FigCavas):
                 # pltLs.append(mpf.make_addplot(HMASignal, ax = self.ax, type = 'scatter', marker = '^', 
                 #         markersize = 50, color = 'b')) temporarily commented for the seminar purpose
                 print('Hull Moving Average plotted')
-
-                self.indicators['HMA' + str(length)] = HMA
 
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
@@ -513,7 +507,8 @@ class Chart(QMainWindow):
                     lbl = line.get_label()
                     if('EMA' in lbl or 'HMA' in lbl):
                         name, _ = str(lbl).split(' ')
-                        line.set_label(name + ' ' +str(round(self.stkChart.indicators[name][xdata], 2)))
+                        # print(line.get_ydata(True)[xdata])
+                        line.set_label(name + ' ' +str(round(line.get_ydata(True)[xdata], 2)))
 
             elif math.ceil(event.xdata) >= len(self.stkChart.df):
                 self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[-1],'.2f')))
@@ -526,7 +521,8 @@ class Chart(QMainWindow):
                     lbl = line.get_label()
                     if('EMA' in lbl or 'HMA' in lbl):
                         name, _ = str(lbl).split(' ')
-                        line.set_label(name + ' ' +str(round(self.stkChart.indicators[name][-1], 2)))
+                        # print(line.get_ydata(True)[-1])
+                        line.set_label(name + ' ' +str(round(line.get_ydata(True)[-1], 2)))
             else: #math.ceil(event.xdata) < 0
                 self.ui.lblOpenVal.setText('$')
                 self.ui.lblHighVal.setText('$')
