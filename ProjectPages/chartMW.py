@@ -51,9 +51,6 @@ class StockChart(FigCavas):
 
         self.ax = self.fig.subplots()
         self.plotChart(self.timeFrame, self.period)
-
-        # setting title
-        # plt.title(self.stkName)
         
         self.fig.tight_layout()
 
@@ -63,6 +60,8 @@ class StockChart(FigCavas):
         # pan_handler = panhandler(self.fig) #if this is enabled then it stop the zoom in x axis and y axis
        
         # self.growingCandleAnimation()
+
+        self.indicators = {}
 
     def plotChart(self, timeFrame, myPeriod):
         '''importing data from yfinance'''
@@ -237,19 +236,18 @@ class StockChart(FigCavas):
                 PMHSignal.append(np.nan)
             
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
-                if self.df['Low'].iloc[i] < prevLow :
-                    PMLSignal.append(self.df['Low'].iloc[i] + 5) # +5 added to show signal little bit above candle
-                    prevLow = self.df['Low'].iloc[i]
+                if self.df['Low'].iloc[j] < self.monthDf['Low'].iloc[i] :
+                    PMLSignal.append(self.df['Low'].iloc[j] + 5) # +5 added to show signal little bit above candle
                 else:
                     PMLSignal.append(np.nan)
             else:
-                prevLow = self.df['Low'].iloc[i]
                 PMLSignal.append(np.nan)
 
             j = j+1
 
 
-        #end PMHSignal
+        #end PMLSignal
+
         # line1, = plt.plot(self.df['Date'], self.df['Close'], color='black')
         pltLs.append(mpf.make_addplot(signal1, ax = self.ax, type = 'scatter', marker = '^', 
                         markersize = 50, color = 'r')) 
@@ -278,19 +276,24 @@ class StockChart(FigCavas):
             case 'Exponential Moving Average':
                 EMA = talib.EMA(self.df['Close'].to_numpy(), timeperiod= length)
 
-                pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA' + str(length)))
+                pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA' + str(length) + ' $'))
                 print('Exponential moving average plotted')
+
+                self.indicators['EMA' + str(length)] = EMA
 
             case 'Hull Moving Average':
                 HMA = talib.WMA(2*talib.WMA(self.df['Close'], timeperiod = length/2)-talib.WMA(self.df['Close'], timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
-                pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA' + str(length)))
+                pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA' + str(length) + ' $'))
  
                 HMASignal = [self.df['Close'].iloc[i] if (self.df['Close'].iloc[i] > HMA[i] and self.df['Open'].iloc[i] < HMA[i]) or (self.df['Close'].iloc[i-1] < HMA[i-1] and self.df['Open'].iloc[i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
 
                 HMASignal.insert(0, np.nan)
                 # pltLs.append(mpf.make_addplot(HMASignal, ax = self.ax, type = 'scatter', marker = '^', 
                 #         markersize = 50, color = 'b')) temporarily commented for the seminar purpose
-                print('Hull Moving Average')
+                print('Hull Moving Average plotted')
+
+                self.indicators['HMA' + str(length)] = HMA
+
 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
         plt.draw()
@@ -504,20 +507,44 @@ class Chart(QMainWindow):
                 self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'].iloc[xdata],'.2f')))
                 self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'].iloc[xdata],'.2f')))
                 self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'].iloc[xdata],'.2f')))
+                
+                #show the current values of indicators 
+                for line in self.stkChart.ax.lines:
+                    lbl = line.get_label()
+                    if('EMA' in lbl or 'HMA' in lbl):
+                        name, _ = str(lbl).split(' ')
+                        line.set_label(name + ' ' +str(round(self.stkChart.indicators[name][xdata], 2)))
+
             elif math.ceil(event.xdata) >= len(self.stkChart.df):
                 self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[-1],'.2f')))
                 self.ui.lblHighVal.setText(str(format(self.stkChart.df['High'].iloc[-1],'.2f')))
                 self.ui.lblLowVal.setText(str(format(self.stkChart.df['Low'].iloc[-1],'.2f')))
                 self.ui.lblCloseVal.setText(str(format(self.stkChart.df['Close'].iloc[-1],'.2f')))
+
+                #show the current values of indicators 
+                for line in self.stkChart.ax.lines:
+                    lbl = line.get_label()
+                    if('EMA' in lbl or 'HMA' in lbl):
+                        name, _ = str(lbl).split(' ')
+                        line.set_label(name + ' ' +str(round(self.stkChart.indicators[name][-1], 2)))
             else: #math.ceil(event.xdata) < 0
                 self.ui.lblOpenVal.setText('$')
                 self.ui.lblHighVal.setText('$')
                 self.ui.lblLowVal.setText('$') 
                 self.ui.lblCloseVal.setText('$')
+
+                #show the current values of indicators 
+                for line in self.stkChart.ax.lines:
+                    lbl = line.get_label()
+                    if('EMA' in lbl or 'HMA' in lbl):
+                        name, _ = str(lbl).split(' ')
+                        line.set_label(name + ' $')
             
             # Redraw the figure
             self.stkChart.fig.canvas.draw()
+            self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
         else:
             self.stkChart.vline.set_visible(False)
             self.stkChart.dateTick.set_visible(False)
             self.stkChart.fig.canvas.draw()
+        
