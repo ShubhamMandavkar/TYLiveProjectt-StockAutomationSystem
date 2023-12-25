@@ -1,5 +1,5 @@
 from PySide6.QtCore import QAbstractTableModel, Qt, QThread
-from PySide6.QtWidgets import QMainWindow, QHeaderView
+from PySide6.QtWidgets import QMainWindow, QHeaderView, QFileDialog
 from ProjectPages.watchlistDetailsDlg import WatchlistDetailsDlg
 from ProjectPages.searchDlg import SearchDlg
 from UIFiles.ui_watchlists import Ui_watchlists
@@ -84,6 +84,7 @@ class Watchlists(QMainWindow):
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
+        self.ui.btnImport.clicked.connect(self.importStocksList)
 
         self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))        
         
@@ -174,13 +175,47 @@ class Watchlists(QMainWindow):
             con.close()
         
         self.manageVisibility()
+    
+    def importStocksList(self):
+        watchlist = self.ui.cmbWatchlists.currentText()
+        filePath, _ = QFileDialog.getOpenFileName(self, 'import file', 'C:\Downloads', 'Excel Files (*.csv)')
+        print(filePath)
+        df = pd.read_csv(filePath)
+        # print(df.head(5))
+
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='watchlists_db')
+            cursor = con.cursor()
+
+            for index, row in df.iterrows():
+                query = f"""insert into {watchlist} values('{row['symbol']}', '{row['name']}')"""
+                cursor.execute(query)
+                con.commit()
+
+                self.watchlistWorker.stkList[row['symbol']] = row['name'] #add stock in worker list
+
+
+            print('data imported successfully')
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        except Exception as e:
+            print('exception in watchlistsMW', e)
+        else:
+            con.close()
+        
+        
 
     def showSearchDlg(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.addToWatchlist)
         self.dlgSearch.show()
 
-    
     def deleteStockFrmWL(self):
         modelIndexls = self.ui.tbvWatchlist.selectedIndexes() #return list of QModelIndices i.e. columns in a row
         stkSym = modelIndexls[0].data(0)
@@ -198,7 +233,6 @@ class Watchlists(QMainWindow):
 
             self.watchlistWorker.stkList.pop(stkSym) #delete from worker list
             self.model.delRow(rowIndex)
-            # self.showWatchlistData(self.model)
             print(stkName, 'deleted from watchlist', watchlist)
 
         except mysql.connector.Error as err:
@@ -233,20 +267,20 @@ class Watchlists(QMainWindow):
     
     
     #this function causing crash  to the system don't know why
-    '''def closeEvent(self, event):
+    def closeEvent(self, event):
         print('closing watchlist window')
         self.watchlistWorker.isRunning = False
-        try:
-            self.watchlistThread.quit()
-            print('called1')
-            res = self.watchlistThread.wait()
-            print('called2')
-        except Exception as e:
-            print('myException: ',e)
+        self.watchlistWorker.sigShowWLData.disconnect(self.showWatchlistData)
+
+        self.watchlistThread.quit()
+        print('called1')
+        res = self.watchlistThread.wait()
+        print('called2')
 
         print('called closeWindow', res)
-        event.accept()'''
-    
+        # print('called closeWindow')
+        event.accept()
+
     '''
     def closeWindow(self):
         print('', self.watchlistThread.isFinished())

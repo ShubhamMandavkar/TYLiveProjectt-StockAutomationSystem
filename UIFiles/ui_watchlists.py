@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'watchlists.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QTableView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFormLayout,
+    QFrame, QHBoxLayout, QHeaderView, QLabel,
+    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
+    QStatusBar, QTableView, QVBoxLayout, QWidget)
 
 class Ui_watchlists(object):
     def setupUi(self, watchlists):
@@ -27,8 +27,8 @@ class Ui_watchlists(object):
         watchlists.resize(1005, 614)
         self.centralwidget = QWidget(watchlists)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.horizontalLayout = QHBoxLayout(self.centralwidget)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.frame_3 = QFrame(self.centralwidget)
         self.frame_3.setObjectName(u"frame_3")
         self.frame_3.setFrameShape(QFrame.StyledPanel)
@@ -79,14 +79,26 @@ class Ui_watchlists(object):
         self.frmWLOperations = QFrame(self.frmWLContent)
         self.frmWLOperations.setObjectName(u"frmWLOperations")
         self.frmWLOperations.setMinimumSize(QSize(100, 0))
+        self.frmWLOperations.setMaximumSize(QSize(150, 16777215))
         self.frmWLOperations.setFrameShape(QFrame.StyledPanel)
         self.frmWLOperations.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frmWLOperations)
+        self.formLayout.setObjectName(u"formLayout")
         self.btnAddToWL = QPushButton(self.frmWLOperations)
         self.btnAddToWL.setObjectName(u"btnAddToWL")
-        self.btnAddToWL.setGeometry(QRect(10, 10, 83, 29))
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnAddToWL)
+
         self.btnDeleteFrmWL = QPushButton(self.frmWLOperations)
         self.btnDeleteFrmWL.setObjectName(u"btnDeleteFrmWL")
-        self.btnDeleteFrmWL.setGeometry(QRect(10, 50, 83, 29))
+
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnDeleteFrmWL)
+
+        self.btnImport = QPushButton(self.frmWLOperations)
+        self.btnImport.setObjectName(u"btnImport")
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnImport)
+
 
         self.horizontalLayout_2.addWidget(self.frmWLOperations)
 
@@ -105,7 +117,7 @@ class Ui_watchlists(object):
         self.verticalLayout_2.addWidget(self.frame_7)
 
 
-        self.horizontalLayout.addWidget(self.frame_3)
+        self.verticalLayout.addWidget(self.frame_3)
 
         watchlists.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(watchlists)
@@ -126,6 +138,7 @@ class Ui_watchlists(object):
         self.lblMsg.setText(QCoreApplication.translate("watchlists", u"No Stocks in Watchlist", None))
         self.btnAddToWL.setText(QCoreApplication.translate("watchlists", u"Add", None))
         self.btnDeleteFrmWL.setText(QCoreApplication.translate("watchlists", u"Delete", None))
+        self.btnImport.setText(QCoreApplication.translate("watchlists", u"import", None))
         self.btnCreateWL.setText(QCoreApplication.translate("watchlists", u"Create", None))
     # retranslateUi
 

@@ -15,6 +15,7 @@ import yfinance as yf
 import pandas as pd
 from algomojo.pyapi import *
 import logging
+import copy
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
@@ -201,8 +202,8 @@ class HoldingsWorker(QObject):
     noti = zroya.Template(zroya.TemplateType.Text2)
     # noti.setAudio(audio=zroya.Audio.Alarm)
 
-    isRunning = True
     holdings = json.dumps({ "status": "success", "data": []})   #static variable to share holdings for all objects
+    isRunning = True
 
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
@@ -266,7 +267,6 @@ class HoldingsWorker(QObject):
             print("Holding function ")
 
 class WatchlistWorker(QObject):
-    
     sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
     def __init__(self):
         super().__init__()
@@ -298,29 +298,41 @@ class WatchlistWorker(QObject):
     def fetchWLData(self):    
         data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
         
-        stkList = self.stkList
+        stkList = copy.deepcopy(self.stkList)
+        yf.enable_debug_mode()
         try:
             for key in stkList.keys():
                 if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
                     break
 
-                #importing data from yfinance
-                stk = yf.Ticker(key+".NS")
-                hist = stk.history(period = '1d', interval = '1d')
-                print(hist)
+                # importing data from yfinance
+                try:
+                    stk = yf.Ticker(key+".NS")
+                    # hist = stk.history(period = '1d', interval = '1d') #this line causes crash when closed the thread
+                    # print(hist)
+                except Exception as e:
+                    print('Exception in thread', e)
+                
 
-                #item method is used to retrieve data only else it return data with index
-                open =  round(hist['Open'].item(), 2)
-                high =  round(hist['High'].item(), 2)
-                low =  round(hist['Low'].item(), 2)
-                close =  round(hist['Close'].item(), 2)
+                # #item method is used to retrieve data only else it return data with index
+                # open =  round(hist['Open'].item(), 2)
+                # high =  round(hist['High'].item(), 2)
+                # low =  round(hist['Low'].item(), 2)
+                # close =  round(hist['Close'].item(), 2)
+
+                # data['Symbol'].append(key)
+                # data['Name'].append(stkList[key])
+                # data['Open'].append(open)
+                # data['High'].append(high)
+                # data['Low'].append(low)
+                # data['Close'].append(close)
 
                 data['Symbol'].append(key)
                 data['Name'].append(stkList[key])
-                data['Open'].append(open)
-                data['High'].append(high)
-                data['Low'].append(low)
-                data['Close'].append(close)
+                data['Open'].append(0)
+                data['High'].append(0)
+                data['Low'].append(0)
+                data['Close'].append(0)
             
         except Exception as e:
             print(e)
@@ -341,10 +353,12 @@ class WatchlistWorker(QObject):
                 continue
 
             self.sigShowWLData.emit(data)
+            # self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
             time.sleep(5)
 
             print('update WL called')
         print('-------------------thread ended------------------')
+        # time.sleep(60)
     
     def setWatchlistChanged(self, wlName):
         self.isWLChanged  = True
