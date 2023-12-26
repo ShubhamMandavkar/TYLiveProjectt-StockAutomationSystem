@@ -1,6 +1,6 @@
 from cProfile import label
 from re import S
-from turtle import width
+from turtle import update, width
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigCavas
@@ -274,12 +274,12 @@ class StockChart(FigCavas):
             case 'Exponential Moving Average':
                 EMA = talib.EMA(self.df['Close'].to_numpy(), timeperiod= length)
 
-                pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA' + str(length) + ' $'))
+                pltLs.append(mpf.make_addplot(EMA, ax = self.ax, color = colour, width = wdth, label = 'EMA ' + str(length) + ' $'))
                 print('Exponential moving average plotted')
 
             case 'Hull Moving Average':
                 HMA = talib.WMA(2*talib.WMA(self.df['Close'], timeperiod = length/2)-talib.WMA(self.df['Close'], timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
-                pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA' + str(length) + ' $'))
+                pltLs.append(mpf.make_addplot(HMA, ax = self.ax, color = colour, width = wdth, label = 'HMA ' + str(length) + ' $'))
  
                 HMASignal = [self.df['Close'].iloc[i] if (self.df['Close'].iloc[i] > HMA[i] and self.df['Open'].iloc[i] < HMA[i]) or (self.df['Close'].iloc[i-1] < HMA[i-1] and self.df['Open'].iloc[i] > HMA[i]) else np.nan for  i in range(1,len(self.df['Close']))]
 
@@ -351,9 +351,12 @@ class Chart(QMainWindow):
 
         self.renderChartState()
         self.stkChart.showSignals() 
-        self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
-        
 
+        #legend event
+        self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
+        self.addEventHandlignToLegend()
+
+        
     #This methods addds the indicators to the chart which were added by to user to show the saved state
     def renderChartState(self):     
         try:
@@ -389,7 +392,7 @@ class Chart(QMainWindow):
         if self.ui.cmbIndicators.currentText() == 'None':
             return
 
-        self.dlgIndicatorDetails = IndicatorDetailsDlg()
+        self.dlgIndicatorDetails = IndicatorDetailsDlg(self.ui.cmbIndicators.currentText())
         self.dlgIndicatorDetails.show()
 
         def saveDetails():
@@ -425,7 +428,7 @@ class Chart(QMainWindow):
                 con.close()
 
 
-        self.dlgIndicatorDetails.ui.bbOkCancel.accepted.connect(saveDetails)
+        self.dlgIndicatorDetails.ui.btnOk.clicked.connect(saveDetails)
 
     def deleteIndicator(self):
         indicator , length = self.ui.cmbIndicatorsAdded.currentText().split('.')
@@ -468,6 +471,96 @@ class Chart(QMainWindow):
         self.dlgDeleteIndicator.ui.btnDelete.clicked.connect(deleteIndicatorFrmDB)
         self.dlgDeleteIndicator.ui.btnCancel.clicked.connect(closeDlg)
 
+    def addEventHandlignToLegend(self):
+        pickRadius = 5
+        
+        for legendLine in self.stkChart.ax.get_legend().get_lines():
+            legendLine.set_picker(pickRadius)
+            # print(legendLine.get_label())
+        
+        def saveDetails(indicator, length, wdth, color):
+            newLength = self.dlgIndicatorDetails.ui.sbLen.value()
+            newWidth = self.dlgIndicatorDetails.ui.dsbWidth.value()
+            newColor = self.dlgIndicatorDetails.color.name()
+
+            #save chart state in Database
+            try:
+                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+                cursor = con.cursor()
+
+                query = f"""update chart_state set length = {newLength}, width = {newWidth}, color = '{newColor}' where indicator = '{indicator}' and length = {length} and width = { wdth } and color = '{color}'"""
+                cursor.execute(query)
+                con.commit()
+
+                self.stkChart.plotChart(self.stkChart.timeFrame, self.stkChart.period)
+                self.renderChartState() 
+                self.stkChart.showSignals()
+                #show legend
+                self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
+            except mysql.connector.Error as err:
+                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                    print("Something is wrong with your user name or password")
+                elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                    print("Database does not exist")
+                else:
+                    print("error:",err)
+            finally:
+                cursor.close()
+                con.close()
+        
+        def deleteIndicator(indicator, length, wdth, color):
+            try:
+                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+                cursor = con.cursor()
+
+                query = f"""delete from chart_state where indicator = '{indicator}' and length = {length} and width = {wdth} and color = '{color}'"""
+                cursor.execute(query)
+                con.commit()
+
+
+                self.stkChart.plotChart(self.stkChart.timeFrame, self.stkChart.period)
+                self.renderChartState() 
+                self.stkChart.showSignals()
+                #show legend
+                self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
+
+            except mysql.connector.Error as err:
+                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                    print("Something is wrong with your user name or password")
+                elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                    print("Database does not exist")
+                else:
+                    print("error:",err)
+            finally:
+                cursor.close()
+                con.close()
+
+        def on_pick(event):
+            legend_line = event.artist
+            color = legend_line.get_color()
+            width = legend_line.get_linewidth()
+            label = legend_line.get_label()
+            name , length, _ = label.split(' ')
+
+            if name == 'EMA':
+                indicator = 'Exponential Moving Average'
+            else:
+                indicator = 'Hull Moving Average'
+
+            self.dlgIndicatorDetails = IndicatorDetailsDlg(indicator, color)
+            self.dlgIndicatorDetails.ui.sbLen.setValue(int(length))
+            self.dlgIndicatorDetails.ui.btnDelete.setVisible(True)
+            self.dlgIndicatorDetails.ui.dsbWidth.setValue(width)
+            self.dlgIndicatorDetails.ui.btnColor.setStyleSheet(f"background-color: {color}")
+            self.dlgIndicatorDetails.show()
+            
+            print('clicked on legend', legend_line, color, width, label)
+            self.dlgIndicatorDetails.ui.btnOk.clicked.connect(lambda : saveDetails(indicator, length, width, color))
+            self.dlgIndicatorDetails.ui.btnDelete.clicked.connect(lambda : deleteIndicator(indicator, length, width, color))
+        
+        self.stkChart.fig.canvas.mpl_connect('pick_event', on_pick)
+
+
     #this method shows date of current candle and OHLC details on mouse move in chart
     def on_mouse_move2(self, event):
         # Check if the cursor is within the axes limits
@@ -506,9 +599,9 @@ class Chart(QMainWindow):
                 for line in self.stkChart.ax.lines:
                     lbl = line.get_label()
                     if('EMA' in lbl or 'HMA' in lbl):
-                        name, _ = str(lbl).split(' ')
+                        name, length, _ = str(lbl).split(' ')
                         # print(line.get_ydata(True)[xdata])
-                        line.set_label(name + ' ' +str(round(line.get_ydata(True)[xdata], 2)))
+                        line.set_label(name + ' ' + length + ' ' +str(round(line.get_ydata(True)[xdata], 2)))
 
             elif math.ceil(event.xdata) >= len(self.stkChart.df):
                 self.ui.lblOpenVal.setText(str(format(self.stkChart.df['Open'].iloc[-1],'.2f')))
@@ -520,9 +613,9 @@ class Chart(QMainWindow):
                 for line in self.stkChart.ax.lines:
                     lbl = line.get_label()
                     if('EMA' in lbl or 'HMA' in lbl):
-                        name, _ = str(lbl).split(' ')
+                        name, length, _ = str(lbl).split(' ')
                         # print(line.get_ydata(True)[-1])
-                        line.set_label(name + ' ' +str(round(line.get_ydata(True)[-1], 2)))
+                        line.set_label(name + ' ' + length + ' ' +str(round(line.get_ydata(True)[-1], 2)))
             else: #math.ceil(event.xdata) < 0
                 self.ui.lblOpenVal.setText('$')
                 self.ui.lblHighVal.setText('$')
@@ -532,13 +625,17 @@ class Chart(QMainWindow):
                 #show the current values of indicators 
                 for line in self.stkChart.ax.lines:
                     lbl = line.get_label()
-                    if('EMA' in lbl or 'HMA' in lbl):
-                        name, _ = str(lbl).split(' ')
-                        line.set_label(name + ' $')
+                    if('EMA' in lbl or 'HMA' in lbl):  
+                        name, length, _ = str(lbl).split(' ')
+                        line.set_label(name + ' ' + length +' $')
             
+            self.stkChart.ax.legend(loc='upper left', fontsize="9") #when called each time creates new legend therefore pickevent needs to be added each time new instance is created
+            pickRadius = 5
+            for legendLine in self.stkChart.ax.get_legend().get_lines():
+                legendLine.set_picker(pickRadius)
+            # self.stkChart.ax.legend(update= True)
             # Redraw the figure
             self.stkChart.fig.canvas.draw()
-            self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
         else:
             self.stkChart.vline.set_visible(False)
             self.stkChart.dateTick.set_visible(False)
