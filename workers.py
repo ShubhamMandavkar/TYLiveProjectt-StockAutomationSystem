@@ -1,6 +1,6 @@
 
 from logging import exception
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal, QThread, QTimer
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -75,6 +75,29 @@ class AlertWorker(QObject):
                 Avg = talib.WMA(2*talib.WMA(data, timeperiod = length/2)-talib.WMA(data, timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
                 return Avg
 
+    def pauseAlert(self, alert):
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+            cursor = con.cursor()
+
+            #update the values of alert
+            query = f"""update alerts set isPaused = 1 where stkSymbol = '{alert['stkSymbol']}' and alertType = '{alert['alertType']}' and alertCondition = '{alert['alertCond']}' and timeFrame = '{alert['timeFrame']}' and alertVal = {alert['alertVal']} and len1 = {alert['len1']} and len2 = {alert['len2']}"""
+            cursor.execute(query)
+            con.commit()
+            print('alert paused')
+
+            AlertWorker.getAlertList()
+            #emit signal to change the myAlerts list
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        finally:
+            con.close()
 
     def processAlerts(self):
         while(self.isRunning):
@@ -92,6 +115,7 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than ' + str(alert['alertVal'])))
                                 zroya.show(self.noti)
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -102,6 +126,7 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1'])))
                                 zroya.show(self.noti)
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
                                 
                     case 'Less Than':
                         if alert['alertType'] == 'Price':
@@ -110,7 +135,8 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal'])))
                                 zroya.show(self.noti)
-                        
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -121,6 +147,8 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1'])))
                                 zroya.show(self.noti)
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                     case 'Crossing Up':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -131,7 +159,9 @@ class AlertWorker(QObject):
                             print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
                             self.noti.setFirstLine(alert['stkName']) 
                             self.noti.setSecondLine(str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal'])))
-                            zroya.show(self.noti)                            
+                            zroya.show(self.noti) 
+                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                     case 'Crossing Down':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['len1']])
@@ -143,8 +173,9 @@ class AlertWorker(QObject):
                             print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
                             self.noti.setFirstLine(alert['stkName']) 
                             self.noti.setSecondLine(str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal'])))
-                            zroya.show(self.noti)   
-                        pass
+                            zroya.show(self.noti)
+                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                     case 'Price > PrevMonthHigh':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -160,6 +191,8 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' Breaks the previous month high'))
                                 zroya.show(self.noti)
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                     case 'Price < PrevMonthLow':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -175,6 +208,8 @@ class AlertWorker(QObject):
                                 self.noti.setFirstLine(alert['stkName']) 
                                 self.noti.setSecondLine(str(str(alert['stkName']) + ' Breaks the previous month low'))
                                 zroya.show(self.noti)
+                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                     case 'In Between':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -190,6 +225,8 @@ class AlertWorker(QObject):
                             self.noti.setFirstLine(alert['stkName']) 
                             self.noti.setSecondLine('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
                             zroya.show(self.noti)
+                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+
 
             time.sleep(5)
             # self.getAlertList()
@@ -268,6 +305,8 @@ class HoldingsWorker(QObject):
 
 class WatchlistWorker(QObject):
     sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
+    finished = Signal()
+
     def __init__(self):
         super().__init__()
         self.isRunning = True
@@ -292,27 +331,24 @@ class WatchlistWorker(QObject):
                 print("Database does not exist")
             else:
                 print("error:",err)
-        else:
+        finally:
             con.close()
 
     def fetchWLData(self):    
         data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
         
-        stkList = copy.deepcopy(self.stkList)
+        stkListt = copy.deepcopy(self.stkList)
         yf.enable_debug_mode()
-        try:
-            for key in stkList.keys():
-                if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
-                    break
+        
+        for key in stkListt.keys():
+            if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
+                break
 
-                # importing data from yfinance
-                try:
-                    stk = yf.Ticker(key+".NS")
-                    # hist = stk.history(period = '1d', interval = '1d') #this line causes crash when closed the thread
-                    # print(hist)
-                except Exception as e:
-                    print('Exception in thread', e)
-                
+            # importing data from yfinance
+            try:
+                stk = yf.Ticker(key+".NS")
+                hist = stk.history(period = '1d', interval = '1d') #this line causes crash when closed the thread
+                # print(hist)
 
                 # #item method is used to retrieve data only else it return data with index
                 # open =  round(hist['Open'].item(), 2)
@@ -326,21 +362,21 @@ class WatchlistWorker(QObject):
                 # data['High'].append(high)
                 # data['Low'].append(low)
                 # data['Close'].append(close)
-
-                data['Symbol'].append(key)
-                data['Name'].append(stkList[key])
-                data['Open'].append(0)
-                data['High'].append(0)
-                data['Low'].append(0)
-                data['Close'].append(0)
+            except Exception as e:
+                print('Exception in thread', e)
             
-        except Exception as e:
-            print(e)
+            data['Symbol'].append(key)
+            data['Name'].append(stkListt[key])
+            data['Open'].append(0)
+            data['High'].append(0)
+            data['Low'].append(0)
+            data['Close'].append(0)
 
         return pd.DataFrame(data)
         
     def updateWL(self):
-        while(self.isRunning):
+        # while(self.isRunning):
+        for i in range(10):
             data = self.fetchWLData()
 
             if(self.isRunning == False): #watchlist closed
@@ -358,10 +394,20 @@ class WatchlistWorker(QObject):
 
             print('update WL called')
         print('-------------------thread ended------------------')
-        # time.sleep(60)
+        self.finished.emit()
     
     def setWatchlistChanged(self, wlName):
         self.isWLChanged  = True
         self.currWL = wlName
         self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
-        
+
+
+class MyWorker(QObject):
+    finished = Signal()
+    def run(self):
+        for i in range(15):
+            stk = yf.Ticker('PNB.NS')
+            hist = stk.history(period='1d', interval='1d')
+            print(hist)
+            time.sleep(1)
+        self.finished.emit()

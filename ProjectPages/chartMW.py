@@ -19,7 +19,7 @@ from matplotlib.widgets import Cursor
 import matplotlib.animation as animation
 from mpl_interactions import ioff, panhandler, zoom_factory
 from matplotlib.backend_bases import MouseEvent
-import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta  
 
 from UIFiles.ui_chart import Ui_Chart
@@ -154,7 +154,7 @@ class StockChart(FigCavas):
 
         signal1 =[low if ((low < e1 and low > e2) or (low > e1 and low < e2)) else np.nan for low, e1, e2 in zip(self.df['Low'], EMA9,EMA14)]
 
-        
+        #previous month high and previous month low signals
         PMHSignal = []  #previous month high signal
         PMLSignal = []  #previous month Low signal
 
@@ -164,70 +164,64 @@ class StockChart(FigCavas):
 
         self.monthDf = pd.DataFrame({'Date': pd.to_datetime(hist.index), 'Open': hist['Open'],'High': hist['High'], 'Low':hist['Low'], 'Close':hist['Close']})
 
-        
         EMA50 = talib.EMA(self.monthDf['Close'].to_numpy(), timeperiod=50)  
-            
-        # prevHigh = self.monthDf['High'].iloc[0]
-        prevLow = self.df['Low'].iloc[0]
 
         i = 0
         j= 0
 
-        m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+        m1, year1 = str(datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
         m1 = int(m1)
         year1 = int(year1)
-        m2, year2 = str(datetime.datetime.strftime(self.dates[j], '%m %Y')).split(' ')
+        m2, year2 = str(datetime.strftime(self.dates[j], '%m %Y')).split(' ')
         m2 = int(m2)
         year2 = int(year2)
 
         if(year1 == year2):
             while(m2 > m1 and m1 != m2-1):
                 i = i+1
-                m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+                m1 = int(datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
         else:
             if(m2 == 1):
                 while(year1 != year2-1):
                     i = i+1
-                    m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+                    m1, year1 = str(datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
                     m1 = int(m1)
                     year1 = int(year1)
                 while(m1 != 12):
                     i = i+1
-                    m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+                    m1 = int(datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
             else:
                 while(year1 != year2):
                     i = i+1
-                    m1, year1 = str(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
+                    m1, year1 = str(datetime.strftime(self.monthDf['Date'].iloc[i], '%m %Y')).split(' ')
                     m1 = int(m1)
                     year1 = int(year1)
                 while(m2 > m1 and m1 != m2-1):
                     i = i+1
-                    m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m')) 
+                    m1 = int(datetime.strftime(self.monthDf['Date'].iloc[i], '%m')) 
 
         while(j < len(self.df)):
-            m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
-            m2 = int(datetime.datetime.strftime(self.dates[j], '%m'))
+            m1 = int(datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
+            m2 = int(datetime.strftime(self.dates[j], '%m'))
 
             while(m1 == m2):
                 j = j+1
                 if(j == len(self.df)):
                     break
 
-                m2 = int(datetime.datetime.strftime(self.dates[j], '%m'))
+                m2 = int(datetime.strftime(self.dates[j], '%m'))
                 PMHSignal.append(np.nan)
                 PMLSignal.append(np.nan)
 
             
             while(abs(m1 - m2) > 1 and (m1+1)%12 != m2):
                 i = i+1
-                m1 = int(datetime.datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
-                # print('myCalled--------------------', m1, year1, m2, year2, j)
+                m1 = int(datetime.strftime(self.monthDf['Date'].iloc[i], '%m'))
 
-            # print(EMA50[i], EMA50[i-1], EMA50[i-2], i)
 
             if EMA50[i] > EMA50[i-1] and EMA50[i-1] > EMA50[i-2]: 
                 if self.df['High'].iloc[j] > self.monthDf['High'].iloc[i]:
-                    PMHSignal.append(self.df['High'].iloc[j] + 5) # +5 added to show signal little bit above candle
+                    PMHSignal.append(self.df['High'].iloc[j] + 35) # +5 added to show signal little bit above candle
                 else:
                     PMHSignal.append(np.nan)
             else:
@@ -235,16 +229,73 @@ class StockChart(FigCavas):
             
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
                 if self.df['Low'].iloc[j] < self.monthDf['Low'].iloc[i] :
-                    PMLSignal.append(self.df['Low'].iloc[j] + 5) # +5 added to show signal little bit above candle
+                    PMLSignal.append(self.df['Low'].iloc[j] - 35) # +5 added to show signal little bit above candle
                 else:
                     PMLSignal.append(np.nan)
             else:
                 PMLSignal.append(np.nan)
 
             j = j+1
+        #end PMHSignal and PMLSignal
 
+        #previous week high and previous week low signals
+        
+        weekHist = stk.history(period="max", interval='1wk')
+        weekDf = pd.DataFrame({'Date': pd.to_datetime(weekHist.index), 'Open': weekHist['Open'],'High': weekHist['High'], 'Low':weekHist['Low'], 'Close':weekHist['Close']})
 
-        #end PMLSignal
+        i = 0
+        j = 0
+        d1, m1, year1 = str(datetime.strftime(weekDf['Date'].iloc[i], '%d %m %Y')).split(' ')
+        d2, m2, year2 = str(datetime.strftime(self.dates[j], '%d %m %Y')).split(' ')
+
+        date1 = datetime(int(year1), int(m1), int(d1))
+        date2 = datetime(int(year2), int(m2), int(d2))
+
+        while(date1 < date2): 
+            i = i+1
+            d1, m1, year1 = str(datetime.strftime(weekDf['Date'].iloc[i], '%d %m %Y')).split(' ')
+            date1 = datetime(int(year1), int(m1), int(d1))
+
+        print(date1, date2)
+        PWHSignal = []
+        PWLSignal = []
+
+        if i == 0:
+            if(i+1 < len(weekDf)):
+            #     d1, m1, year1 = str(datetime.strftime(weekDf['Date'].iloc[i+1], '%d %m %Y')).split(' ')
+            #     temp = datetime(int(year1), int(m1), int(d1))
+                while(j+1 < len(self.df) and date2 < date1 + timedelta(days = 7)):
+                    j = j+1
+                    d2, m2, year2 = str(datetime.strftime(self.dates[j], '%d %m %Y')).split(' ')
+                    date2 = datetime(int(year2), int(m2), int(d2))
+                    PWHSignal.append(np.nan)
+        else:
+            i = i-1
+
+        while(j < len(self.df)):
+            d2, m2, year2 = str(datetime.strftime(self.dates[j], '%d %m %Y')).split(' ')
+            date2 = datetime(int(year2), int(m2), int(d2))
+
+            if(i+1 < len(weekDf)):
+                d1, m1, year1 = str(datetime.strftime(weekDf['Date'].iloc[i+1], '%d %m %Y')).split(' ')
+                temp = datetime(int(year1), int(m1), int(d1))
+
+                if(date2 >= temp + timedelta(days = 7)):
+                    i = i+1 
+
+            if weekDf['High'].iloc[i] < self.df['High'].iloc[j] :
+                PWHSignal.append(self.df['High'].iloc[j] + 20) # +5 added to show signal little bit above candle
+            else:
+                PWHSignal.append(np.nan)
+
+            if weekDf['Low'].iloc[i] < self.df['Low'].iloc[j] :
+                PWLSignal.append(self.df['Low'].iloc[j] - 20) # +5 added to show signal little bit above candle
+            else:
+                PWLSignal.append(np.nan)
+            
+            j = j+1
+        #end PMHSignal and PMLSignal
+
 
         # line1, = plt.plot(self.df['Date'], self.df['Close'], color='black')
         pltLs.append(mpf.make_addplot(signal1, ax = self.ax, type = 'scatter', marker = '^', 
@@ -254,6 +305,10 @@ class StockChart(FigCavas):
         pltLs.append(mpf.make_addplot(PMLSignal, ax = self.ax, type = 'scatter', marker = 'D', 
                         markersize = 50, color = 'r', label = 'PMLSignal')) 
 
+        pltLs.append(mpf.make_addplot(PWHSignal, ax = self.ax, type = 'scatter', marker = 'X', 
+                        markersize = 50, color = 'blue', label = 'PWHSignal')) 
+        pltLs.append(mpf.make_addplot(PWLSignal, ax = self.ax, type = 'scatter', marker = 'X', 
+                        markersize = 50, color = '#db13ed', label = 'PWLSignal')) 
         mpf.plot(self.df, ax = self.ax, type='candle', addplot = pltLs)
         plt.draw()
 

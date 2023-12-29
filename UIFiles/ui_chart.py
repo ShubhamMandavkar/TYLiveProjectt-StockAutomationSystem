@@ -68,7 +68,6 @@ class Ui_Chart(object):
         self.cmbIndicators.addItem("")
         self.cmbIndicators.addItem("")
         self.cmbIndicators.addItem("")
-        self.cmbIndicators.addItem("")
         self.cmbIndicators.setObjectName(u"cmbIndicators")
         self.cmbIndicators.setGeometry(QRect(290, 20, 211, 28))
         self.lblIndicatorsAdded = QLabel(self.frame_3)
@@ -214,7 +213,6 @@ class Ui_Chart(object):
         self.cmbIndicators.setItemText(0, QCoreApplication.translate("Chart", u"None", None))
         self.cmbIndicators.setItemText(1, QCoreApplication.translate("Chart", u"Exponential Moving Average", None))
         self.cmbIndicators.setItemText(2, QCoreApplication.translate("Chart", u"Hull Moving Average", None))
-        self.cmbIndicators.setItemText(3, QCoreApplication.translate("Chart", u"RSI", None))
 
         self.lblIndicatorsAdded.setText(QCoreApplication.translate("Chart", u"Indicators Added", None))
         self.btnSearch.setText(QCoreApplication.translate("Chart", u"Search", None))

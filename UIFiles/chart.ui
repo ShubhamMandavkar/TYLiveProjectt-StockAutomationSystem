@@ -182,11 +182,6 @@
             <string>Hull Moving Average</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>RSI</string>
-           </property>
-          </item>
          </widget>
          <widget class="QLabel" name="lblIndicatorsAdded">
           <property name="geometry">
