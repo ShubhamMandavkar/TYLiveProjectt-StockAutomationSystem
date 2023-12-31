@@ -3,6 +3,7 @@ import sys
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtWidgets import QDialog
+import requests
 
 # Important:
 # You need to run the following command to generate the ui_form.py file
@@ -17,6 +18,7 @@ from ProjectPages.holdingsMW import Holdings
 from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
 from ProjectPages.stockDetailsMW import StockDetails
+from ProjectPages.messageDlg import MessageDlg
 from workers import AlertWorker, HoldingsWorker
 
 import mysql.connector
@@ -33,8 +35,16 @@ class Navigation:
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
 
-        self.stkDetails = StockDetails(stkSym, stkName)
-        self.stkDetails.show()
+        try:
+            self.stkDetails = StockDetails(stkSym, stkName)
+            self.stkDetails.show()
+        except requests.exceptions.ConnectionError as e:
+            dlg = MessageDlg('Please check your internet connection')
+            dlg.show()
+            print('Please check your internet connection')
+        except Exception as e:
+            print('Exception occur in stockDetails.py')
+
          
     def showMyAlertsWindow(self):
         self.myAlerts = MyAlerts()
