@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>936</width>
-    <height>617</height>
+    <height>641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -160,7 +160,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -185,7 +185,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -210,7 +210,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -235,7 +235,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -260,7 +260,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -288,7 +288,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -313,7 +313,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -338,7 +338,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -363,7 +363,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
@@ -391,7 +391,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>?</string>
                </property>
               </widget>
              </item>
