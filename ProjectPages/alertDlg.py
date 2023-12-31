@@ -111,13 +111,6 @@ class AlertDlg(QDialog):
             self.ui.lblAlertVal.hide()
             self.ui.dsbAlertVal.hide()
             
-        # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
-        # lastPrice = stk['data']['last_price']
-
-        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
-        lastPrice = stkDf['Close'].iloc[-1]
-        self.ui.dsbAlertVal.setValue(lastPrice)
-    
     def addAlert(self):
         alertType = self.ui.cmbAlertType.currentText()
         alertCond = self.ui.cmbAlertCond.currentText()
