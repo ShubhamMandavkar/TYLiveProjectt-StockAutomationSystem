@@ -221,7 +221,7 @@ class StockChart(FigCavas):
 
             if EMA50[i] > EMA50[i-1] and EMA50[i-1] > EMA50[i-2]: 
                 if self.df['High'].iloc[j] > self.monthDf['High'].iloc[i]:
-                    PMHSignal.append(self.df['High'].iloc[j] + 35) # +5 added to show signal little bit above candle
+                    PMHSignal.append(self.df['High'].iloc[j] + 20) # +5 added to show signal little bit above candle
                 else:
                     PMHSignal.append(np.nan)
             else:
@@ -229,7 +229,7 @@ class StockChart(FigCavas):
             
             if EMA50[i] < EMA50[i-1] and EMA50[i-1] < EMA50[i-2]: 
                 if self.df['Low'].iloc[j] < self.monthDf['Low'].iloc[i] :
-                    PMLSignal.append(self.df['Low'].iloc[j] - 35) # +5 added to show signal little bit above candle
+                    PMLSignal.append(self.df['Low'].iloc[j] - 20) # +5 added to show signal little bit above candle
                 else:
                     PMLSignal.append(np.nan)
             else:
@@ -269,6 +269,7 @@ class StockChart(FigCavas):
                     d2, m2, year2 = str(datetime.strftime(self.dates[j], '%d %m %Y')).split(' ')
                     date2 = datetime(int(year2), int(m2), int(d2))
                     PWHSignal.append(np.nan)
+                    PWLSignal.append(np.nan)
         else:
             i = i-1
 
@@ -284,12 +285,12 @@ class StockChart(FigCavas):
                     i = i+1 
 
             if weekDf['High'].iloc[i] < self.df['High'].iloc[j] :
-                PWHSignal.append(self.df['High'].iloc[j] + 20) # +5 added to show signal little bit above candle
+                PWHSignal.append(self.df['High'].iloc[j] + 10) # +5 added to show signal little bit above candle
             else:
                 PWHSignal.append(np.nan)
 
             if weekDf['Low'].iloc[i] < self.df['Low'].iloc[j] :
-                PWLSignal.append(self.df['Low'].iloc[j] - 20) # +5 added to show signal little bit above candle
+                PWLSignal.append(self.df['Low'].iloc[j] - 10) # +5 added to show signal little bit above candle
             else:
                 PWLSignal.append(np.nan)
             
@@ -298,6 +299,7 @@ class StockChart(FigCavas):
 
 
         # line1, = plt.plot(self.df['Date'], self.df['Close'], color='black')
+
         pltLs.append(mpf.make_addplot(signal1, ax = self.ax, type = 'scatter', marker = '^', 
                         markersize = 50, color = 'r')) 
         pltLs.append(mpf.make_addplot(PMHSignal, ax = self.ax, type = 'scatter', marker = 'D', 

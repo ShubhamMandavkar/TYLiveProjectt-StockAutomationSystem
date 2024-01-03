@@ -74,14 +74,9 @@ def getQuote2(userId, stkSym, brCode, stkExchange):
     })
 
 def getQuoteFromYfinance(userId, stkSym, brCode, stkExchange):
-    try:
-        stk = yf.Ticker(stkSym+".NS")
-        df = stk.history(period="1d", interval = '1d')
-        return df
-    except Exception as e:
-        print(e)
-    
-    return pd.DataFrame({'Open':0, 'Close':0, 'High':0, 'Low':0})
+    stk = yf.Ticker(stkSym+".NS")
+    df = stk.history(period="1d", interval = '1d', raise_errors= True)
+    return df
 
 
 def getHoldings2():

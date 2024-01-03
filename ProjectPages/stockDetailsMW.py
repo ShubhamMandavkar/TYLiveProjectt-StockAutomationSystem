@@ -8,6 +8,8 @@ import requests
 from UIFiles.ui_stockDetails import Ui_stockDetails
 from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
+from ProjectPages.messageDlg import MessageDlg
+
 
 
 class StockDetails(QMainWindow):
@@ -67,12 +69,16 @@ class StockDetails(QMainWindow):
 
         # stk = json.loads(getQuote2("shubh", self.stkName, 'tc', 'NSE'))
         # lastPrice = stk['data']['last_price']
-
-        stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
-        lastPrice = stkDf['Close'].iloc[-1]
+        try:
+            stkDf = getQuoteFromYfinance('shubh',self.stkSymbol, 'tc', 'NSE')
+            lastPrice = stkDf['Close'].iloc[-1]
+        except Exception as e:
+            lastPrice = 0.00
+            print('Please check your internet connection')
+            
         self.dlgAlert.ui.dsbAlertVal.setValue(lastPrice)
         self.dlgAlert.show()
-    
+
     def showChartWindow(self):
         self.chart = Chart(self.stkSymbol, self.stkName)
         self.chart.show()
