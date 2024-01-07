@@ -1,4 +1,3 @@
-
 from logging import exception
 from PySide6.QtCore import QObject, Signal, QThread, QTimer
 
@@ -16,6 +15,25 @@ import pandas as pd
 from algomojo.pyapi import *
 import logging
 import copy
+from telethon import TelegramClient
+from apiDetails import apiId, apiHashId
+import asyncio
+
+class TeleApiWorker(QObject):
+    finished = Signal()
+    teleClient = TelegramClient('MySession', apiId, apiHashId)
+    loop = None
+    def __init__(self, loop=None):
+        super().__init__()
+        TeleApiWorker.loop = loop
+        
+    def startEventLoop(self):
+        asyncio.set_event_loop(self.loop)
+        TeleApiWorker.loop.run_forever()
+    
+    async def sendMessage(msg):
+        async with TeleApiWorker.teleClient as client:
+            await client.send_message('+918208823690', msg)
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
@@ -98,6 +116,11 @@ class AlertWorker(QObject):
                 print("error:",err)
         finally:
             con.close()
+    
+    def sendNotiToDesktop(self, title, message):
+        self.noti.setFirstLine(title) 
+        self.noti.setSecondLine(message)
+        zroya.show(self.noti) #notificatoin sent to desktop
 
     def processAlerts(self):
         while(self.isRunning):
@@ -112,10 +135,14 @@ class AlertWorker(QObject):
                         if alert['alertType'] == 'Price':
                             if currPrice > alert['alertVal']:
                                 print(alert['stkName'], 'price is greater than ', alert['alertVal'])
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than ' + str(alert['alertVal'])))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' price is greater than ' + str(alert['alertVal']))
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
+
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
@@ -123,18 +150,24 @@ class AlertWorker(QObject):
 
                             if currPrice > Avg[-1]:
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1'])))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
                                 
                     case 'Less Than':
                         if alert['alertType'] == 'Price':
                             if currPrice < alert['alertVal']:
                                 print(alert['stkName'], 'price is less than ', alert['alertVal'])
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal'])))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal']))
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
@@ -144,9 +177,12 @@ class AlertWorker(QObject):
 
                             if currPrice < Avg[-1]:
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1'])))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                     case 'Crossing Up':
@@ -157,9 +193,13 @@ class AlertWorker(QObject):
 
                         if((df['Open'][-1] < Avg[-1] or df['Close'][-2] < Avg[-2]) and df['Close'] > Avg[-1]):
                             print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
-                            self.noti.setFirstLine(alert['stkName']) 
-                            self.noti.setSecondLine(str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal'])))
-                            zroya.show(self.noti) 
+
+                            title = alert['stkName']
+                            msg = str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal']))
+                            self.sendNotiToDesktop(title, msg)
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
+
                             self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                     case 'Crossing Down':
@@ -170,10 +210,14 @@ class AlertWorker(QObject):
                                 alert['timeFrame'],   alert['len1'])
 
                         if((df['Open'][-1] > Avg[-1] or df['Close'][-2] > Avg[-2]) and df['Close'] < Avg[-1]):
-                            print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
-                            self.noti.setFirstLine(alert['stkName']) 
-                            self.noti.setSecondLine(str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal'])))
-                            zroya.show(self.noti)
+                            print(alert['stkName'], 'crosses down the price ', alert['alertVal'])
+
+                            title = alert['stkName']
+                            msg = str(str(alert['stkName']) + ' crosses down the price ' + str(alert['alertVal']))
+                            self.sendNotiToDesktop(title, msg)
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
+
                             self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                     case 'Price > PrevMonthHigh':
@@ -188,9 +232,12 @@ class AlertWorker(QObject):
                         if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]: #uptrend
                             if currMP > prevHigh :
                                 print(alert['stkName'], 'Breaks the previous month high of')
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' Breaks the previous month high'))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' Breaks the previous month high')
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                     case 'Price < PrevMonthLow':
@@ -205,9 +252,12 @@ class AlertWorker(QObject):
                         if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]: #downtrend
                             if currMP < prevLow :
                                 print(alert['stkName'], 'Breaks the previous month low')
-                                self.noti.setFirstLine(alert['stkName']) 
-                                self.noti.setSecondLine(str(str(alert['stkName']) + ' Breaks the previous month low'))
-                                zroya.show(self.noti)
+
+                                title = alert['stkName']
+                                msg = str(str(alert['stkName']) + ' Breaks the previous month low')
+                                self.sendNotiToDesktop(title, msg)
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                                 self.pauseAlert(alert) #pause alert when 1 notification is sent
 
                     case 'In Between':
@@ -222,9 +272,12 @@ class AlertWorker(QObject):
                         currMP = df['Close'].iloc[-1] 
                         if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]):
                             print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
-                            self.noti.setFirstLine(alert['stkName']) 
-                            self.noti.setSecondLine('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
-                            zroya.show(self.noti)
+
+                            title = alert['stkName']
+                            msg = str('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
+                            self.sendNotiToDesktop(title, msg)
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
                             self.pauseAlert(alert) #pause alert when 1 notification is sent
 
 

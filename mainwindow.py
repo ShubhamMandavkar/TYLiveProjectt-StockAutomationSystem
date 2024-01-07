@@ -1,9 +1,11 @@
 # This Python file uses the following encoding: utf-8
+import asyncio
 import sys
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtWidgets import QDialog
 import requests
+
 
 # Important:
 # You need to run the following command to generate the ui_form.py file
@@ -19,7 +21,7 @@ from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
 from ProjectPages.stockDetailsMW import StockDetails
 from ProjectPages.messageDlg import MessageDlg
-from workers import AlertWorker, HoldingsWorker
+from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -139,7 +141,21 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    alertThread.start()
     # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
+
+    loop = asyncio.new_event_loop()
+    teleApiWorker = TeleApiWorker(loop)
+    teleApiThread = QThread()
+    teleApiWorker.moveToThread(teleApiThread)
+
+    teleApiThread.started.connect(teleApiWorker.startEventLoop)
+    teleApiWorker.finished.connect(teleApiThread.quit)
+    teleApiWorker.finished.connect(teleApiWorker.deleteLater)
+    teleApiThread.finished.connect(teleApiThread.deleteLater)
+    teleApiThread.finished.connect(lambda: print('thread finished completely'))
+    teleApiThread.start()
+    
+    alertThread.start() #this thread should be started later than the teleApiThread
+
     sys.exit(app.exec())
