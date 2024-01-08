@@ -35,6 +35,15 @@ class TeleApiWorker(QObject):
         async with TeleApiWorker.teleClient as client:
             await client.send_message('+918208823690', msg)
 
+def isNetworkConnected():
+    import requests
+    try:
+        response = requests.get("http://www.google.com")
+        return True
+    except requests.ConnectionError:
+        return False
+    
+
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
     isRunning = False
@@ -123,13 +132,27 @@ class AlertWorker(QObject):
         zroya.show(self.noti) #notificatoin sent to desktop
 
     def processAlerts(self):
+        isSentNetworkWarning = False
         while(self.isRunning):
             for alert in AlertWorker.alertList:
                 if(alert['isPaused']):
                     continue
-                
-                # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
-                currPrice = getQuoteFromYfinance('shubh',alert['stkSymbol'], 'tc', 'NSE')['Close'].iloc[-1]
+
+                if(not isNetworkConnected()):
+                    if(not isSentNetworkWarning):
+                        isSentNetworkWarning = True
+                        print('check network')
+                else:
+                    isSentNetworkWarning = False
+
+
+                try:
+                    # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
+                    currPrice = getQuoteFromYfinance('shubh',alert['stkSymbol'], 'tc', 'NSE')['Close'].iloc[-1]
+                except Exception as e:
+                    print(e)
+                    continue
+
                 match alert['alertCond']:
                     case 'Greater Than':
                         if alert['alertType'] == 'Price':
@@ -280,7 +303,6 @@ class AlertWorker(QObject):
 
                             self.pauseAlert(alert) #pause alert when 1 notification is sent
 
-
             time.sleep(5)
             # self.getAlertList()
             print("processAlerts Called")
@@ -393,6 +415,9 @@ class WatchlistWorker(QObject):
         stkList = copy.deepcopy(self.stkList)
         
         for key in stkList.keys():
+            if(not isNetworkConnected()): #if network is not connected stop the operation
+                break
+
             if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
                 break
 
@@ -420,7 +445,11 @@ class WatchlistWorker(QObject):
     def updateWL(self):
         while(self.isRunning):
         # for i in range(3):
-            data = self.fetchWLData()
+            if(isNetworkConnected()):
+                data = self.fetchWLData()
+                
+            if(isNetworkConnected()):
+                self.sigShowWLData.emit(data)
 
             if(self.isRunning == False): #watchlist closed
                 continue
@@ -431,7 +460,6 @@ class WatchlistWorker(QObject):
                 self.isWLChanged = False
                 continue
 
-            self.sigShowWLData.emit(data)
             time.sleep(5)
 
             print('update WL called')
