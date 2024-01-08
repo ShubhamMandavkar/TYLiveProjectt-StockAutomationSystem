@@ -77,25 +77,19 @@ class Watchlists(QMainWindow):
 
         self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
         self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData)
-        self.watchlistWorker.finished.connect(self.watchlistThread.quit)
+        '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
+        self.watchlistWorker.finished.connect(self.watchlistThread.quit) 
+        self.watchlistWorker.finished.connect(self.watchlistThread.wait)
         self.watchlistWorker.finished.connect(self.watchlistWorker.deleteLater)
         self.watchlistThread.finished.connect(self.watchlistThread.deleteLater)
-        # self.watchlistThread.start()
+        self.watchlistThread.start()
 
-        self.worker = MyWorker()
-        self.myThread = QThread()
-        self.worker.moveToThread(self.myThread)
-        self.worker.finished.connect(self.myThread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.myThread.started.connect(self.worker.run)
-        self.myThread.finished.connect(self.myThread.deleteLater)
-        self.myThread.start()
     
     def addConnectors(self):
-        # self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
-        # self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
-        # self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
-        # self.ui.btnImport.clicked.connect(self.importStocksList)
+        self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
+        self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
+        self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
+        self.ui.btnImport.clicked.connect(self.importStocksList)
 
         self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))        
         
@@ -124,14 +118,14 @@ class Watchlists(QMainWindow):
         self.model = TableModel(wlData)
         self.ui.tbvWatchlist.setModel(self.model)
         
-    '''def getWatchlistDetails(self):
+    def getWatchlistDetails(self):
         #get watchlist details
         self.watchlistDetails = WatchlistDetailsDlg()
         self.watchlistDetails.ui.btnCreate.clicked.connect(self.createWatchlistInDB)
         self.watchlistDetails.ui.btnCreate.clicked.connect(lambda: self.watchlistDetails.close()) #close the watchlistDetails dialog
-        self.watchlistDetails.show()'''
+        self.watchlistDetails.show()
 
-    ''' def createWatchlistInDB(self):
+    def createWatchlistInDB(self):
         name = self.watchlistDetails.ui.leName.text()
         # TODOO : you can create single table in Db and just add the extra column of watchlistName
         try:
@@ -154,10 +148,10 @@ class Watchlists(QMainWindow):
             else:
                 print("error:",err)
         else:
-            con.close()'''
+            con.close()
         
     
-    '''def addToWatchlist(self):
+    def addToWatchlist(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
@@ -185,9 +179,9 @@ class Watchlists(QMainWindow):
         else:
             con.close()
         
-        self.manageVisibility()'''
+        self.manageVisibility()
     
-    '''def importStocksList(self):
+    def importStocksList(self):
         watchlist = self.ui.cmbWatchlists.currentText()
         filePath, _ = QFileDialog.getOpenFileName(self, 'import file', 'C:\Downloads', 'Excel Files (*.csv)')
         print(filePath)
@@ -218,16 +212,14 @@ class Watchlists(QMainWindow):
         except Exception as e:
             print('exception in watchlistsMW', e)
         else:
-            con.close()'''
-        
-        
+            con.close()        
 
-    '''def showSearchDlg(self):
+    def showSearchDlg(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.addToWatchlist)
-        self.dlgSearch.show()'''
+        self.dlgSearch.show()
 
-    '''def deleteStockFrmWL(self):
+    def deleteStockFrmWL(self):
         modelIndexls = self.ui.tbvWatchlist.selectedIndexes() #return list of QModelIndices i.e. columns in a row
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
@@ -256,7 +248,7 @@ class Watchlists(QMainWindow):
         except Exception as e: #If the key is not found in dict then dict.pop might raise a KeyError.
             print(e)
         else:
-            con.close()'''
+            con.close()
             
     
     def manageVisibility(self): #manages the visibility of watchlist table and msg label
@@ -282,21 +274,9 @@ class Watchlists(QMainWindow):
         print('closing watchlist window')
         
         self.watchlistWorker.isRunning = False
-        # self.watchlistWorker.sigShowWLData.disconnect(self.showWatchlistData)
-
-        # self.watchlistThread.quit()
-        print('called1')
-        # res = self.watchlistThread.wait()
-        print('called2')
-
-        # print('called closeWindow', res)
+        MyWorker.isRunning = False
         print('called closeWindow')
         event.accept()
 
-    '''
-    def closeWindow(self):
-        print('', self.watchlistThread.isFinished())
-        self.watchlistThread.quit()
-        self.close()'''
         
         

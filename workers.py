@@ -390,46 +390,36 @@ class WatchlistWorker(QObject):
     def fetchWLData(self):    
         data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
         
-        stkListt = copy.deepcopy(self.stkList)
-        yf.enable_debug_mode()
+        stkList = copy.deepcopy(self.stkList)
         
-        for key in stkListt.keys():
+        for key in stkList.keys():
             if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
                 break
 
             # importing data from yfinance
             try:
-                stk = yf.Ticker(key+".NS")
-                hist = stk.history(period = '1d', interval = '1d') #this line causes crash when closed the thread
-                # print(hist)
+                hist = yf.download(key + '.NS', period='1d', interval='1d')
 
                 # #item method is used to retrieve data only else it return data with index
-                # open =  round(hist['Open'].item(), 2)
-                # high =  round(hist['High'].item(), 2)
-                # low =  round(hist['Low'].item(), 2)
-                # close =  round(hist['Close'].item(), 2)
+                open =  round(hist['Open'].item(), 2)
+                high =  round(hist['High'].item(), 2)
+                low =  round(hist['Low'].item(), 2)
+                close =  round(hist['Close'].item(), 2)
 
-                # data['Symbol'].append(key)
-                # data['Name'].append(stkList[key])
-                # data['Open'].append(open)
-                # data['High'].append(high)
-                # data['Low'].append(low)
-                # data['Close'].append(close)
+                data['Symbol'].append(key)
+                data['Name'].append(stkList[key])
+                data['Open'].append(open)
+                data['High'].append(high)
+                data['Low'].append(low)
+                data['Close'].append(close)
             except Exception as e:
                 print('Exception in thread', e)
-            
-            data['Symbol'].append(key)
-            data['Name'].append(stkListt[key])
-            data['Open'].append(0)
-            data['High'].append(0)
-            data['Low'].append(0)
-            data['Close'].append(0)
 
         return pd.DataFrame(data)
         
     def updateWL(self):
-        # while(self.isRunning):
-        for i in range(10):
+        while(self.isRunning):
+        # for i in range(3):
             data = self.fetchWLData()
 
             if(self.isRunning == False): #watchlist closed
@@ -442,11 +432,10 @@ class WatchlistWorker(QObject):
                 continue
 
             self.sigShowWLData.emit(data)
-            # self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
             time.sleep(5)
 
             print('update WL called')
-        print('-------------------thread ended------------------')
+        print('--------------watchlist thread ended--------------')
         self.finished.emit()
     
     def setWatchlistChanged(self, wlName):
@@ -457,10 +446,10 @@ class WatchlistWorker(QObject):
 
 class MyWorker(QObject):
     finished = Signal()
+    isRunning = True
     def run(self):
-        for i in range(15):
-            stk = yf.Ticker('PNB.NS')
-            hist = stk.history(period='1d', interval='1d')
-            print(hist)
-            time.sleep(1)
+        # while MyWorker.isRunning:
+        for i in range(3):
+            df = yf.download('PNB.NS', period='1d', interval='1d')
+            time.sleep(0.2)
         self.finished.emit()

@@ -144,9 +144,9 @@ if __name__ == "__main__":
     # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
-    loop = asyncio.new_event_loop()
+    loop = asyncio.new_event_loop() 
     teleApiWorker = TeleApiWorker(loop)
-    teleApiThread = QThread()
+    teleApiThread = QThread() #this thread runs event loop required to send message on telegram
     teleApiWorker.moveToThread(teleApiThread)
 
     teleApiThread.started.connect(teleApiWorker.startEventLoop)
