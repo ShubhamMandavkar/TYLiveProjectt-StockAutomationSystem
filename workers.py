@@ -325,6 +325,7 @@ class HoldingsWorker(QObject):
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
     sigShowMsg = Signal(str)
+    finished = Signal()
 
     def __init__(self, key='', sKey='', brCode='tc'):
         super().__init__()
@@ -387,27 +388,30 @@ class HoldingsWorker(QObject):
             print("process Holdings called")                            
 
     def getHoldingsTableModel(self):
-        isApiInvalidMsgShown = False 
+        self.isApiInvalidMsgShown = False 
         while(self.isHoldingsPage):
-            myData = HoldingsWorker.holdings
+            self.myData = HoldingsWorker.holdings
 
-            if(myData['status'] == 'success'):
-                if(len(myData['data']) != 0):
-                    dfHoldings = pd.DataFrame(myData['data'], columns=['symbol', 'holdqty','average_price','invest_val','hld_val','PL'])
-                    self.sigChngHoldData.emit(dfHoldings)
+            if(self.myData['status'] == 'success'):
+                if(len(self.myData['data']) != 0):
+                    self.dfHoldings = pd.DataFrame(self.myData['data'], columns=['symbol', 'holdqty','average_price','invest_val','hld_val','PL'])
+                    self.sigChngHoldData.emit(self.dfHoldings)
                 else:
                     self.sigNoHoldData.emit()
                 
-                isApiInvalidMsgShown = False
+                self.isApiInvalidMsgShown = False
             else:
-                if(not isApiInvalidMsgShown):
+                if(not self.isApiInvalidMsgShown):
                     #show message
-                    self.sigShowMsg.emit(myData['error_msg'])
+                    self.sigShowMsg.emit(self.myData['error_msg'])
                     self.sigNoHoldData.emit()
-                    isApiInvalidMsgShown = True
+                    self.isApiInvalidMsgShown = True
  
             time.sleep(5)
-            print("Holding function ")
+            print("getHoldingTbleModel function ")
+
+        self.finished.emit()
+        print('getHoldingTbleModel finished')
 
 class WatchlistWorker(QObject):
     sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
@@ -501,3 +505,31 @@ class WatchlistWorker(QObject):
         self.isWLChanged  = True
         self.currWL = wlName
         self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
+
+
+class StockWorker(QObject):
+    sigShowStkDetails = Signal(pd.DataFrame)
+    finished = Signal()
+
+    def __init__(self, name):
+        super().__init__()
+        self.stkSymbol = name
+        self.isRunning = True
+
+    def fetchStockDetails(self):
+        while(self.isRunning):
+            stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d')
+            stk = yf.Ticker(self.stkSymbol + '.NS')
+            stkInfo = stk.info
+            self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
+                                                      'High': stkDf['High'], 
+                                                      'Low': stkDf['Low'], 
+                                                      'Close': stkDf['Close'], 
+                                                      'Volume': stkDf['Volume'], 
+                                                      'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
+                                                      'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] }))
+            print('fetchStockDetails called')
+            time.sleep(5)
+
+        self.finished.emit()
+        print('fetchStockDetails thread ended')

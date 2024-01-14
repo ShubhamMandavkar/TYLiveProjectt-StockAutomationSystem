@@ -1,5 +1,7 @@
-from urllib import request
+from PySide6.QtCore import QThread
 from PySide6.QtWidgets import QMainWindow
+
+from workers import StockWorker
 from APIMethods import getQuote2, getQuote, getQuoteFromYfinance
 import json
 import yfinance as yf
@@ -9,8 +11,6 @@ from UIFiles.ui_stockDetails import Ui_stockDetails
 from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
 from ProjectPages.messageDlg import MessageDlg
-
-
 
 class StockDetails(QMainWindow):
     def __init__(self, stkSym, stkName, parent=None):
@@ -24,13 +24,26 @@ class StockDetails(QMainWindow):
         self.showDetails()
         self.addConnectors()
 
+        
+        self.stockWorker = StockWorker(self.stkSymbol)
+        self.stockThread = QThread()
+        self.stockWorker.moveToThread(self.stockThread)
+
+        self.stockThread.started.connect(self.stockWorker.fetchStockDetails)   
+        self.stockWorker.sigShowStkDetails.connect(self.showStkDetails)
+        '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
+        self.stockWorker.finished.connect(self.stockThread.quit) 
+        self.stockWorker.finished.connect(self.stockThread.wait)
+        self.stockWorker.finished.connect(self.stockWorker.deleteLater)
+        self.stockThread.finished.connect(self.stockThread.deleteLater)
+        self.stockThread.start()
+
     def addConnectors(self):
         self.ui.btnAlert.clicked.connect(self.showAlertDialog)
         self.ui.btnChart.clicked.connect(self.showChartWindow)
         self.ui.btnBuy.clicked.connect(self.getBuyDetails)
 
     def showDetails(self):
-    
         # stk = json.loads(getQuote2('',self.stkSymbol, 'tc', 'NSE'))
         self.ui.lblStkName.setText(self.stkName)
         self.ui.lblSymbolVal.setText(self.stkSymbol)
@@ -56,11 +69,22 @@ class StockDetails(QMainWindow):
         self.ui.lblCloseVal.setText(str(round(stkDf['Close'].iloc[0], 2)))
         self.ui.lblChange.hide()
         self.ui.lblChangeVal.hide()
-        # self.ui.lblChangeVal.setText(str(stkInfo['longName']))
         self.ui.lbl52wkHighVal.setText(str(stkInfo['fiftyTwoWeekHigh']))
         self.ui.lbl52wkLowVal.setText(str(stkInfo['fiftyTwoWeekLow']))
         self.ui.lblVolumeVal.setText(str(stkInfo['volume']))
-    
+
+    def showStkDetails(self, stkDf):
+        self.ui.lblCompanyVal.setText(self.stkName)
+        self.ui.lblExchangeVal.setText('NSE')
+        self.ui.lblOpenVal.setText(str(round(stkDf['Open'].iloc[0], 2)))
+        self.ui.lblHighVal.setText(str(round(stkDf['High'].iloc[0], 2)))
+        self.ui.lblLowVal.setText(str(round(stkDf['Low'].iloc[0], 2)))
+        self.ui.lblCloseVal.setText(str(round(stkDf['Close'].iloc[0], 2)))
+        self.ui.lblVolumeVal.setText(str(stkDf['Volume'].iloc[0]))
+
+        self.ui.lbl52wkHighVal.setText(str(stkDf['fiftyTwoWeekHigh'].iloc[0]))
+        self.ui.lbl52wkLowVal.setText(str(stkDf['fiftyTwoWeekLow'].iloc[0]))
+
     def getBuyDetails(self):
         pass
     
@@ -82,4 +106,11 @@ class StockDetails(QMainWindow):
     def showChartWindow(self):
         self.chart = Chart(self.stkSymbol, self.stkName)
         self.chart.show()
+
+    def closeEvent(self, event):
+        print('closing stockDetails Window')
+        self.stockWorker.isRunning = False
+        event.accept()
+        print('closed stockDetails Window')
+
     

@@ -5,6 +5,8 @@ from ProjectPages.messageDlg import MessageDlg
 
 from workers import HoldingsWorker
 
+import time
+
 class TableModel(QAbstractTableModel):
     Ncol = None
     order = None
@@ -49,23 +51,29 @@ class Holdings(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_holdings()
         self.ui.setupUi(self)
-
         self.holdingsWorker = HoldingsWorker()
         self.holdingsThread = QThread()
         self.holdingsWorker.moveToThread(self.holdingsThread)
 
         self.holdingsWorker.isHoldingsPage = True
         self.holdingsThread.started.connect(self.holdingsWorker.getHoldingsTableModel)
+        '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
+        self.holdingsWorker.finished.connect(self.holdingsThread.quit)
+        self.holdingsWorker.finished.connect(self.holdingsThread.wait)
+        self.holdingsWorker.finished.connect(self.holdingsWorker.deleteLater)
+        self.holdingsThread.finished.connect(self.holdingsThread.deleteLater)
+
         self.holdingsWorker.sigChngHoldData.connect(self.showHoldings)
         self.holdingsWorker.sigNoHoldData.connect(self.showNoHoldingsMsg)
         self.holdingsWorker.sigShowMsg.connect(self.showMessage)
+
         self.holdingsThread.start()
  
     def showHoldings(self, dfHoldings):
-        model = TableModel(dfHoldings)
+        self.model = TableModel(dfHoldings)
         if TableModel.order != None:
-            model.sort(TableModel.Ncol, TableModel.order)
-        self.ui.tvHoldings.setModel(model)
+            self.model.sort(TableModel.Ncol, TableModel.order)
+        self.ui.tvHoldings.setModel(self.model)
     
         self.ui.tvHoldings.setVisible(True)
         self.ui.lblNoHoldingsMsg.setVisible(False)
@@ -81,14 +89,10 @@ class Holdings(QMainWindow):
     def closeEvent(self, event):
         print('closing holding window')
         self.holdingsWorker.isHoldingsPage = False
-        TableModel.order = None
-        TableModel.Ncol = None
-        self.holdingsThread.quit()
-        res = self.holdingsThread.wait()
+        # TableModel.order = None
+        # TableModel.Ncol = None
         event.accept()
-        print('called closeWindow', res)
-    
-    def closeWindow(self):
-        self.close()
+        print('called closeWindow')
+
         
         

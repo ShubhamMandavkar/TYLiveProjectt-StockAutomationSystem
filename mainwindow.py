@@ -25,6 +25,7 @@ from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 import mysql.connector
 from mysql.connector import errorcode
 
+#TODOO: need to resolve holding crash issue when 2 holdings window created app crashes
 
 class UserDetails:
     def __init__(self):
@@ -55,10 +56,12 @@ class UserDetails:
 
 
 class Navigation:
+    
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
         self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
+        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.dlgSearch.close)
 
     def showStkDetails(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
@@ -73,7 +76,7 @@ class Navigation:
             dlg.show()
             print('Please check your internet connection')
         except Exception as e:
-            print('Exception occur in stockDetails.py')
+            print('Exception occur in stockDetails.py', e)
 
          
     def showMyAlertsWindow(self):
