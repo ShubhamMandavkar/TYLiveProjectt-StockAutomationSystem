@@ -1,5 +1,4 @@
-from logging import exception
-from PySide6.QtCore import QObject, Signal, QThread, QTimer
+from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -9,11 +8,9 @@ import math
 import time
 import zroya
 import talib
-import numpy as np
 import yfinance as yf
 import pandas as pd
 from algomojo.pyapi import *
-import logging
 import copy
 from telethon import TelegramClient
 from apiDetails import apiId, apiHashId
@@ -126,10 +123,19 @@ class AlertWorker(QObject):
         finally:
             con.close()
     
+    def myAction(self, nId, actionId):
+        if(actionId == 0):
+            print("stock sold successfully")
+        elif(actionId == 1):
+            print("Thank you for response")
+
     def sendNotiToDesktop(self, title, message):
         self.noti.setFirstLine(title) 
         self.noti.setSecondLine(message)
-        zroya.show(self.noti) #notificatoin sent to desktop
+        self.noti.addAction("sell")
+        self.noti.addAction("No")
+        zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
+        # zroya.show(self.noti) #notificatoin sent to desktop
 
     def processAlerts(self):
         isSentNetworkWarning = False
@@ -306,8 +312,7 @@ class AlertWorker(QObject):
             time.sleep(5)
             # self.getAlertList()
             print("processAlerts Called")
-    
-    
+      
 
 class HoldingsWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
@@ -319,6 +324,7 @@ class HoldingsWorker(QObject):
 
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
+    sigShowMsg = Signal(str)
 
     def __init__(self, key='', sKey='', brCode='tc'):
         super().__init__()
@@ -329,13 +335,28 @@ class HoldingsWorker(QObject):
 
         #to show holdings in holdings page
         self.isHoldingsPage = False
+    
+    def changeDetails(self, key, sKey, brCode = 'tc'):
+        self.apiKey = key
+        self.apiSecretKey = sKey
+        self.brCode = brCode
+        self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
         
     
     def fetchHoldings(self, brCode = 'tc'):
         while(HoldingsWorker.isRunning):
-            # HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
-            # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
-            HoldingsWorker.holdings = getHoldings2() #testing purpose only
+            try :
+                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
+                
+                # print(HoldingsWorker.holdings['status'])
+                # print(HoldingsWorker.holdings['error_msg'])
+                # print(HoldingsWorker.holdings['error_type'])
+
+                # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
+                # HoldingsWorker.holdings = getHoldings2() #testing purpose only
+            except Exception as e:
+                print(e)
+            
 
             print('HoldingsfetchingThread called')
             time.sleep(5)
@@ -348,9 +369,9 @@ class HoldingsWorker(QObject):
 
     def processHoldings(self):
         while(HoldingsWorker.isRunning):
-            myData = json.loads(HoldingsWorker.holdings)
+            myData = HoldingsWorker.holdings
 
-            if(len(myData['data']) != 0):
+            if(myData['status'] == 'success'):
                 for holding in myData['data']:
                     if(holding['PL'] > 15):
                         print('Above 15% profit')
@@ -366,14 +387,24 @@ class HoldingsWorker(QObject):
             print("process Holdings called")                            
 
     def getHoldingsTableModel(self):
+        isApiInvalidMsgShown = False 
         while(self.isHoldingsPage):
-            myData = json.loads(HoldingsWorker.holdings)
-            
-            if(len(myData['data']) != 0):
-                dfHoldings = pd.DataFrame(myData['data'], columns=['symbol', 'holdqty','average_price','invest_val','hld_val','PL'])
-                self.sigChngHoldData.emit(dfHoldings)
+            myData = HoldingsWorker.holdings
+
+            if(myData['status'] == 'success'):
+                if(len(myData['data']) != 0):
+                    dfHoldings = pd.DataFrame(myData['data'], columns=['symbol', 'holdqty','average_price','invest_val','hld_val','PL'])
+                    self.sigChngHoldData.emit(dfHoldings)
+                else:
+                    self.sigNoHoldData.emit()
+                
+                isApiInvalidMsgShown = False
             else:
-                self.sigNoHoldData.emit()
+                if(not isApiInvalidMsgShown):
+                    #show message
+                    self.sigShowMsg.emit(myData['error_msg'])
+                    self.sigNoHoldData.emit()
+                    isApiInvalidMsgShown = True
  
             time.sleep(5)
             print("Holding function ")
@@ -447,7 +478,7 @@ class WatchlistWorker(QObject):
         # for i in range(3):
             if(isNetworkConnected()):
                 data = self.fetchWLData()
-                
+
             if(isNetworkConnected()):
                 self.sigShowWLData.emit(data)
 
@@ -470,14 +501,3 @@ class WatchlistWorker(QObject):
         self.isWLChanged  = True
         self.currWL = wlName
         self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
-
-
-class MyWorker(QObject):
-    finished = Signal()
-    isRunning = True
-    def run(self):
-        # while MyWorker.isRunning:
-        for i in range(3):
-            df = yf.download('PNB.NS', period='1d', interval='1d')
-            time.sleep(0.2)
-        self.finished.emit()

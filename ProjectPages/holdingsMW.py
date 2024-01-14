@@ -1,6 +1,7 @@
 from PySide6.QtCore import  QThread, QAbstractTableModel, Qt
 from PySide6.QtWidgets import QMainWindow
 from UIFiles.ui_holdings import Ui_holdings
+from ProjectPages.messageDlg import MessageDlg
 
 from workers import HoldingsWorker
 
@@ -56,8 +57,26 @@ class Holdings(QMainWindow):
         self.holdingsWorker.isHoldingsPage = True
         self.holdingsThread.started.connect(self.holdingsWorker.getHoldingsTableModel)
         self.holdingsWorker.sigChngHoldData.connect(self.showHoldings)
+        self.holdingsWorker.sigNoHoldData.connect(self.showNoHoldingsMsg)
+        self.holdingsWorker.sigShowMsg.connect(self.showMessage)
         self.holdingsThread.start()
  
+    def showHoldings(self, dfHoldings):
+        model = TableModel(dfHoldings)
+        if TableModel.order != None:
+            model.sort(TableModel.Ncol, TableModel.order)
+        self.ui.tvHoldings.setModel(model)
+    
+        self.ui.tvHoldings.setVisible(True)
+        self.ui.lblNoHoldingsMsg.setVisible(False)
+
+    def showNoHoldingsMsg(self):
+        self.ui.tvHoldings.setVisible(False)
+        self.ui.lblNoHoldingsMsg.setVisible(True)
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
 
     def closeEvent(self, event):
         print('closing holding window')
@@ -72,9 +91,4 @@ class Holdings(QMainWindow):
     def closeWindow(self):
         self.close()
         
-    def showHoldings(self, dfHoldings):
-        model = TableModel(dfHoldings)
-        if TableModel.order != None:
-            model.sort(TableModel.Ncol, TableModel.order)
-        self.ui.tvHoldings.setModel(model)
         

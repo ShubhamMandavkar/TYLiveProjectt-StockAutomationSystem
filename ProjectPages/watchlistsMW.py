@@ -3,13 +3,13 @@ from PySide6.QtWidgets import QMainWindow, QHeaderView, QFileDialog
 from ProjectPages.watchlistDetailsDlg import WatchlistDetailsDlg
 from ProjectPages.searchDlg import SearchDlg
 from UIFiles.ui_watchlists import Ui_watchlists
-from workers import WatchlistWorker, MyWorker
+from workers import WatchlistWorker
+from APIMethods import getQuoteFromYfinance
 
 import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
 import yfinance as yf
-import time
 
 # TODOO: add synchronization to self.watchlistData because when we change the watchlist watchlist data changes
 
@@ -33,6 +33,11 @@ class TableModel(QAbstractTableModel):
     def delRow(self, index):
         self.layoutAboutToBeChanged.emit()
         self._data.drop(index, axis = 0, inplace = True)
+        self.layoutChanged.emit()
+
+    def addRow(self, row):
+        self.layoutAboutToBeChanged.emit()
+        self._data = pd.concat([self._data, row], ignore_index= True)
         self.layoutChanged.emit()
 
     #essential to overide for custom header
@@ -167,6 +172,19 @@ class Watchlists(QMainWindow):
             con.commit()
 
             self.watchlistWorker.stkList[stkSym] = stkName #add stock in worker list
+            
+            try:
+                # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
+                stk = getQuoteFromYfinance('shubh', stkSym, 'tc', 'NSE')
+                self.model.addRow(pd.DataFrame( {'Symbol' : [stkSym], 
+                                                 'Name' : [stkName], 
+                                                 'Open' : [round(stk['Open'].item(), 2)], 
+                                                 'High' : [round(stk['High'].item(), 2)], 
+                                                 'Low' : [round(stk['Low'].item(), 2)], 
+                                                 'Close' : [round(stk['Close'].item(), 2)]} ))     
+            except Exception as e:
+                print(e)
+
             print(stkName, 'added to watchlist', watchlist)
             
         except mysql.connector.Error as err:
@@ -274,7 +292,6 @@ class Watchlists(QMainWindow):
         print('closing watchlist window')
         
         self.watchlistWorker.isRunning = False
-        MyWorker.isRunning = False
         print('called closeWindow')
         event.accept()
 

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'holdings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QTableView, QVBoxLayout,
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFormLayout, QFrame,
+    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
+    QMenuBar, QSizePolicy, QStatusBar, QTableView,
     QWidget)
 
 class Ui_holdings(object):
@@ -33,20 +33,34 @@ class Ui_holdings(object):
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_2 = QVBoxLayout(self.frame_4)
-        self.verticalLayout_2.setSpacing(2)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(2, 2, 2, 2)
-        self.lblStkName = QLabel(self.frame_4)
-        self.lblStkName.setObjectName(u"lblStkName")
-        self.lblStkName.setMinimumSize(QSize(0, 50))
-        self.lblStkName.setMaximumSize(QSize(16777215, 50))
+        self.formLayout = QFormLayout(self.frame_4)
+        self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setContentsMargins(2, 2, 2, 2)
+        self.lblHeading = QLabel(self.frame_4)
+        self.lblHeading.setObjectName(u"lblHeading")
+        self.lblHeading.setMinimumSize(QSize(0, 50))
+        self.lblHeading.setMaximumSize(QSize(16777215, 50))
         font = QFont()
         font.setPointSize(14)
         font.setBold(True)
-        self.lblStkName.setFont(font)
+        font.setKerning(False)
+        self.lblHeading.setFont(font)
+        self.lblHeading.setStyleSheet(u"color: rgb(0, 0, 0);")
 
-        self.verticalLayout_2.addWidget(self.lblStkName)
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.lblHeading)
+
+        self.lblNoHoldingsMsg = QLabel(self.frame_4)
+        self.lblNoHoldingsMsg.setObjectName(u"lblNoHoldingsMsg")
+        self.lblNoHoldingsMsg.setMinimumSize(QSize(0, 50))
+        self.lblNoHoldingsMsg.setMaximumSize(QSize(16777215, 50))
+        font1 = QFont()
+        font1.setPointSize(12)
+        font1.setBold(True)
+        self.lblNoHoldingsMsg.setFont(font1)
+        self.lblNoHoldingsMsg.setStyleSheet(u"color: rgb(0, 0, 0);")
+        self.lblNoHoldingsMsg.setWordWrap(True)
+
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.lblNoHoldingsMsg)
 
         self.tvHoldings = QTableView(self.frame_4)
         self.tvHoldings.setObjectName(u"tvHoldings")
@@ -55,7 +69,7 @@ class Ui_holdings(object):
         self.tvHoldings.setSortingEnabled(True)
         self.tvHoldings.verticalHeader().setVisible(False)
 
-        self.verticalLayout_2.addWidget(self.tvHoldings)
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.tvHoldings)
 
 
         self.horizontalLayout.addWidget(self.frame_4)
@@ -76,6 +90,7 @@ class Ui_holdings(object):
 
     def retranslateUi(self, holdings):
         holdings.setWindowTitle(QCoreApplication.translate("holdings", u"MainWindow", None))
-        self.lblStkName.setText(QCoreApplication.translate("holdings", u"Holdings", None))
+        self.lblHeading.setText(QCoreApplication.translate("holdings", u"Holdings", None))
+        self.lblNoHoldingsMsg.setText(QCoreApplication.translate("holdings", u"Currently you do not have any holdings in your porfolio.", None))
     # retranslateUi
 

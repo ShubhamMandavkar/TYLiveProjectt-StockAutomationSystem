@@ -3,7 +3,6 @@ import asyncio
 import sys
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtWidgets import QDialog
 import requests
 
 
@@ -25,6 +24,35 @@ from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 
 import mysql.connector
 from mysql.connector import errorcode
+
+
+class UserDetails:
+    def __init__(self):
+        self.apiKey = ''
+        self.apiSecretKey = ''
+    
+    def getUserDetails(self):
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+            cursor = con.cursor()
+
+            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{'shubh'}'"""
+            cursor.execute(query)
+            for (key, sKey) in cursor:
+                self.apiKey = key
+                self.apiSecretKey = sKey            
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        finally:
+            cursor.close()
+            con.close()
+
 
 class Navigation:
     def showSearchDialog(self):
@@ -59,10 +87,10 @@ class Navigation:
     def showWatchlists(self):
         self.watchlists = Watchlists()
         self.watchlists.show()
-        pass
       
     def showCustomDetails(self):
         self.customDetails = CustomDetails()
+        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingWorkerDetails)
         self.customDetails.show()
 
 class MainWindow(QMainWindow):
@@ -71,37 +99,15 @@ class MainWindow(QMainWindow):
         self.ui = Ui_Home()
         self.ui.setupUi(self)
 
+        self.userDetails = UserDetails()
+        self.userDetails.getUserDetails()
+
         #navigation class
         self.nav = Navigation()
 
         self.addConnectors()
-        self.getUserDetails()
+
     
-    def getUserDetails(self):
-        self.apiKey = 'key'
-        self.apiSecretKey = 'mykey'
-        pass
-        # try:
-        #     con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
-        #     cursor = con.cursor()
-
-        #     query = f"""select apiKey, apiSecretKey from customer_details where userId = '{'shubh'}'"""
-        #     cursor.execute(query)
-        #     for (key, sKey) in cursor:
-        #         self.apiKey = key
-        #         self.apiSecretKey = sKey            
-
-        # except mysql.connector.Error as err:
-        #     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        #         print("Something is wrong with your user name or password")
-        #     elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        #         print("Database does not exist")
-        #     else:
-        #         print("error:",err)
-        # finally:
-        #     cursor.close()
-        #     con.close()
-
     def addConnectors(self):
         #navigation code
         self.ui.btnSearch.clicked.connect(self.nav.showSearchDialog)
@@ -110,7 +116,9 @@ class MainWindow(QMainWindow):
         self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlists)
         self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetails)
 
-
+def chnageHoldingWorkerDetails():
+    widget.userDetails.getUserDetails()
+    holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -125,7 +133,7 @@ if __name__ == "__main__":
     alertThread.started.connect(alertWorker.processAlerts)
 
     #worker to fetch holdings details
-    holdingsFetchingWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)
+    holdingsFetchingWorker = HoldingsWorker(widget.userDetails.apiKey, widget.userDetails.apiSecretKey)
 
     #Thread to fetch holdings continuously
     holdingsFetchingThread = QThread()
@@ -134,14 +142,14 @@ if __name__ == "__main__":
     holdingsFetchingThread.started.connect(holdingsFetchingWorker.fetchHoldings)
 
     #worker to process holdings
-    holdingsProcessWorker = HoldingsWorker(widget.apiKey, widget.apiSecretKey)
+    holdingsProcessWorker = HoldingsWorker()
     #Thread to process holdings
     holdingsProcessThread = QThread()
     holdingsProcessWorker.moveToThread(holdingsProcessThread)
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    # holdingsFetchingThread.start()
+    holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
@@ -154,8 +162,8 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    teleApiThread.start()
+    # teleApiThread.start()
     
-    alertThread.start() #this thread should be started later than the teleApiThread
+    # alertThread.start() #this thread should be started later than the teleApiThread
 
     sys.exit(app.exec())
