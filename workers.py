@@ -15,6 +15,7 @@ import copy
 from telethon import TelegramClient
 from apiDetails import apiId, apiHashId
 import asyncio
+import requests
 
 class TeleApiWorker(QObject):
     finished = Signal()
@@ -33,7 +34,6 @@ class TeleApiWorker(QObject):
             await client.send_message('+918208823690', msg)
 
 def isNetworkConnected():
-    import requests
     try:
         response = requests.get("http://www.google.com")
         return True
@@ -336,7 +336,7 @@ class HoldingsWorker(QObject):
 
         #to show holdings in holdings page
         self.isHoldingsPage = False
-    
+
     def changeDetails(self, key, sKey, brCode = 'tc'):
         self.apiKey = key
         self.apiSecretKey = sKey
@@ -509,6 +509,7 @@ class WatchlistWorker(QObject):
 
 class StockWorker(QObject):
     sigShowStkDetails = Signal(pd.DataFrame)
+    sigShowCheckNetworkMsg = Signal(str)
     finished = Signal()
 
     def __init__(self, name):
@@ -517,17 +518,28 @@ class StockWorker(QObject):
         self.isRunning = True
 
     def fetchStockDetails(self):
+        isNetNotConnectedMsgSend = False
         while(self.isRunning):
-            stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d')
-            stk = yf.Ticker(self.stkSymbol + '.NS')
-            stkInfo = stk.info
-            self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
-                                                      'High': stkDf['High'], 
-                                                      'Low': stkDf['Low'], 
-                                                      'Close': stkDf['Close'], 
-                                                      'Volume': stkDf['Volume'], 
-                                                      'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
-                                                      'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] }))
+            try:
+                stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d')
+                stk = yf.Ticker(self.stkSymbol + '.NS')
+                stkInfo = stk.info
+                self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
+                                                        'High': stkDf['High'], 
+                                                        'Low': stkDf['Low'], 
+                                                        'Close': stkDf['Close'], 
+                                                        'Volume': stkDf['Volume'], 
+                                                        'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
+                                                        'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
+                                                        }))
+                isNetNotConnectedMsgSend = False    
+            except requests.exceptions.ConnectionError:
+                if(not isNetNotConnectedMsgSend):
+                    self.sigShowCheckNetworkMsg.emit('Please check your internet connection')   
+                    isNetNotConnectedMsgSend = True                                 
+            except Exception as e:
+                print('Exception in stkDetailsWorker', e)
+
             print('fetchStockDetails called')
             time.sleep(5)
 

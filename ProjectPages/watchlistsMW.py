@@ -153,8 +153,7 @@ class Watchlists(QMainWindow):
             else:
                 print("error:",err)
         else:
-            con.close()
-        
+            con.close()   
     
     def addToWatchlist(self):
         modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row

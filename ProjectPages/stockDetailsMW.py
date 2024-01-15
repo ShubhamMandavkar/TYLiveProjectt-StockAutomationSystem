@@ -17,13 +17,16 @@ class StockDetails(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_stockDetails()
         self.ui.setupUi(self)
+        self.ui.lblChange.hide()
+        self.ui.lblChangeVal.hide()
 
         self.stkSymbol = stkSym
         self.stkName = stkName
 
-        self.showDetails()
-        self.addConnectors()
+        self.ui.lblStkName.setText(self.stkName)
+        self.ui.lblSymbolVal.setText(self.stkSymbol)
 
+        self.addConnectors()
         
         self.stockWorker = StockWorker(self.stkSymbol)
         self.stockThread = QThread()
@@ -31,6 +34,7 @@ class StockDetails(QMainWindow):
 
         self.stockThread.started.connect(self.stockWorker.fetchStockDetails)   
         self.stockWorker.sigShowStkDetails.connect(self.showStkDetails)
+        self.stockWorker.sigShowCheckNetworkMsg.connect(self.showMessage)
         '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.stockWorker.finished.connect(self.stockThread.quit) 
         self.stockWorker.finished.connect(self.stockThread.wait)
@@ -44,34 +48,19 @@ class StockDetails(QMainWindow):
         self.ui.btnBuy.clicked.connect(self.getBuyDetails)
 
     def showDetails(self):
-        # stk = json.loads(getQuote2('',self.stkSymbol, 'tc', 'NSE'))
-        self.ui.lblStkName.setText(self.stkName)
+        stk = json.loads(getQuote2('',self.stkSymbol, 'tc', 'NSE'))
         self.ui.lblSymbolVal.setText(self.stkSymbol)
-        # self.ui.lblCompanyVal.setText(stk['data']['company_name'])
-        # self.ui.lblExchangeVal.setText(stk['data']['exchange'])
-        # self.ui.lblOpenVal.setText(str(stk['data']['open']))
-        # self.ui.lblHighVal.setText(str(stk['data']['high']))
-        # self.ui.lblLowVal.setText(str(stk['data']['low']))
-        # self.ui.lblCloseVal.setText(str(stk['data']['close']))
-        # self.ui.lblChangeVal.setText(str(stk['data']['change']))
-        # self.ui.lbl52wkHighVal.setText(str(stk['data']['yearly_high_price']))
-        # self.ui.lbl52wkLowVal.setText(str(stk['data']['yearly_low_price']))
-        # self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
+        self.ui.lblCompanyVal.setText(stk['data']['company_name'])
+        self.ui.lblExchangeVal.setText(stk['data']['exchange'])
+        self.ui.lblOpenVal.setText(str(stk['data']['open']))
+        self.ui.lblHighVal.setText(str(stk['data']['high']))
+        self.ui.lblLowVal.setText(str(stk['data']['low']))
+        self.ui.lblCloseVal.setText(str(stk['data']['close']))
+        self.ui.lblChangeVal.setText(str(stk['data']['change']))
+        self.ui.lbl52wkHighVal.setText(str(stk['data']['yearly_high_price']))
+        self.ui.lbl52wkLowVal.setText(str(stk['data']['yearly_low_price']))
+        self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
 
-        stk = yf.Ticker(self.stkSymbol +".NS")
-        stkInfo = stk.info
-        stkDf = getQuoteFromYfinance('', self.stkSymbol,'tc','NSE')
-        self.ui.lblCompanyVal.setText(stkInfo['longName'])
-        self.ui.lblExchangeVal.setText('NSE')
-        self.ui.lblOpenVal.setText(str(round(stkDf['Open'].iloc[0], 2)))
-        self.ui.lblHighVal.setText(str(round(stkDf['High'].iloc[0], 2)))
-        self.ui.lblLowVal.setText(str(round(stkDf['Low'].iloc[0], 2)))
-        self.ui.lblCloseVal.setText(str(round(stkDf['Close'].iloc[0], 2)))
-        self.ui.lblChange.hide()
-        self.ui.lblChangeVal.hide()
-        self.ui.lbl52wkHighVal.setText(str(stkInfo['fiftyTwoWeekHigh']))
-        self.ui.lbl52wkLowVal.setText(str(stkInfo['fiftyTwoWeekLow']))
-        self.ui.lblVolumeVal.setText(str(stkInfo['volume']))
 
     def showStkDetails(self, stkDf):
         self.ui.lblCompanyVal.setText(self.stkName)
@@ -106,6 +95,10 @@ class StockDetails(QMainWindow):
     def showChartWindow(self):
         self.chart = Chart(self.stkSymbol, self.stkName)
         self.chart.show()
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
 
     def closeEvent(self, event):
         print('closing stockDetails Window')

@@ -152,7 +152,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    holdingsFetchingThread.start()
+    # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
