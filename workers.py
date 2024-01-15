@@ -1,3 +1,4 @@
+from urllib import request
 from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
@@ -319,8 +320,9 @@ class HoldingsWorker(QObject):
     noti = zroya.Template(zroya.TemplateType.Text2)
     # noti.setAudio(audio=zroya.Audio.Alarm)
 
-    holdings = json.dumps({ "status": "success", "data": []})   #static variable to share holdings for all objects
+    holdings = { "status": "success", "data": []}   #static variable to share holdings for all objects
     isRunning = True
+    isNetConnected = False
 
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
@@ -355,6 +357,10 @@ class HoldingsWorker(QObject):
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
                 # HoldingsWorker.holdings = getHoldings2() #testing purpose only
+
+                HoldingsWorker.isNetConnected = True
+            except requests.exceptions.ConnectionError:
+                HoldingsWorker.isNetConnected = False
             except Exception as e:
                 print(e)
             
@@ -389,7 +395,15 @@ class HoldingsWorker(QObject):
 
     def getHoldingsTableModel(self):
         self.isApiInvalidMsgShown = False 
+        isNetNotConnectedMsgSend = False
+        
         while(self.isHoldingsPage):
+            if(not HoldingsWorker.isNetConnected): #if network is not connected
+                if(not isNetNotConnectedMsgSend):
+                    self.sigShowMsg.emit('Please check your internet connection')
+                    isNetNotConnectedMsgSend = True
+                continue
+
             self.myData = HoldingsWorker.holdings
 
             if(self.myData['status'] == 'success'):
@@ -406,7 +420,9 @@ class HoldingsWorker(QObject):
                     self.sigShowMsg.emit(self.myData['error_msg'])
                     self.sigNoHoldData.emit()
                     self.isApiInvalidMsgShown = True
- 
+            
+            isNetNotConnectedMsgSend = False
+
             time.sleep(5)
             print("getHoldingTbleModel function ")
 

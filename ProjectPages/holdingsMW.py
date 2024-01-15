@@ -51,6 +51,8 @@ class Holdings(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_holdings()
         self.ui.setupUi(self)
+        self.ui.tvHoldings.setVisible(False)
+
         self.holdingsWorker = HoldingsWorker()
         self.holdingsThread = QThread()
         self.holdingsWorker.moveToThread(self.holdingsThread)
