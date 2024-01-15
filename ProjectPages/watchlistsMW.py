@@ -1,7 +1,9 @@
-from PySide6.QtCore import QAbstractTableModel, Qt, QThread, QReadWriteLock
-from PySide6.QtWidgets import QMainWindow, QHeaderView, QFileDialog
+from PySide6.QtCore import QAbstractTableModel, Qt, QThread
+from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ProjectPages.watchlistDetailsDlg import WatchlistDetailsDlg
 from ProjectPages.searchDlg import SearchDlg
+from ProjectPages.messageDlg import MessageDlg
+
 from UIFiles.ui_watchlists import Ui_watchlists
 from workers import WatchlistWorker
 from APIMethods import getQuoteFromYfinance
@@ -9,7 +11,6 @@ from APIMethods import getQuoteFromYfinance
 import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
-import yfinance as yf
 
 # TODOO: add synchronization to self.watchlistData because when we change the watchlist watchlist data changes
 
@@ -82,6 +83,7 @@ class Watchlists(QMainWindow):
 
         self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
         self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData)
+        self.watchlistWorker.sigShowMsg.connect(self.showMessage)
         '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.watchlistWorker.finished.connect(self.watchlistThread.quit) 
         self.watchlistWorker.finished.connect(self.watchlistThread.wait)
@@ -96,8 +98,7 @@ class Watchlists(QMainWindow):
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
         self.ui.btnImport.clicked.connect(self.importStocksList)
 
-        self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))        
-        
+        self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))         
 
     def loadWatchlists(self):
         try:
@@ -267,7 +268,10 @@ class Watchlists(QMainWindow):
         else:
             con.close()
             
-    
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
+
     def manageVisibility(self): #manages the visibility of watchlist table and msg label
         count = self.ui.cmbWatchlists.count()
         if count != 0: #if there is atleast 1 watchlist then show the watchlist frame and list of watchlists in combobox

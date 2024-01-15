@@ -40,7 +40,8 @@ def isNetworkConnected():
         return True
     except requests.ConnectionError:
         return False
-    
+    except Exception:
+        return False
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
@@ -431,6 +432,7 @@ class HoldingsWorker(QObject):
 
 class WatchlistWorker(QObject):
     sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
+    sigShowMsg = Signal(str)
     finished = Signal()
 
     def __init__(self):
@@ -489,11 +491,12 @@ class WatchlistWorker(QObject):
                 data['Low'].append(low)
                 data['Close'].append(close)
             except Exception as e:
-                print('Exception in thread', e)
+                print('Exception in watchlist thread', e)
 
         return pd.DataFrame(data)
         
     def updateWL(self):
+        isNetNotConnectedMsgSend = False
         while(self.isRunning):
         # for i in range(3):
             if(isNetworkConnected()):
@@ -501,6 +504,11 @@ class WatchlistWorker(QObject):
 
             if(isNetworkConnected()):
                 self.sigShowWLData.emit(data)
+                isNetNotConnectedMsgSend = False
+            else:
+                if(not isNetNotConnectedMsgSend):
+                    self.sigShowMsg.emit('Please check your internet connection')
+                    isNetNotConnectedMsgSend = True
 
             if(self.isRunning == False): #watchlist closed
                 continue
