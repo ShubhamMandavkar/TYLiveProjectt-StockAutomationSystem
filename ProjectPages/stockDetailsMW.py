@@ -4,13 +4,13 @@ from PySide6.QtWidgets import QMainWindow
 from workers import StockWorker
 from APIMethods import getQuote2, getQuote, getQuoteFromYfinance
 import json
-import yfinance as yf
-import requests
 
 from UIFiles.ui_stockDetails import Ui_stockDetails
 from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
 from ProjectPages.messageDlg import MessageDlg
+from ProjectPages.buyOrderWidget import BuyOrderWidget
+from ProjectPages.sellOrderWidget import SellOrderWidget
 
 class StockDetails(QMainWindow):
     def __init__(self, stkSym, stkName, parent=None):
@@ -45,7 +45,8 @@ class StockDetails(QMainWindow):
     def addConnectors(self):
         self.ui.btnAlert.clicked.connect(self.showAlertDialog)
         self.ui.btnChart.clicked.connect(self.showChartWindow)
-        self.ui.btnBuy.clicked.connect(self.getBuyDetails)
+        self.ui.btnBuy.clicked.connect(self.showBuyOrderWidget)
+        self.ui.btnSell.clicked.connect(self.showSellOrderWidget)
 
     def showDetails(self):
         stk = json.loads(getQuote2('',self.stkSymbol, 'tc', 'NSE'))
@@ -74,8 +75,13 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkHighVal.setText(str(stkDf['fiftyTwoWeekHigh'].iloc[0]))
         self.ui.lbl52wkLowVal.setText(str(stkDf['fiftyTwoWeekLow'].iloc[0]))
 
-    def getBuyDetails(self):
-        pass
+    def showBuyOrderWidget(self):
+        self.orderWidget = BuyOrderWidget()
+        self.orderWidget.show()
+    
+    def showSellOrderWidget(self):
+        self.orderWidget = SellOrderWidget()
+        self.orderWidget.show()
     
     def showAlertDialog(self):
         self.dlgAlert = AlertDlg(self.stkSymbol, self.stkName)

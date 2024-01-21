@@ -1,4 +1,3 @@
-from urllib import request
 from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
@@ -45,6 +44,8 @@ def isNetworkConnected():
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
+    sigShowBuyOrderWidget = Signal()
+    sigShowSellOrderWidget = Signal()
     isRunning = False
     alertList = []
 
@@ -127,15 +128,17 @@ class AlertWorker(QObject):
     
     def myAction(self, nId, actionId):
         if(actionId == 0):
-            print("stock sold successfully")
+            self.sigShowBuyOrderWidget.emit()
+            print("Thank you for response")
         elif(actionId == 1):
+            self.sigShowSellOrderWidget.emit()
             print("Thank you for response")
 
     def sendNotiToDesktop(self, title, message):
         self.noti.setFirstLine(title) 
         self.noti.setSecondLine(message)
-        self.noti.addAction("sell")
-        self.noti.addAction("No")
+        self.noti.addAction("BUY")
+        self.noti.addAction("SELL")
         zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
         # zroya.show(self.noti) #notificatoin sent to desktop
 

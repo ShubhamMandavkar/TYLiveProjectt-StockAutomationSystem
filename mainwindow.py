@@ -20,6 +20,8 @@ from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
 from ProjectPages.stockDetailsMW import StockDetails
 from ProjectPages.messageDlg import MessageDlg
+from ProjectPages.buyOrderWidget import BuyOrderWidget
+from ProjectPages.sellOrderWidget import SellOrderWidget
 from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 
 import mysql.connector
@@ -54,7 +56,6 @@ class UserDetails:
             cursor.close()
             con.close()
 
-
 class Navigation:
     
     def showSearchDialog(self):
@@ -77,8 +78,7 @@ class Navigation:
             print('Please check your internet connection')
         except Exception as e:
             print('Exception occur in stockDetails.py', e)
-
-         
+      
     def showMyAlertsWindow(self):
         self.myAlerts = MyAlerts()
         self.myAlerts.show()
@@ -119,9 +119,18 @@ class MainWindow(QMainWindow):
         self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlists)
         self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetails)
 
+    def showBuyOrderWidget(self):
+        self.orderWidget = BuyOrderWidget()
+        self.orderWidget.show()
+
+    def showSellOrderWidget(self):
+        self.orderWidget = SellOrderWidget()
+        self.orderWidget.show()
+
 def chnageHoldingWorkerDetails():
     widget.userDetails.getUserDetails()
     holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -134,6 +143,8 @@ if __name__ == "__main__":
 
     alertThread.started.connect(AlertWorker.getAlertList)
     alertThread.started.connect(alertWorker.processAlerts)
+    alertWorker.sigShowBuyOrderWidget.connect(widget.showBuyOrderWidget)
+    alertWorker.sigShowSellOrderWidget.connect(widget.showSellOrderWidget)
 
     #worker to fetch holdings details
     holdingsFetchingWorker = HoldingsWorker(widget.userDetails.apiKey, widget.userDetails.apiSecretKey)
@@ -152,7 +163,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    holdingsFetchingThread.start()
+    # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
@@ -165,8 +176,8 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    # teleApiThread.start()
+    teleApiThread.start()
     
-    # alertThread.start() #this thread should be started later than the teleApiThread
+    alertThread.start() #this thread should be started later than the teleApiThread
 
     sys.exit(app.exec())
