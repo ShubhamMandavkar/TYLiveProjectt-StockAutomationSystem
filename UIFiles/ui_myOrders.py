@@ -69,6 +69,7 @@ class Ui_myOrders(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.lsvPendingOrders = QListView(self.pendingOrdersWidget)
         self.lsvPendingOrders.setObjectName(u"lsvPendingOrders")
+        self.lsvPendingOrders.setFont(font2)
 
         self.horizontalLayout_3.addWidget(self.lsvPendingOrders)
 
@@ -90,7 +91,7 @@ class Ui_myOrders(object):
 
         self.retranslateUi(myOrders)
 
-        self.myOrdersTabWidget.setCurrentIndex(0)
+        self.myOrdersTabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(myOrders)
@@ -100,6 +101,6 @@ class Ui_myOrders(object):
         myOrders.setWindowTitle(QCoreApplication.translate("myOrders", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("myOrders", u"My Orders", None))
         self.myOrdersTabWidget.setTabText(self.myOrdersTabWidget.indexOf(self.allOrdersWidget), QCoreApplication.translate("myOrders", u"ALL Orders", None))
-        self.myOrdersTabWidget.setTabText(self.myOrdersTabWidget.indexOf(self.pendingOrdersWidget), QCoreApplication.translate("myOrders", u"Pending Orders", None))
+        self.myOrdersTabWidget.setTabText(self.myOrdersTabWidget.indexOf(self.pendingOrdersWidget), QCoreApplication.translate("myOrders", u"Open Orders", None))
     # retranslateUi
 

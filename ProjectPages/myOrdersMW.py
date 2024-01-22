@@ -214,7 +214,8 @@ class MyOrders(QMainWindow):
 
     def addConnectors(self):
         self.ui.lsvAllOrders.doubleClicked.connect(self.showOrderDetails)
-        pass
+        self.ui.lsvPendingOrders.doubleClicked.connect(self.showPendingOrderDetails)
+
     
     def loadAllOrders(self):
         self.myOrders = fetchAllOrders2(self.userDetails)
@@ -252,6 +253,14 @@ class MyOrders(QMainWindow):
         modelIndexls = self.ui.lsvAllOrders.selectedIndexes()
         row = modelIndexls[0].row()
         order = self.ui.lsvAllOrders.model()._data.iloc[row]
+
+        self.orderDetails = OrderDetailsDlg(order)
+        self.orderDetails.show()
+
+    def showPendingOrderDetails(self):
+        modelIndexls = self.ui.lsvPendingOrders.selectedIndexes()
+        row = modelIndexls[0].row()
+        order = self.ui.lsvPendingOrders.model()._data.iloc[row]
 
         self.orderDetails = OrderDetailsDlg(order)
         self.orderDetails.show()

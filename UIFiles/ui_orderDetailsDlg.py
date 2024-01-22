@@ -22,7 +22,7 @@ class Ui_OrderDetailsDlg(object):
     def setupUi(self, OrderDetailsDlg):
         if not OrderDetailsDlg.objectName():
             OrderDetailsDlg.setObjectName(u"OrderDetailsDlg")
-        OrderDetailsDlg.resize(560, 526)
+        OrderDetailsDlg.resize(580, 526)
         self.formLayout_4 = QFormLayout(OrderDetailsDlg)
         self.formLayout_4.setObjectName(u"formLayout_4")
         self.lblOrderDetails = QLabel(OrderDetailsDlg)
@@ -217,15 +217,15 @@ class Ui_OrderDetailsDlg(object):
         self.frmButtons.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frmButtons)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton = QPushButton(self.frmButtons)
-        self.pushButton.setObjectName(u"pushButton")
+        self.btnCancel = QPushButton(self.frmButtons)
+        self.btnCancel.setObjectName(u"btnCancel")
 
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.horizontalLayout.addWidget(self.btnCancel)
 
-        self.pushButton_2 = QPushButton(self.frmButtons)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.btnModify = QPushButton(self.frmButtons)
+        self.btnModify.setObjectName(u"btnModify")
 
-        self.horizontalLayout.addWidget(self.pushButton_2)
+        self.horizontalLayout.addWidget(self.btnModify)
 
 
         self.formLayout_4.setWidget(7, QFormLayout.SpanningRole, self.frmButtons)
@@ -259,7 +259,7 @@ class Ui_OrderDetailsDlg(object):
         self.lblOrderPlacedVal.setText(QCoreApplication.translate("OrderDetailsDlg", u"TextLabel", None))
         self.lblExchOrderId.setText(QCoreApplication.translate("OrderDetailsDlg", u"exchange order id", None))
         self.lblExchOrderIdVal.setText(QCoreApplication.translate("OrderDetailsDlg", u"TextLabel", None))
-        self.pushButton.setText(QCoreApplication.translate("OrderDetailsDlg", u"Cancel", None))
-        self.pushButton_2.setText(QCoreApplication.translate("OrderDetailsDlg", u"Modify", None))
+        self.btnCancel.setText(QCoreApplication.translate("OrderDetailsDlg", u"Cancel", None))
+        self.btnModify.setText(QCoreApplication.translate("OrderDetailsDlg", u"Modify", None))
     # retranslateUi
 

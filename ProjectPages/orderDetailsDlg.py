@@ -10,9 +10,15 @@ class OrderDetailsDlg(QDialog):
         self.order = order
 
         self.setDetails()
-        if(self.order['status'] != 'open'):
+        if(self.order['status'] != 'open' and self.order['status'] != 'pending'):
             self.hideButtonsFrame()
-    
+
+        self.addConnectors()
+
+    def addConnectors(self):
+        self.ui.btnCancel.clicked.connect(self.close)
+        self.ui.btnModify.clicked.connect(self.modifyOrder)
+
     def setDetails(self):
         self.ui.lblStkSymbol.setText(self.order['symbol'])
         self.ui.lblQuantityVal.setText(str(int(self.order['quantity'])) + ' shares')
@@ -36,6 +42,9 @@ class OrderDetailsDlg(QDialog):
         self.ui.lblOrderIdVal.setText(self.order['order_id'])
         self.ui.lblOrderPlacedVal.setText(self.order['exchconfrmtime'])
         self.ui.lblExchOrderIdVal.setText(self.order['exchordid'])
+
+    def modifyOrder(self):
+        pass
 
     def hideButtonsFrame(self):
         self.ui.frmButtons.hide()
