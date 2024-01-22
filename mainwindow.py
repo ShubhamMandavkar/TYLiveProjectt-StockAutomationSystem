@@ -20,8 +20,9 @@ from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
 from ProjectPages.stockDetailsMW import StockDetails
 from ProjectPages.messageDlg import MessageDlg
-from ProjectPages.buyOrderWidget import BuyOrderWidget
+from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderWidget import SellOrderWidget
+from ProjectPages.myOrdersMW import MyOrders
 from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 
 import mysql.connector
@@ -83,15 +84,19 @@ class Navigation:
         self.myAlerts = MyAlerts()
         self.myAlerts.show()
 
+    def showMyOrdersWindow(self):
+        self.myOrders = MyOrders()
+        self.myOrders.show()
+
     def showHoldingsWindow(self):
         self.holdings = Holdings()
         self.holdings.show()
     
-    def showWatchlists(self):
+    def showWatchlistsWindow(self):
         self.watchlists = Watchlists()
         self.watchlists.show()
       
-    def showCustomDetails(self):
+    def showCustomDetailsWindow(self):
         self.customDetails = CustomDetails()
         self.customDetails.ui.btnSave.clicked.connect(chnageHoldingWorkerDetails)
         self.customDetails.show()
@@ -115,12 +120,13 @@ class MainWindow(QMainWindow):
         #navigation code
         self.ui.btnSearch.clicked.connect(self.nav.showSearchDialog)
         self.ui.btnMyAlerts.clicked.connect(self.nav.showMyAlertsWindow)
+        self.ui.btnMyOrders.clicked.connect(self.nav.showMyOrdersWindow)
         self.ui.btnHoldings.clicked.connect(self.nav.showHoldingsWindow)
-        self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlists)
-        self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetails)
+        self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlistsWindow)
+        self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetailsWindow)
 
     def showBuyOrderWidget(self):
-        self.orderWidget = BuyOrderWidget()
+        self.orderWidget = BuyOrderDlg()
         self.orderWidget.show()
 
     def showSellOrderWidget(self):
@@ -176,8 +182,8 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    teleApiThread.start()
+    # teleApiThread.start()
     
-    alertThread.start() #this thread should be started later than the teleApiThread
+    # alertThread.start() #this thread should be started later than the teleApiThread
 
     sys.exit(app.exec())

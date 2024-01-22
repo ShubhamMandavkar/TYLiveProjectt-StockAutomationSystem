@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1156</width>
-    <height>604</height>
+    <width>1113</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,19 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="btnHome">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Home</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0" colspan="2">
         <widget class="QPushButton" name="btnMyAlerts">
          <property name="font">
@@ -43,7 +56,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="3" column="0" colspan="2">
         <widget class="QPushButton" name="btnHoldings">
          <property name="font">
           <font>
@@ -57,19 +70,6 @@
         </widget>
        </item>
        <item row="4" column="0" colspan="2">
-        <widget class="QPushButton" name="btnCustomDetails">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>CustomDetails</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
         <widget class="QPushButton" name="btnWatchlists">
          <property name="font">
           <font>
@@ -82,8 +82,8 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QPushButton" name="btnHome">
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="btnMyOrders">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -91,7 +91,20 @@
           </font>
          </property>
          <property name="text">
-          <string>Home</string>
+          <string>MyOrders</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QPushButton" name="btnCustomDetails">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>CustomDetails</string>
          </property>
         </widget>
        </item>
@@ -109,6 +122,12 @@
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QFrame" name="frame">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -124,7 +143,7 @@
          <widget class="QPushButton" name="btnSearch">
           <property name="geometry">
            <rect>
-            <x>640</x>
+            <x>580</x>
             <y>30</y>
             <width>141</width>
             <height>41</height>
@@ -150,8 +169,8 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0" colspan="2">
            <widget class="QLabel" name="lblOrders">
             <property name="maximumSize">
              <size>
@@ -170,12 +189,12 @@
             </property>
            </widget>
           </item>
-          <item>
+          <item row="1" column="0" colspan="2">
            <widget class="QFrame" name="frame_3">
             <property name="maximumSize">
              <size>
               <width>600</width>
-              <height>16777215</height>
+              <height>70</height>
              </size>
             </property>
             <property name="frameShape">
@@ -201,8 +220,8 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lblPendings">
+             <item row="2" column="2">
+              <widget class="QLabel" name="lblRejected">
                <property name="font">
                 <font>
                  <pointsize>12</pointsize>
@@ -210,7 +229,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Pendings</string>
+                <string>Rejected</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -219,22 +238,6 @@
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="lblPendingsVal">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="lblClosedVal">
                <property name="font">
                 <font>
                  <pointsize>12</pointsize>
@@ -265,8 +268,8 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="2">
-              <widget class="QLabel" name="lblRejected">
+             <item row="0" column="1">
+              <widget class="QLabel" name="lblClosedVal">
                <property name="font">
                 <font>
                  <pointsize>12</pointsize>
@@ -274,7 +277,23 @@
                 </font>
                </property>
                <property name="text">
-                <string>Rejected</string>
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lblPendings">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Pendings</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -284,7 +303,7 @@
             </layout>
            </widget>
           </item>
-          <item>
+          <item row="2" column="0" colspan="2">
            <widget class="QLabel" name="lblHoldings">
             <property name="maximumSize">
              <size>
@@ -303,12 +322,12 @@
             </property>
            </widget>
           </item>
-          <item>
+          <item row="3" column="0" colspan="2">
            <widget class="QFrame" name="frame_5">
             <property name="maximumSize">
              <size>
               <width>600</width>
-              <height>16777215</height>
+              <height>70</height>
              </size>
             </property>
             <property name="frameShape">
@@ -417,139 +436,6 @@
             </layout>
            </widget>
           </item>
-          <item>
-           <widget class="QLabel" name="lblPositions">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>14</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Positions</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_4">
-            <property name="maximumSize">
-             <size>
-              <width>600</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="1" column="1">
-              <widget class="QLabel" name="lblTotalPandL">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Total P &amp; L</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="lblTotalPandLVal">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0 </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lblOpenPos">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Open Positions</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="lblOpenPosVal">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="lblDayMTMVal">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLabel" name="lblDayMTM">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Day MTM</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -563,7 +449,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1156</width>
+     <width>1113</width>
      <height>25</height>
     </rect>
    </property>

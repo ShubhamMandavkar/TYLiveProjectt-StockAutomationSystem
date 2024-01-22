@@ -24,7 +24,7 @@ class Ui_Home(object):
     def setupUi(self, Home):
         if not Home.objectName():
             Home.setObjectName(u"Home")
-        Home.resize(1156, 604)
+        Home.resize(1113, 567)
         self.centralwidget = QWidget(Home)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -36,11 +36,17 @@ class Ui_Home(object):
         self.frmNavBar.setFrameShadow(QFrame.Raised)
         self.formLayout = QFormLayout(self.frmNavBar)
         self.formLayout.setObjectName(u"formLayout")
-        self.btnMyAlerts = QPushButton(self.frmNavBar)
-        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
+        self.btnHome = QPushButton(self.frmNavBar)
+        self.btnHome.setObjectName(u"btnHome")
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
+        self.btnHome.setFont(font)
+
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
+
+        self.btnMyAlerts = QPushButton(self.frmNavBar)
+        self.btnMyAlerts.setObjectName(u"btnMyAlerts")
         self.btnMyAlerts.setFont(font)
 
         self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
@@ -49,25 +55,25 @@ class Ui_Home(object):
         self.btnHoldings.setObjectName(u"btnHoldings")
         self.btnHoldings.setFont(font)
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnHoldings)
-
-        self.btnCustomDetails = QPushButton(self.frmNavBar)
-        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
-        self.btnCustomDetails.setFont(font)
-
-        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnCustomDetails)
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnHoldings)
 
         self.btnWatchlists = QPushButton(self.frmNavBar)
         self.btnWatchlists.setObjectName(u"btnWatchlists")
         self.btnWatchlists.setFont(font)
 
-        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnWatchlists)
+        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnWatchlists)
 
-        self.btnHome = QPushButton(self.frmNavBar)
-        self.btnHome.setObjectName(u"btnHome")
-        self.btnHome.setFont(font)
+        self.btnMyOrders = QPushButton(self.frmNavBar)
+        self.btnMyOrders.setObjectName(u"btnMyOrders")
+        self.btnMyOrders.setFont(font)
 
-        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnMyOrders)
+
+        self.btnCustomDetails = QPushButton(self.frmNavBar)
+        self.btnCustomDetails.setObjectName(u"btnCustomDetails")
+        self.btnCustomDetails.setFont(font)
+
+        self.formLayout.setWidget(5, QFormLayout.SpanningRole, self.btnCustomDetails)
 
 
         self.horizontalLayout.addWidget(self.frmNavBar)
@@ -80,12 +86,13 @@ class Ui_Home(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.frame = QFrame(self.frmContent)
         self.frame.setObjectName(u"frame")
+        self.frame.setMinimumSize(QSize(0, 100))
         self.frame.setMaximumSize(QSize(16777215, 100))
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.btnSearch = QPushButton(self.frame)
         self.btnSearch.setObjectName(u"btnSearch")
-        self.btnSearch.setGeometry(QRect(640, 30, 141, 41))
+        self.btnSearch.setGeometry(QRect(580, 30, 141, 41))
         self.btnSearch.setFont(font)
 
         self.verticalLayout.addWidget(self.frame)
@@ -94,8 +101,8 @@ class Ui_Home(object):
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_2 = QVBoxLayout(self.frame_2)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.formLayout_2 = QFormLayout(self.frame_2)
+        self.formLayout_2.setObjectName(u"formLayout_2")
         self.lblOrders = QLabel(self.frame_2)
         self.lblOrders.setObjectName(u"lblOrders")
         self.lblOrders.setMaximumSize(QSize(16777215, 40))
@@ -104,11 +111,11 @@ class Ui_Home(object):
         font1.setBold(True)
         self.lblOrders.setFont(font1)
 
-        self.verticalLayout_2.addWidget(self.lblOrders)
+        self.formLayout_2.setWidget(0, QFormLayout.SpanningRole, self.lblOrders)
 
         self.frame_3 = QFrame(self.frame_2)
         self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setMaximumSize(QSize(600, 16777215))
+        self.frame_3.setMaximumSize(QSize(600, 70))
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame_3)
@@ -120,12 +127,12 @@ class Ui_Home(object):
 
         self.gridLayout.addWidget(self.lblClosed, 2, 1, 1, 1)
 
-        self.lblPendings = QLabel(self.frame_3)
-        self.lblPendings.setObjectName(u"lblPendings")
-        self.lblPendings.setFont(font)
-        self.lblPendings.setAlignment(Qt.AlignCenter)
+        self.lblRejected = QLabel(self.frame_3)
+        self.lblRejected.setObjectName(u"lblRejected")
+        self.lblRejected.setFont(font)
+        self.lblRejected.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.lblPendings, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.lblRejected, 2, 2, 1, 1)
 
         self.lblPendingsVal = QLabel(self.frame_3)
         self.lblPendingsVal.setObjectName(u"lblPendingsVal")
@@ -134,13 +141,6 @@ class Ui_Home(object):
 
         self.gridLayout.addWidget(self.lblPendingsVal, 0, 0, 1, 1)
 
-        self.lblClosedVal = QLabel(self.frame_3)
-        self.lblClosedVal.setObjectName(u"lblClosedVal")
-        self.lblClosedVal.setFont(font)
-        self.lblClosedVal.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout.addWidget(self.lblClosedVal, 0, 1, 1, 1)
-
         self.lblRejectedVal = QLabel(self.frame_3)
         self.lblRejectedVal.setObjectName(u"lblRejectedVal")
         self.lblRejectedVal.setFont(font)
@@ -148,26 +148,33 @@ class Ui_Home(object):
 
         self.gridLayout.addWidget(self.lblRejectedVal, 0, 2, 1, 1)
 
-        self.lblRejected = QLabel(self.frame_3)
-        self.lblRejected.setObjectName(u"lblRejected")
-        self.lblRejected.setFont(font)
-        self.lblRejected.setAlignment(Qt.AlignCenter)
+        self.lblClosedVal = QLabel(self.frame_3)
+        self.lblClosedVal.setObjectName(u"lblClosedVal")
+        self.lblClosedVal.setFont(font)
+        self.lblClosedVal.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout.addWidget(self.lblRejected, 2, 2, 1, 1)
+        self.gridLayout.addWidget(self.lblClosedVal, 0, 1, 1, 1)
+
+        self.lblPendings = QLabel(self.frame_3)
+        self.lblPendings.setObjectName(u"lblPendings")
+        self.lblPendings.setFont(font)
+        self.lblPendings.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.lblPendings, 2, 0, 1, 1)
 
 
-        self.verticalLayout_2.addWidget(self.frame_3)
+        self.formLayout_2.setWidget(1, QFormLayout.SpanningRole, self.frame_3)
 
         self.lblHoldings = QLabel(self.frame_2)
         self.lblHoldings.setObjectName(u"lblHoldings")
         self.lblHoldings.setMaximumSize(QSize(16777215, 40))
         self.lblHoldings.setFont(font1)
 
-        self.verticalLayout_2.addWidget(self.lblHoldings)
+        self.formLayout_2.setWidget(2, QFormLayout.SpanningRole, self.lblHoldings)
 
         self.frame_5 = QFrame(self.frame_2)
         self.frame_5.setObjectName(u"frame_5")
-        self.frame_5.setMaximumSize(QSize(600, 16777215))
+        self.frame_5.setMaximumSize(QSize(600, 70))
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.gridLayout_2 = QGridLayout(self.frame_5)
@@ -215,66 +222,7 @@ class Ui_Home(object):
         self.gridLayout_2.addWidget(self.lblCurrentValue, 1, 1, 1, 1)
 
 
-        self.verticalLayout_2.addWidget(self.frame_5)
-
-        self.lblPositions = QLabel(self.frame_2)
-        self.lblPositions.setObjectName(u"lblPositions")
-        self.lblPositions.setMaximumSize(QSize(16777215, 40))
-        self.lblPositions.setFont(font1)
-
-        self.verticalLayout_2.addWidget(self.lblPositions)
-
-        self.frame_4 = QFrame(self.frame_2)
-        self.frame_4.setObjectName(u"frame_4")
-        self.frame_4.setMaximumSize(QSize(600, 16777215))
-        self.frame_4.setFrameShape(QFrame.StyledPanel)
-        self.frame_4.setFrameShadow(QFrame.Raised)
-        self.gridLayout_3 = QGridLayout(self.frame_4)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.lblTotalPandL = QLabel(self.frame_4)
-        self.lblTotalPandL.setObjectName(u"lblTotalPandL")
-        self.lblTotalPandL.setFont(font)
-        self.lblTotalPandL.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblTotalPandL, 1, 1, 1, 1)
-
-        self.lblTotalPandLVal = QLabel(self.frame_4)
-        self.lblTotalPandLVal.setObjectName(u"lblTotalPandLVal")
-        self.lblTotalPandLVal.setFont(font)
-        self.lblTotalPandLVal.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblTotalPandLVal, 0, 1, 1, 1)
-
-        self.lblOpenPos = QLabel(self.frame_4)
-        self.lblOpenPos.setObjectName(u"lblOpenPos")
-        self.lblOpenPos.setFont(font)
-        self.lblOpenPos.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblOpenPos, 1, 0, 1, 1)
-
-        self.lblOpenPosVal = QLabel(self.frame_4)
-        self.lblOpenPosVal.setObjectName(u"lblOpenPosVal")
-        self.lblOpenPosVal.setFont(font)
-        self.lblOpenPosVal.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblOpenPosVal, 0, 0, 1, 1)
-
-        self.lblDayMTMVal = QLabel(self.frame_4)
-        self.lblDayMTMVal.setObjectName(u"lblDayMTMVal")
-        self.lblDayMTMVal.setFont(font)
-        self.lblDayMTMVal.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblDayMTMVal, 0, 2, 1, 1)
-
-        self.lblDayMTM = QLabel(self.frame_4)
-        self.lblDayMTM.setObjectName(u"lblDayMTM")
-        self.lblDayMTM.setFont(font)
-        self.lblDayMTM.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.lblDayMTM, 1, 2, 1, 1)
-
-
-        self.verticalLayout_2.addWidget(self.frame_4)
+        self.formLayout_2.setWidget(3, QFormLayout.SpanningRole, self.frame_5)
 
 
         self.verticalLayout.addWidget(self.frame_2)
@@ -285,7 +233,7 @@ class Ui_Home(object):
         Home.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Home)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1156, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1113, 25))
         Home.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Home)
         self.statusbar.setObjectName(u"statusbar")
@@ -298,19 +246,20 @@ class Ui_Home(object):
 
     def retranslateUi(self, Home):
         Home.setWindowTitle(QCoreApplication.translate("Home", u"MainWindow", None))
+        self.btnHome.setText(QCoreApplication.translate("Home", u"Home", None))
         self.btnMyAlerts.setText(QCoreApplication.translate("Home", u"MyAlerts", None))
         self.btnHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
-        self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
         self.btnWatchlists.setText(QCoreApplication.translate("Home", u"Watchlists", None))
-        self.btnHome.setText(QCoreApplication.translate("Home", u"Home", None))
+        self.btnMyOrders.setText(QCoreApplication.translate("Home", u"MyOrders", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
         self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
         self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
         self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))
-        self.lblPendings.setText(QCoreApplication.translate("Home", u"Pendings", None))
-        self.lblPendingsVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblClosedVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblRejectedVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblRejected.setText(QCoreApplication.translate("Home", u"Rejected", None))
+        self.lblPendingsVal.setText(QCoreApplication.translate("Home", u"0", None))
+        self.lblRejectedVal.setText(QCoreApplication.translate("Home", u"0", None))
+        self.lblClosedVal.setText(QCoreApplication.translate("Home", u"0", None))
+        self.lblPendings.setText(QCoreApplication.translate("Home", u"Pendings", None))
         self.lblHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
         self.lblToltalInv.setText(QCoreApplication.translate("Home", u"Total Investment", None))
         self.lbalCurrentValueVal.setText(QCoreApplication.translate("Home", u"0", None))
@@ -318,12 +267,5 @@ class Ui_Home(object):
         self.lblTotalInvVal.setText(QCoreApplication.translate("Home", u"0", None))
         self.lblPandL.setText(QCoreApplication.translate("Home", u"P & L", None))
         self.lblCurrentValue.setText(QCoreApplication.translate("Home", u"Current Value", None))
-        self.lblPositions.setText(QCoreApplication.translate("Home", u"Positions", None))
-        self.lblTotalPandL.setText(QCoreApplication.translate("Home", u"Total P & L", None))
-        self.lblTotalPandLVal.setText(QCoreApplication.translate("Home", u"0 ", None))
-        self.lblOpenPos.setText(QCoreApplication.translate("Home", u"Open Positions", None))
-        self.lblOpenPosVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblDayMTMVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblDayMTM.setText(QCoreApplication.translate("Home", u"Day MTM", None))
     # retranslateUi
 

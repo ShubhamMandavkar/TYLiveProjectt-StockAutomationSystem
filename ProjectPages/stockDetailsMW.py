@@ -9,7 +9,7 @@ from UIFiles.ui_stockDetails import Ui_stockDetails
 from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
 from ProjectPages.messageDlg import MessageDlg
-from ProjectPages.buyOrderWidget import BuyOrderWidget
+from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderWidget import SellOrderWidget
 
 class StockDetails(QMainWindow):
@@ -76,7 +76,7 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkLowVal.setText(str(stkDf['fiftyTwoWeekLow'].iloc[0]))
 
     def showBuyOrderWidget(self):
-        self.orderWidget = BuyOrderWidget()
+        self.orderWidget = BuyOrderDlg()
         self.orderWidget.show()
     
     def showSellOrderWidget(self):
