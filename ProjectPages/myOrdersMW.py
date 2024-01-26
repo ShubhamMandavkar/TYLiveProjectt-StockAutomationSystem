@@ -17,10 +17,11 @@ class ListModel(QAbstractListModel):
     def data(self, index, role):
         if role == Qt.DisplayRole:
             # See below for the data structure.
+            date = self._data['exchconfrmtime'][index.row()]
             name = self._data['symbol'][index.row()]
             quantity = self._data['quantity'][index.row()]
             action = self._data['action'][index.row()]
-            return str(name +' . '+ str(int(quantity)) +' . '+ action)
+            return str(date + '\n' + name +' . '+ str(int(quantity)) +' . '+ action)
 
     def rowCount(self, index):
         return len(self._data)  

@@ -23,7 +23,7 @@ class Ui_OrderDlg(object):
     def setupUi(self, OrderDlg):
         if not OrderDlg.objectName():
             OrderDlg.setObjectName(u"OrderDlg")
-        OrderDlg.resize(496, 190)
+        OrderDlg.resize(493, 212)
         self.verticalLayout = QVBoxLayout(OrderDlg)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblStkSymbol = QLabel(OrderDlg)
@@ -56,7 +56,7 @@ class Ui_OrderDlg(object):
         self.cmbPriceType.setObjectName(u"cmbPriceType")
         self.cmbPriceType.setMinimumSize(QSize(100, 0))
 
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.cmbPriceType)
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.cmbPriceType)
 
         self.sbQuantity = QSpinBox(self.frame)
         self.sbQuantity.setObjectName(u"sbQuantity")
@@ -66,7 +66,17 @@ class Ui_OrderDlg(object):
         self.dsbPriceValue = QDoubleSpinBox(self.frame)
         self.dsbPriceValue.setObjectName(u"dsbPriceValue")
 
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.dsbPriceValue)
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.dsbPriceValue)
+
+        self.lblAvailQuantity = QLabel(self.frame)
+        self.lblAvailQuantity.setObjectName(u"lblAvailQuantity")
+
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lblAvailQuantity)
+
+        self.lblAvailQuantityVal = QLabel(self.frame)
+        self.lblAvailQuantityVal.setObjectName(u"lblAvailQuantityVal")
+
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.lblAvailQuantityVal)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -91,6 +101,8 @@ class Ui_OrderDlg(object):
         self.cmbPriceType.setItemText(2, QCoreApplication.translate("OrderDlg", u"SL", None))
         self.cmbPriceType.setItemText(3, QCoreApplication.translate("OrderDlg", u"SL-M", None))
 
+        self.lblAvailQuantity.setText(QCoreApplication.translate("OrderDlg", u"Available Quantity : ", None))
+        self.lblAvailQuantityVal.setText(QCoreApplication.translate("OrderDlg", u"0", None))
         self.btnOrder.setText(QCoreApplication.translate("OrderDlg", u"OK", None))
     # retranslateUi
 

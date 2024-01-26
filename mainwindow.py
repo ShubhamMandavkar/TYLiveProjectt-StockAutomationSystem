@@ -182,8 +182,8 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    # teleApiThread.start()
+    teleApiThread.start()
     
-    # alertThread.start() #this thread should be started later than the teleApiThread
+    alertThread.start() #this thread should be started later than the teleApiThread
 
     sys.exit(app.exec())

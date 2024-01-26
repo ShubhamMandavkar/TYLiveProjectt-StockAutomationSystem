@@ -183,7 +183,7 @@ class MyAlerts(QMainWindow):
             cursor.execute(query)
 
             data = []
-            for (symbol, name, type, cond, tf, val,len1, len2, msg, isPaused) in cursor: #cursor returns tuple
+            for (symbol, name, type, cond, tf, val,len1, len2, msg, isPaused, lastTriggerTime) in cursor: #cursor returns tuple
                 data.append([symbol, name, type, cond, tf, val, len1, len2, msg, isPaused])
 
             self.model = ListModel(data)    

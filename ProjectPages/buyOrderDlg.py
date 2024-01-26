@@ -37,10 +37,14 @@ class UserDetails:
 
 
 class BuyOrderDlg(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, stkSymbol, parent=None):
         super().__init__(parent)
         self.ui = Ui_OrderDlg()
         self.ui.setupUi(self)
+
+        self.ui.lblAvailQuantity.setVisible(False)
+        self.ui.lblAvailQuantityVal.setVisible(False)
+        self.ui.lblStkSymbol.setText(stkSymbol)
         self.ui.btnOrder.setText('BUY')
 
         self.addConnectors()

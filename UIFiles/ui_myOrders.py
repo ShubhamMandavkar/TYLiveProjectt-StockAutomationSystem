@@ -59,6 +59,7 @@ class Ui_myOrders(object):
         font2.setPointSize(12)
         font2.setBold(True)
         self.lsvAllOrders.setFont(font2)
+        self.lsvAllOrders.setAlternatingRowColors(True)
 
         self.horizontalLayout_2.addWidget(self.lsvAllOrders)
 
@@ -91,7 +92,7 @@ class Ui_myOrders(object):
 
         self.retranslateUi(myOrders)
 
-        self.myOrdersTabWidget.setCurrentIndex(1)
+        self.myOrdersTabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(myOrders)

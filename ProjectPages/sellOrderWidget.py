@@ -37,20 +37,33 @@ class UserDetails:
 
 
 class SellOrderWidget(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, stkSymbol, parent=None):
         super().__init__(parent)
         self.ui = Ui_OrderDlg()
         self.ui.setupUi(self)
+        self.stkSymbol = stkSymbol
+        self.ui.lblStkSymbol.setText(stkSymbol)
         self.ui.btnOrder.setText('SELL')
 
         self.addConnectors()
         self.userDetails = UserDetails()
+        self.accessApi()
+        self.getHoldings()
 
     def addConnectors(self):
         self.ui.sbQuantity.valueChanged.connect(self.validateQuantity)
         self.ui.btnOrder.clicked.connect(self.close)
         self.ui.btnOrder.clicked.connect(self.placeSellOrder)
 
+    def accessApi(self):
+        self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
+
+    def getHoldings(self):
+        self.holdings = json.loads(json.dumps(self.algomojo.Holdings('tc')))
+
+    def setQuantity(self):
+        print(self.holdings.loc[self.holdings['symbol'] == self.stkSymbol])
+        pass
     def validateQuantity(self):
         #fetch quantity using api call
 
@@ -58,8 +71,6 @@ class SellOrderWidget(QDialog):
         pass
 
     def placeSellOrder(self):
-        self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
-
         broker = 'tc'
         strategy = 'MyStrategy'
         exchange = 'NSE'

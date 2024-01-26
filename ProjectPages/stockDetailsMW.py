@@ -76,11 +76,11 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkLowVal.setText(str(stkDf['fiftyTwoWeekLow'].iloc[0]))
 
     def showBuyOrderWidget(self):
-        self.orderWidget = BuyOrderDlg()
+        self.orderWidget = BuyOrderDlg(self.stkSymbol)
         self.orderWidget.show()
     
     def showSellOrderWidget(self):
-        self.orderWidget = SellOrderWidget()
+        self.orderWidget = SellOrderWidget(self.stkSymbol)
         self.orderWidget.show()
     
     def showAlertDialog(self):

@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
@@ -52,6 +53,8 @@ class AlertWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
     noti = zroya.Template(zroya.TemplateType.Text2)
     noti.setAudio(audio=zroya.Audio.Alarm)
+    noti.addAction("BUY")
+    noti.addAction("SELL")
     
     tf = {'Daily' : '1d', 'Monthly' : '1mo', 'Weekly' : '1wk'}
     def getAlertList():
@@ -62,7 +65,7 @@ class AlertWorker(QObject):
             query = f"""select * from alerts"""
             cursor.execute(query)
             alerts = []
-            for (sym, name, type, condition, tf, val, len1, len2, msg, isPaused) in cursor:
+            for (sym, name, type, condition, tf, val, len1, len2, msg, isPaused, lastTriggerTime) in cursor:
                 alert = dict()
                 alert['stkSymbol'] = sym
                 alert['stkName'] = name
@@ -74,6 +77,7 @@ class AlertWorker(QObject):
                 alert['len2'] = len2
                 alert['alertMsg'] = msg
                 alert['isPaused'] = isPaused
+                alert['lastTriggerTime'] = lastTriggerTime
 
                 alerts.append(alert)
             AlertWorker.alertList = alerts
@@ -126,6 +130,35 @@ class AlertWorker(QObject):
         finally:
             con.close()
     
+    def setLastTriggerTime(self, alert, lastTriggerTime):
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+            cursor = con.cursor()
+
+            #update the values of alert
+            query = f"""update alerts set prevTriggerTime = '{lastTriggerTime}' where stkSymbol = '{alert['stkSymbol']}' and alertType = '{alert['alertType']}' and alertCondition = '{alert['alertCond']}' and timeFrame = '{alert['timeFrame']}' and alertVal = {alert['alertVal']} and len1 = {alert['len1']} and len2 = {alert['len2']}"""
+            cursor.execute(query)
+            con.commit()
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        finally:
+            con.close()
+    
+    def checkLastTriggerTime(self, alert): #check for the lastTriggerTime
+        if(alert['lastTriggerTime']) == None:
+            return True 
+
+        lastTriggerTime = datetime.strptime(alert['lastTriggerTime'],'%Y-%m-%d %H:%M:%S.%f') 
+        currTime = datetime.now() - timedelta(minutes=1)
+
+        return lastTriggerTime < currTime
+        
+
     def myAction(self, nId, actionId):
         if(actionId == 0):
             self.sigShowBuyOrderWidget.emit()
@@ -137,8 +170,6 @@ class AlertWorker(QObject):
     def sendNotiToDesktop(self, title, message):
         self.noti.setFirstLine(title) 
         self.noti.setSecondLine(message)
-        self.noti.addAction("BUY")
-        self.noti.addAction("SELL")
         zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
         # zroya.show(self.noti) #notificatoin sent to desktop
 
@@ -167,7 +198,7 @@ class AlertWorker(QObject):
                 match alert['alertCond']:
                     case 'Greater Than':
                         if alert['alertType'] == 'Price':
-                            if currPrice > alert['alertVal']:
+                            if currPrice > alert['alertVal'] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than ', alert['alertVal'])
 
                                 title = alert['stkName']
@@ -175,14 +206,15 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
                             Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
 
-                            if currPrice > Avg[-1]:
+                            if currPrice > Avg[-1] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
 
                                 title = alert['stkName']
@@ -190,11 +222,12 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
                                 
                     case 'Less Than':
                         if alert['alertType'] == 'Price':
-                            if currPrice < alert['alertVal']:
+                            if currPrice < alert['alertVal'] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is less than ', alert['alertVal'])
 
                                 title = alert['stkName']
@@ -202,14 +235,15 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
                                 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
                             Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
 
-                            if currPrice < Avg[-1]:
+                            if currPrice < Avg[-1] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
 
                                 title = alert['stkName']
@@ -217,7 +251,8 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                     case 'Crossing Up':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -225,7 +260,7 @@ class AlertWorker(QObject):
 
                         Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
 
-                        if((df['Open'][-1] < Avg[-1] or df['Close'][-2] < Avg[-2]) and df['Close'] > Avg[-1]):
+                        if((df['Open'][-1] < Avg[-1] or df['Close'][-2] < Avg[-2]) and df['Close'] > Avg[-1] and self.checkLastTriggerTime(alert)):
                             print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
 
                             title = alert['stkName']
@@ -233,8 +268,8 @@ class AlertWorker(QObject):
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-
-                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                     case 'Crossing Down':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -243,7 +278,7 @@ class AlertWorker(QObject):
                         Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
                                 alert['timeFrame'],   alert['len1'])
 
-                        if((df['Open'][-1] > Avg[-1] or df['Close'][-2] > Avg[-2]) and df['Close'] < Avg[-1]):
+                        if((df['Open'][-1] > Avg[-1] or df['Close'][-2] > Avg[-2]) and df['Close'] < Avg[-1] and self.checkLastTriggerTime(alert)):
                             print(alert['stkName'], 'crosses down the price ', alert['alertVal'])
 
                             title = alert['stkName']
@@ -251,8 +286,8 @@ class AlertWorker(QObject):
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-
-                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                     case 'Price > PrevMonthHigh':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -264,7 +299,7 @@ class AlertWorker(QObject):
                         currMP = df['Close'].iloc[-1]
                         prevHigh = max(df['Close'][-2], df['Close'][-3])
                         if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]: #uptrend
-                            if currMP > prevHigh :
+                            if currMP > prevHigh and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'Breaks the previous month high of')
 
                                 title = alert['stkName']
@@ -272,7 +307,8 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                     case 'Price < PrevMonthLow':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -284,7 +320,7 @@ class AlertWorker(QObject):
                         currMP = df['Close'].iloc[-1]
                         prevLow = min(df['Close'][-2], df['Close'][-3])
                         if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]: #downtrend
-                            if currMP < prevLow :
+                            if currMP < prevLow and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'Breaks the previous month low')
 
                                 title = alert['stkName']
@@ -292,7 +328,8 @@ class AlertWorker(QObject):
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                                self.pauseAlert(alert) #pause alert when 1 notification is sent
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                     case 'In Between':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
@@ -304,7 +341,7 @@ class AlertWorker(QObject):
                         Avg2 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
                                 alert['timeFrame'],   alert['len2'])
                         currMP = df['Close'].iloc[-1] 
-                        if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]):
+                        if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]) and self.checkLastTriggerTime(alert):
                             print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
 
                             title = alert['stkName']
@@ -312,7 +349,8 @@ class AlertWorker(QObject):
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
 
-                            self.pauseAlert(alert) #pause alert when 1 notification is sent
+                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
             time.sleep(5)
             # self.getAlertList()
