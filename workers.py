@@ -376,10 +376,11 @@ class HoldingsWorker(QObject):
     sigShowMsg = Signal(str)
     finished = Signal() 
 
-    def __init__(self, key='', sKey='', brCode='tc'):
+    def __init__(self, key='', sKey='', profitTh = 100000, brCode='tc'):
         super().__init__()
         self.apiKey = key
         self.apiSecretKey = sKey
+        self.profitThreshold = profitTh
         self.brCode = brCode
 
         self.investedValue = 0
@@ -390,10 +391,12 @@ class HoldingsWorker(QObject):
         #to show holdings in holdings page
         self.isHoldingsPage = False
 
-    def changeDetails(self, key, sKey, brCode = 'tc'):
+
+    def changeDetails(self, key='', sKey='', profitTh = 100000, brCode = 'tc'):
         self.apiKey = key
         self.apiSecretKey = sKey
         self.brCode = brCode
+        self.profitThreshold = profitTh
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
 
     def tempFunction(self):
@@ -462,11 +465,11 @@ class HoldingsWorker(QObject):
                     tempCurrentValue += holding['hld_val']
                     tempProfitAndLoss += holding['PL']
 
-                    if(((holding['invest_val']*1.10) < holding['hld_val']) and self.checkLastNotiSend(holding['symbol'])):
-                        print('Above 15% profit')
+                    if(((holding['invest_val']+(holding['invest_val'] * self.profitThreshold)/100) <= holding['hld_val']) and self.checkLastNotiSend(holding['symbol'])):
+                        print('Above given% profit')
                         
                         self.noti.setFirstLine("Stock Profit Notification")
-                        self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above threshold!!!")
+                        self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")
                         # zroya.show(self.noti, on_action= self.myActio)
                         zroya.show(self.noti)
 

@@ -34,17 +34,19 @@ class UserDetails:
     def __init__(self):
         self.apiKey = ''
         self.apiSecretKey = ''
+        self.profitThreshold = 100000
     
     def getUserDetails(self):
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{'shubh'}'"""
+            query = f"""select apiKey, apiSecretKey, profitThreshold from customer_details where userId = '{'shubh'}'"""
             cursor.execute(query)
-            for (key, sKey) in cursor:
+            for (key, sKey, profitThld) in cursor:
                 self.apiKey = key
-                self.apiSecretKey = sKey            
+                self.apiSecretKey = sKey 
+                self.profitThreshold = profitThld           
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -99,7 +101,8 @@ class Navigation:
       
     def showCustomDetailsWindow(self):
         self.customDetails = CustomDetails()
-        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingWorkerDetails)
+        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsFetchingWorkerDetails)
+        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsProcessingWorkerDetails)
         self.customDetails.show()
 
 class MainWindow(QMainWindow):
@@ -142,9 +145,13 @@ class MainWindow(QMainWindow):
         self.ui.lbalCurrentValueVal.setText(str(round(holdDetails['currentValue'].iloc[0], 2)))
         self.ui.lblPandLVal.setText(str(round(holdDetails['profitAndLoss'].iloc[0], 2)))
 
-def chnageHoldingWorkerDetails():
+def chnageHoldingsFetchingWorkerDetails():
     widget.userDetails.getUserDetails()
     holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
+
+def chnageHoldingsProcessingWorkerDetails():
+    widget.userDetails.getUserDetails()
+    holdingsProcessWorker.changeDetails(profitTh= widget.userDetails.profitThreshold) 
 
 
 if __name__ == "__main__":
@@ -171,7 +178,7 @@ if __name__ == "__main__":
     holdingsFetchingThread.started.connect(holdingsFetchingWorker.fetchHoldings)
 
     #worker to process holdings 
-    holdingsProcessWorker = HoldingsWorker()
+    holdingsProcessWorker = HoldingsWorker(profitTh= widget.userDetails.profitThreshold)
     holdingsProcessWorker.sigHoldDetails.connect(widget.showHoldingDetails)
     #Thread to process holdings
     holdingsProcessThread = QThread()
