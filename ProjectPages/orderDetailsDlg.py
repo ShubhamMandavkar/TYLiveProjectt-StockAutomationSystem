@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QDialog
 from UIFiles.ui_orderDetailsDlg import Ui_OrderDetailsDlg
-
+from ProjectPages.buyOrderDlg import BuyOrderDlg
+from ProjectPages.sellOrderDlg import SellOrderDlg
 
 class OrderDetailsDlg(QDialog):
     def __init__(self, order, parent=None):
@@ -18,6 +19,7 @@ class OrderDetailsDlg(QDialog):
     def addConnectors(self):
         self.ui.btnCancel.clicked.connect(self.close)
         self.ui.btnModify.clicked.connect(self.modifyOrder)
+        self.ui.btnModify.clicked.connect(self.close)
 
     def setDetails(self):
         self.ui.lblStkSymbol.setText(self.order['symbol'])
@@ -44,7 +46,23 @@ class OrderDetailsDlg(QDialog):
         self.ui.lblExchOrderIdVal.setText(self.order['exchordid'])
 
     def modifyOrder(self):
-        pass
+        symbol , _ = self.order['symbol'].split('-')
+        if(self.order['action'] == 'BUY'):
+            self.orderDlg = BuyOrderDlg(symbol)
+            self.orderDlg.setOrderDetails(self.order)
+            self.orderDlg.ui.btnOrder.clicked.disconnect(self.orderDlg.placeBuyOrder)
+            self.orderDlg.ui.btnOrder.clicked.connect(lambda:self.orderDlg.modifyOrder(self.order))
+            self.orderDlg.show()
+            print('Modified buy order')
+        else:
+            self.orderDlg = SellOrderDlg(symbol)
+            self.orderDlg.setOrderDetails(self.order)
+            self.orderDlg.validateQuantity()
+            self.orderDlg.ui.btnOrder.clicked.disconnect(self.orderDlg.placeSellOrder)
+            self.orderDlg.ui.btnOrder.clicked.connect(lambda:self.orderDlg.modifyOrder(self.order))
+            self.orderDlg.show()
+            print('Modified sell order')
+
 
     def hideButtonsFrame(self):
         self.ui.frmButtons.hide()

@@ -64,6 +64,11 @@ class Ui_holdings(object):
 
         self.tvHoldings = QTableView(self.frame_4)
         self.tvHoldings.setObjectName(u"tvHoldings")
+        font2 = QFont()
+        font2.setPointSize(10)
+        font2.setBold(True)
+        self.tvHoldings.setFont(font2)
+        self.tvHoldings.setLayoutDirection(Qt.LeftToRight)
         self.tvHoldings.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.tvHoldings.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tvHoldings.setSortingEnabled(True)

@@ -32,7 +32,7 @@ class TeleApiWorker(QObject):
     
     async def sendMessage(msg):
         async with TeleApiWorker.teleClient as client:
-            await client.send_message('+918208823690', msg)
+            await client.send_message('me', msg)
 
 def isNetworkConnected():
     try:
@@ -45,7 +45,7 @@ def isNetworkConnected():
 
 class AlertWorker(QObject):
     sigDeletedAlert = Signal()
-    sigShowBuyOrderWidget = Signal()
+    sigShowBuyOrderWidget = Signal(str)
     sigShowSellOrderWidget = Signal()
     isRunning = False
     alertList = []
@@ -159,9 +159,9 @@ class AlertWorker(QObject):
         return lastTriggerTime < currTime
         
 
-    def myAction(self, nId, actionId):
+    def myAction(self, nId, actionId):  
         if(actionId == 0):
-            self.sigShowBuyOrderWidget.emit()
+            self.sigShowBuyOrderWidget.emit(self.noti.getFirstLine())
             print("Thank you for response")
         elif(actionId == 1):
             self.sigShowSellOrderWidget.emit()
@@ -201,7 +201,7 @@ class AlertWorker(QObject):
                             if currPrice > alert['alertVal'] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than ', alert['alertVal'])
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than ' + str(alert['alertVal']))
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -217,7 +217,7 @@ class AlertWorker(QObject):
                             if currPrice > Avg[-1] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -230,7 +230,7 @@ class AlertWorker(QObject):
                             if currPrice < alert['alertVal'] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is less than ', alert['alertVal'])
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal']))
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -246,7 +246,7 @@ class AlertWorker(QObject):
                             if currPrice < Avg[-1] and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'price is greater than EMA', alert['len1'])
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -263,7 +263,7 @@ class AlertWorker(QObject):
                         if((df['Open'][-1] < Avg[-1] or df['Close'][-2] < Avg[-2]) and df['Close'] > Avg[-1] and self.checkLastTriggerTime(alert)):
                             print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
 
-                            title = alert['stkName']
+                            title = alert['stkSymbol']
                             msg = str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal']))
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -281,7 +281,7 @@ class AlertWorker(QObject):
                         if((df['Open'][-1] > Avg[-1] or df['Close'][-2] > Avg[-2]) and df['Close'] < Avg[-1] and self.checkLastTriggerTime(alert)):
                             print(alert['stkName'], 'crosses down the price ', alert['alertVal'])
 
-                            title = alert['stkName']
+                            title = alert['stkSymbol']
                             msg = str(str(alert['stkName']) + ' crosses down the price ' + str(alert['alertVal']))
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -302,7 +302,7 @@ class AlertWorker(QObject):
                             if currMP > prevHigh and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'Breaks the previous month high of')
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' Breaks the previous month high')
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -323,7 +323,7 @@ class AlertWorker(QObject):
                             if currMP < prevLow and self.checkLastTriggerTime(alert):
                                 print(alert['stkName'], 'Breaks the previous month low')
 
-                                title = alert['stkName']
+                                title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' Breaks the previous month low')
                                 self.sendNotiToDesktop(title, msg)
                                 asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -344,7 +344,7 @@ class AlertWorker(QObject):
                         if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]) and self.checkLastTriggerTime(alert):
                             print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
 
-                            title = alert['stkName']
+                            title = alert['stkSymbol']
                             msg = str('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
                             self.sendNotiToDesktop(title, msg)
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
@@ -354,7 +354,7 @@ class AlertWorker(QObject):
 
             time.sleep(5)
             # self.getAlertList()
-            print("processAlerts Called")
+            # print("processAlerts Called")
       
 
 class HoldingsWorker(QObject):
@@ -368,14 +368,19 @@ class HoldingsWorker(QObject):
 
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
+    sigHoldDetails = Signal(pd.DataFrame) #signal to emit holding details to be shown on home page
     sigShowMsg = Signal(str)
-    finished = Signal()
+    finished = Signal() 
 
     def __init__(self, key='', sKey='', brCode='tc'):
         super().__init__()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.brCode = brCode
+
+        self.investedValue = 0
+        self.currentValue = 0
+        self.profitAndLoss = 0
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
 
         #to show holdings in holdings page
@@ -419,10 +424,17 @@ class HoldingsWorker(QObject):
     def processHoldings(self):
         while(HoldingsWorker.isRunning):
             myData = HoldingsWorker.holdings
+            tempInvestedValue = 0
+            tempCurrentValue = 0
+            tempProfitAndLoss = 0
 
             if(myData['status'] == 'success'):
                 for holding in myData['data']:
-                    if(holding['PL'] > 15):
+                    tempInvestedValue += holding['invest_val']
+                    tempCurrentValue += holding['hld_val']
+                    tempProfitAndLoss += holding['PL']
+
+                    if(((holding['invest_val']*1.10) < holding['hld_val'])):
                         print('Above 15% profit')
                         
                         self.noti.setFirstLine("Stock Profit Notification")
@@ -431,9 +443,18 @@ class HoldingsWorker(QObject):
                         # self.noti.addAction("No")
                         # zroya.show(self.noti, on_action= self.myActio)
                         zroya.show(self.noti)
+            
+            self.investedValue = tempInvestedValue
+            self.currentValue = tempCurrentValue
+            self.profitAndLoss = tempProfitAndLoss
+
+            self.sigHoldDetails.emit( pd.DataFrame({'investedValue': [self.investedValue], 'currentValue': [self.currentValue], 'profitAndLoss': [self.profitAndLoss]}) )
 
             time.sleep(5)
             print("process Holdings called")                            
+
+    def roundDigit(self, val):
+        return round(val, 2)
 
     def getHoldingsTableModel(self):
         self.isApiInvalidMsgShown = False 
@@ -450,7 +471,13 @@ class HoldingsWorker(QObject):
 
             if(self.myData['status'] == 'success'):
                 if(len(self.myData['data']) != 0):
-                    self.dfHoldings = pd.DataFrame(self.myData['data'], columns=['symbol', 'holdqty','average_price','invest_val','hld_val','PL'])
+                    self.dfHoldings = pd.DataFrame(self.myData['data'], columns=['symbol', 'ltp', 'holdqty','average_price','invest_val','hld_val','PL'])
+
+                    self.dfHoldings['ltp'] = self.dfHoldings['ltp'].apply(self.roundDigit) 
+                    self.dfHoldings['average_price'] = self.dfHoldings['average_price'].apply(self.roundDigit) 
+                    self.dfHoldings['invest_val'] = self.dfHoldings['invest_val'].apply(self.roundDigit) 
+                    self.dfHoldings['hld_val'] = self.dfHoldings['hld_val'].apply(self.roundDigit) 
+                    self.dfHoldings['PL'] = self.dfHoldings['PL'].apply(self.roundDigit) 
                     self.sigChngHoldData.emit(self.dfHoldings)
                 else:
                     self.sigNoHoldData.emit()

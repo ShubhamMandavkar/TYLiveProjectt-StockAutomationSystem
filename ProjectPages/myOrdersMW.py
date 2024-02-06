@@ -176,7 +176,7 @@ def fetchAllOrders2(userDetails):
             "trigger_price": 0,
             "quantity": 1,
             "disclosed_quantity": 0,
-            "action": "BUY",
+            "action": "SELL",
             "avgprc": 13.95,
             "fillshares": 1,
             "remarks": "ARROW",

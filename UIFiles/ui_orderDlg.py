@@ -23,7 +23,7 @@ class Ui_OrderDlg(object):
     def setupUi(self, OrderDlg):
         if not OrderDlg.objectName():
             OrderDlg.setObjectName(u"OrderDlg")
-        OrderDlg.resize(493, 212)
+        OrderDlg.resize(513, 212)
         self.verticalLayout = QVBoxLayout(OrderDlg)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.lblStkSymbol = QLabel(OrderDlg)
@@ -60,6 +60,7 @@ class Ui_OrderDlg(object):
 
         self.sbQuantity = QSpinBox(self.frame)
         self.sbQuantity.setObjectName(u"sbQuantity")
+        self.sbQuantity.setMaximum(1000000000)
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.sbQuantity)
 

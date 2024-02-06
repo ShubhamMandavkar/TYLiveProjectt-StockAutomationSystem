@@ -21,7 +21,7 @@ from ProjectPages.customDetailsMW import CustomDetails
 from ProjectPages.stockDetailsMW import StockDetails
 from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderWidget import SellOrderWidget
+from ProjectPages.sellOrderDlg import SellOrderDlg
 from ProjectPages.myOrdersMW import MyOrders
 from workers import AlertWorker, HoldingsWorker, TeleApiWorker
 
@@ -57,8 +57,9 @@ class UserDetails:
             cursor.close()
             con.close()
 
-class Navigation:
-    
+class Navigation: 
+    holdings = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
+    stkDetails  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
@@ -71,8 +72,8 @@ class Navigation:
         stkName = modelIndexls[1].data(0)
 
         try:
-            self.stkDetails = StockDetails(stkSym, stkName)
-            self.stkDetails.show()
+            self.stkDetails.append(StockDetails(stkSym, stkName)) 
+            self.stkDetails[-1].show()
         except requests.exceptions.ConnectionError as e:
             dlg = MessageDlg('Please check your internet connection')
             dlg.show()
@@ -89,8 +90,8 @@ class Navigation:
         self.myOrders.show()
 
     def showHoldingsWindow(self):
-        self.holdings = Holdings()
-        self.holdings.show()
+        self.holdings.append(Holdings()) 
+        self.holdings[-1].show()
     
     def showWatchlistsWindow(self):
         self.watchlists = Watchlists()
@@ -125,13 +126,21 @@ class MainWindow(QMainWindow):
         self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlistsWindow)
         self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetailsWindow)
 
-    def showBuyOrderWidget(self):
-        self.orderWidget = BuyOrderDlg()
+    '''method called when user clicks on buy button of notification sent on windows'''
+    def showBuyOrderWidget(self, stkSymbol): 
+        print('buyOrderWidget shown')
+        self.orderWidget = BuyOrderDlg(stkSymbol)
         self.orderWidget.show()
 
-    def showSellOrderWidget(self):
-        self.orderWidget = SellOrderWidget()
+    '''method called when user clicks on sell button of notification sent on windows'''
+    def showSellOrderWidget(self): 
+        self.orderWidget = SellOrderDlg()
         self.orderWidget.show()
+
+    def showHoldingDetails(self, holdDetails):
+        self.ui.lblTotalInvVal.setText(str(holdDetails['investedValue'].iloc[0]))
+        self.ui.lbalCurrentValueVal.setText(str(holdDetails['currentValue'].iloc[0]))
+        self.ui.lblPandLVal.setText(str(holdDetails['profitAndLoss'].iloc[0]))
 
 def chnageHoldingWorkerDetails():
     widget.userDetails.getUserDetails()
@@ -161,15 +170,16 @@ if __name__ == "__main__":
 
     holdingsFetchingThread.started.connect(holdingsFetchingWorker.fetchHoldings)
 
-    #worker to process holdings
+    #worker to process holdings 
     holdingsProcessWorker = HoldingsWorker()
+    holdingsProcessWorker.sigHoldDetails.connect(widget.showHoldingDetails)
     #Thread to process holdings
     holdingsProcessThread = QThread()
     holdingsProcessWorker.moveToThread(holdingsProcessThread)
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    # holdingsFetchingThread.start()
+    holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 

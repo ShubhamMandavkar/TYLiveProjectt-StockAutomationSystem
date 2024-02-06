@@ -66,6 +66,8 @@ class Watchlists(QMainWindow):
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
 
+        self.selectedRow = None #to store the selection
+
         self.watchlistWorker = WatchlistWorker()
         self.watchlistThread = QThread()
         self.watchlistWorker.moveToThread(self.watchlistThread)
@@ -93,12 +95,16 @@ class Watchlists(QMainWindow):
 
     
     def addConnectors(self):
+        self.ui.tbvWatchlist.clicked.connect(self.saveSelectedIndex)
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
         self.ui.btnAddToWL.clicked.connect(self.showSearchDlg)
         self.ui.btnDeleteFrmWL.clicked.connect(self.deleteStockFrmWL)
         self.ui.btnImport.clicked.connect(self.importStocksList)
 
         self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))         
+
+    def saveSelectedIndex(self):
+        self.selectedRow = self.ui.tbvWatchlist.currentIndex().row()
 
     def loadWatchlists(self):
         try:
@@ -123,6 +129,8 @@ class Watchlists(QMainWindow):
         print(wlData)
         self.model = TableModel(wlData)
         self.ui.tbvWatchlist.setModel(self.model)
+        if(self.selectedRow != None):
+            self.ui.tbvWatchlist.selectRow(self.selectedRow)
         
     def getWatchlistDetails(self):
         #get watchlist details
@@ -288,7 +296,6 @@ class Watchlists(QMainWindow):
             self.ui.tbvWatchlist.hide()
             self.ui.lblMsg.setVisible(True)
         print('callled manageVisibility')
-    
     
     #this function causing crash  to the system don't know why
     def closeEvent(self, event):

@@ -10,7 +10,7 @@ from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
 from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderWidget import SellOrderWidget
+from ProjectPages.sellOrderDlg import SellOrderDlg
 
 class StockDetails(QMainWindow):
     def __init__(self, stkSym, stkName, parent=None):
@@ -62,7 +62,6 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkLowVal.setText(str(stk['data']['yearly_low_price']))
         self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
 
-
     def showStkDetails(self, stkDf):
         self.ui.lblCompanyVal.setText(self.stkName)
         self.ui.lblExchangeVal.setText('NSE')
@@ -80,7 +79,7 @@ class StockDetails(QMainWindow):
         self.orderWidget.show()
     
     def showSellOrderWidget(self):
-        self.orderWidget = SellOrderWidget(self.stkSymbol)
+        self.orderWidget = SellOrderDlg(self.stkSymbol)
         self.orderWidget.show()
     
     def showAlertDialog(self):
