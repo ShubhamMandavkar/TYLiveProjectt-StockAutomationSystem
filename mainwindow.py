@@ -138,9 +138,9 @@ class MainWindow(QMainWindow):
         self.orderWidget.show()
 
     def showHoldingDetails(self, holdDetails):
-        self.ui.lblTotalInvVal.setText(str(holdDetails['investedValue'].iloc[0]))
-        self.ui.lbalCurrentValueVal.setText(str(holdDetails['currentValue'].iloc[0]))
-        self.ui.lblPandLVal.setText(str(holdDetails['profitAndLoss'].iloc[0]))
+        self.ui.lblTotalInvVal.setText(str(round(holdDetails['investedValue'].iloc[0], 2)))
+        self.ui.lbalCurrentValueVal.setText(str(round(holdDetails['currentValue'].iloc[0], 2)))
+        self.ui.lblPandLVal.setText(str(round(holdDetails['profitAndLoss'].iloc[0], 2)))
 
 def chnageHoldingWorkerDetails():
     widget.userDetails.getUserDetails()
@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
     widget.show()
     holdingsFetchingThread.start()
-    # holdingsProcessThread.start()
+    holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
     teleApiWorker = TeleApiWorker(loop)

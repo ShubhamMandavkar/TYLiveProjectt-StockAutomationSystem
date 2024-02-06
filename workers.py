@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from operator import concat
 from PySide6.QtCore import QObject, Signal
 
 import mysql.connector
@@ -360,9 +361,12 @@ class AlertWorker(QObject):
 class HoldingsWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
     noti = zroya.Template(zroya.TemplateType.Text2)
-    # noti.setAudio(audio=zroya.Audio.Alarm)
+    noti.setAudio(audio=zroya.Audio.Alarm)
+    noti.addAction("BUY")
+    noti.addAction("SELL")
 
     holdings = { "status": "success", "data": []}   #static variable to share holdings for all objects
+    lastNotificationSentTime = pd.DataFrame()
     isRunning = True
     isNetConnected = False
 
@@ -391,19 +395,43 @@ class HoldingsWorker(QObject):
         self.apiSecretKey = sKey
         self.brCode = brCode
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
+
+    def tempFunction(self):
+        tempHoldings = pd.DataFrame(pd.DataFrame(HoldingsWorker.holdings['data'])['symbol'])
+        tempHoldings['lastNotiSent'] = None
+        tempHoldings.set_index('symbol', inplace= True)
+
+        if(HoldingsWorker.lastNotificationSentTime.size == 0):
+            HoldingsWorker.lastNotificationSentTime = tempHoldings
+        else:
+            #HoldingsWorker.lastNotificationSentTime contains symbols which are present in both and symbols which are only present in tempHoldings
+            HoldingsWorker.lastNotificationSentTime = pd.concat([HoldingsWorker.lastNotificationSentTime[HoldingsWorker.lastNotificationSentTime.index.isin(tempHoldings.index) == True], tempHoldings[tempHoldings.index.isin(HoldingsWorker.lastNotificationSentTime.index) == False]])
         
-    
+        
+    def checkLastNotiSend(self, stkSymbol):
+        if(stkSymbol not in HoldingsWorker.lastNotificationSentTime.index):
+            return False
+
+        if(HoldingsWorker.lastNotificationSentTime.loc[stkSymbol, 'lastNotiSent']) == None:
+            return True 
+
+        lastTriggerTime = datetime.strptime(HoldingsWorker.lastNotificationSentTime.loc[stkSymbol, 'lastNotiSent'],'%Y-%m-%d %H:%M:%S.%f') 
+        currTime = datetime.now() - timedelta(minutes=1)
+
+        return lastTriggerTime < currTime
+
     def fetchHoldings(self, brCode = 'tc'):
         while(HoldingsWorker.isRunning):
             try :
-                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
+                # HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
                 # print(HoldingsWorker.holdings['error_msg'])
                 # print(HoldingsWorker.holdings['error_type'])
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
-                # HoldingsWorker.holdings = getHoldings2() #testing purpose only
+                HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
+                self.tempFunction()
 
                 HoldingsWorker.isNetConnected = True
             except requests.exceptions.ConnectionError:
@@ -434,15 +462,16 @@ class HoldingsWorker(QObject):
                     tempCurrentValue += holding['hld_val']
                     tempProfitAndLoss += holding['PL']
 
-                    if(((holding['invest_val']*1.10) < holding['hld_val'])):
+                    if(((holding['invest_val']*1.10) < holding['hld_val']) and self.checkLastNotiSend(holding['symbol'])):
                         print('Above 15% profit')
                         
                         self.noti.setFirstLine("Stock Profit Notification")
                         self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above threshold!!!")
-                        # self.noti.addAction("sell")
-                        # self.noti.addAction("No")
                         # zroya.show(self.noti, on_action= self.myActio)
                         zroya.show(self.noti)
+
+                        HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+
             
             self.investedValue = tempInvestedValue
             self.currentValue = tempCurrentValue
