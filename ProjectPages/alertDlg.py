@@ -124,13 +124,13 @@ class AlertDlg(QDialog):
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""insert into alerts values('{self.stkSymbol}', '{self.stkName}', '{alertType}', '{alertCond}', '{timeFrame}', {alertVal}, {len1}, {len2}, '{alertMsg}', 0) """
+            query = f"""insert into alerts values('{self.stkSymbol}', '{self.stkName}', '{alertType}', '{alertCond}', '{timeFrame}', {alertVal}, {len1}, {len2}, '{alertMsg}', 0, NULL) """
             print(query)
             cursor.execute(query)
             con.commit()
 
             #add alert to alertlist in AlertWorker for processing
-            AlertWorker.alertList.append({'stkSymbol' : self.stkSymbol, 'stkName' : self.stkName, 'alertType' : alertType, 'alertCond' : alertCond, 'timeFrame' : timeFrame, 'alertVal' : alertVal, 'len1' : len1, 'len2' : len2, 'alertMsg' : alertMsg, 'isPaused': 0})
+            AlertWorker.alertList.append({'stkSymbol' : self.stkSymbol, 'stkName' : self.stkName, 'alertType' : alertType, 'alertCond' : alertCond, 'timeFrame' : timeFrame, 'alertVal' : alertVal, 'len1' : len1, 'len2' : len2, 'alertMsg' : alertMsg, 'isPaused': 0, 'lastTriggerTime' : None})
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
