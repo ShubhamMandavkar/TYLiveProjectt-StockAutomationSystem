@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-from operator import concat
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal, QReadWriteLock
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -51,6 +50,7 @@ class AlertWorker(QObject):
     isRunning = False
     alertList = []
 
+    #desktop notification setup
     zroya.init("StockAutomation", "a", "b", "c", "d")
     noti = zroya.Template(zroya.TemplateType.Text2)
     noti.setAudio(audio=zroya.Audio.Alarm)
@@ -159,7 +159,6 @@ class AlertWorker(QObject):
 
         return lastTriggerTime < currTime
         
-
     def myAction(self, nId, actionId):  
         if(actionId == 0):
             self.sigShowBuyOrderWidget.emit(self.noti.getFirstLine())
@@ -187,7 +186,6 @@ class AlertWorker(QObject):
                         print('check network')
                 else:
                     isSentNetworkWarning = False
-
 
                 try:
                     # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
@@ -354,9 +352,7 @@ class AlertWorker(QObject):
                             self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
             time.sleep(5)
-            # self.getAlertList()
-            # print("processAlerts Called")
-      
+            print("processAlerts Called")  
 
 class HoldingsWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
@@ -630,7 +626,6 @@ class WatchlistWorker(QObject):
         self.currWL = wlName
         self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
 
-
 class StockWorker(QObject):
     sigShowStkDetails = Signal(pd.DataFrame)
     sigShowCheckNetworkMsg = Signal(str)
@@ -669,3 +664,259 @@ class StockWorker(QObject):
 
         self.finished.emit()
         print('fetchStockDetails thread ended')
+
+class SpecialAlertsWorker(QObject):
+    isRunning = False
+
+    stkSymbolsList = pd.DataFrame({'stkSymbol': [], 
+                                    'lastPMHNotiSent': [], 'lastPMLNotiSent': [],                             
+                                    'lastPWHNotiSent': [], 'lastPWLNotiSent': []})
+    stkSymbolsList.set_index('stkSymbol')
+
+    #desktop notification setup
+    zroya.init("StockAutomation", "a", "b", "c", "d")
+    noti = zroya.Template(zroya.TemplateType.Text2)
+    noti.setAudio(audio=zroya.Audio.Alarm)
+    noti.addAction("BUY")
+    noti.addAction("SELL")
+
+    def __init__(self):
+        super().__init__()
+        self.lock = QReadWriteLock() #lock to synchronize the use of shared resource between threads
+
+    #get the list of symbols
+    def getStkSymbolsList(self):
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+            cursor = con.cursor()
+
+            query = f"""select * from special_alerts_stk_list"""
+            cursor.execute(query)
+            stkList = {'stkSymbol': []}
+            for (stkSymbol, stkName) in cursor:
+                stkList['stkSymbol'].append(stkSymbol)
+
+            stkList = pd.DataFrame(stkList, columns=stkList.keys())
+            stkList['lastPMHNotiSent'] = None
+            stkList['lastPMLNotiSent'] = None
+            stkList['lastPWHNotiSent'] = None
+            stkList['lastPWLNotiSent'] = None
+
+            stkList.set_index('stkSymbol', inplace= True)
+
+            self.lock.lockForWrite()
+            SpecialAlertsWorker.stkSymbolsList = stkList
+            self.lock.unlock()
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        finally:
+            cursor.close()
+            con.close()
+    
+    def addToSymbolsList(self, symbol):
+        temp = pd.DataFrame({'stkSymbol': [symbol]})
+        temp['lastPMHNotiSent'] = None
+        temp['lastPMLNotiSent'] = None
+        temp['lastPWHNotiSent'] = None
+        temp['lastPWLNotiSent'] = None
+        temp.set_index('stkSymbol', inplace=True)
+
+        self.lock.lockForWrite()
+        SpecialAlertsWorker.stkSymbolsList = pd.concat([SpecialAlertsWorker.stkSymbolsList, temp])
+        self.lock.unlock()
+
+    def deleteFromSymbolsList(self, symbol):
+        self.lock.lockForWrite()
+        SpecialAlertsWorker.stkSymbolsList.drop(symbol, inplace=True, axis=0)
+        self.lock.unlock()
+
+    def clearSymbolsList(self):
+        self.lock.lockForWrite()
+        SpecialAlertsWorker.stkSymbolsList = pd.DataFrame({'stkSymbol': [], 
+                                    'lastPMHNotiSent': [], 'lastPMLNotiSent': [],                             
+                                    'lastPWHNotiSent': [], 'lastPWLNotiSent': []})
+        self.lock.unlock()
+
+    def myAction(self, nId, actionId):  
+        if(actionId == 0):
+            self.sigShowBuyOrderWidget.emit(self.noti.getFirstLine())
+            print("Thank you for response")
+        elif(actionId == 1):
+            self.sigShowSellOrderWidget.emit()
+            print("Thank you for response")
+    
+    def sendNotiToDesktop(self, title, message):
+        self.noti.setFirstLine(title) 
+        self.noti.setSecondLine(message)
+        zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
+
+    def calAverage(self, data, avgType, avgLen = None):
+        match avgType:
+            case 'MA':
+                Avg = talib.MA(data, timeperiod = avgLen)
+                return Avg
+            case 'EMA':
+                Avg = talib.EMA(data, timeperiod = avgLen)
+                return Avg
+            case 'HMA':
+                length = avgLen
+                Avg = talib.WMA(2*talib.WMA(data, timeperiod = length/2)-talib.WMA(data, timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
+                return Avg
+
+    def setLastTriggerTime(self, symbol, type, lastTriggerTime):
+        self.lock.lockForWrite()
+        SpecialAlertsWorker.stkSymbolsList[type].loc[symbol] = lastTriggerTime
+        self.lock.unlock()
+
+    def checkLastTriggerTime(self, symbol, type): #check for the lastTriggerTime
+        ''' 
+            function: checks the last trigger time 
+            output : returns true if lastTriggerTime is more than 1 minute else false
+        '''
+        try:
+            self.lock.lockForRead()
+            if(SpecialAlertsWorker.stkSymbolsList[type].loc[symbol] == None) :
+                self.lock.unlock()
+                return True 
+
+            self.lock.lockForRead()
+            lastTriggerTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList[type].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') 
+            self.lock.unlock()
+            currTime = datetime.now() - timedelta(minutes=1)
+
+            return lastTriggerTime < currTime
+        except Exception as e:
+            print(e)
+
+        return False
+
+    def isPriceGreaterThanPMH(self, symbol):
+        '''checks if price is greater than previous month high'''
+        try:
+            stk = yf.Ticker(symbol + ".NS")
+            df = stk.history(period="max", interval = '1mo')
+
+            Avg = self.calAverage(df['Close'].to_numpy(), 'EMA', 50)
+            currMP = df['Close'].iloc[-1]
+
+            if(df.size >= 2):
+                prevHigh = df['Close'].iloc[-2]
+                
+                if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]:
+                    if currMP > prevHigh:
+                        return True
+                    
+                return False
+            else:
+                #the symbol has been listed in current month
+                return True
+        except Exception as e:
+            print(e)
+
+        return False
+
+    def isPriceLowerThanPML(self, symbol):
+        '''checks if price is lower than previous month low'''
+
+        try:
+            stk = yf.Ticker(symbol + ".NS")
+            df = stk.history(period="max", interval = '1mo')
+
+            Avg = self.calAverage(df['Close'].to_numpy(), 'EMA', 50)
+            currMP = df['Close'].iloc[-1]
+
+            if(df.size >= 2):
+                prevLow = df['Close'].iloc[-2]
+                
+                if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]:
+                    if currMP < prevLow:
+                        return True
+                    
+                return False
+            else:
+                #the symbol has been listed in current month
+                return True
+        except Exception as e:
+            print(e)
+
+        return False
+
+    def isPriceGreaterThanPWH(self, symbol):
+        '''checks if price is greater than previous week high'''
+
+        try:
+            stk = yf.Ticker(symbol + ".NS")
+            df = stk.history(period="1mo", interval = '1wk')
+
+            currMP = df['Close'].iloc[-1]
+
+            if(df.size >= 2):
+                prevHigh = df['Close'].iloc[-2]
+                if currMP > prevHigh:
+                    return True
+                    
+                return False
+            else:
+                #the symbol has been listed in current week
+                return True
+        except Exception as e:
+            print(e)
+
+        return False
+
+    def isPriceLowerThanPWL(self, symbol):
+        '''checks if price is lower than previous month low'''
+
+        try:
+            stk = yf.Ticker(symbol + ".NS")
+            df = stk.history(period="1mo", interval = '1wk')
+
+            currMP = df['Close'].iloc[-1]
+
+            if(df.size >= 2):
+                prevLow = df['Close'].iloc[-2]
+                if currMP < prevLow:
+                    return True
+                    
+                return False
+            else:
+                #the symbol has been listed in current month
+                return True
+        except Exception as e:
+            print(e)
+
+        return False
+
+
+    def check(self):
+        while(self.isRunning):
+            symbols = SpecialAlertsWorker.stkSymbolsList
+            print(symbols)
+            for symbol in symbols.index:
+                if(self.isPriceGreaterThanPMH(symbol) and self.checkLastTriggerTime(symbol, 'lastPMHNotiSent')):
+                    self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
+                    self.setLastTriggerTime(symbol, 'lastPMHNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                    
+
+                if(self.isPriceLowerThanPML(symbol) and self.checkLastTriggerTime(symbol, 'lastPMLNotiSent')):
+                    self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
+                    self.setLastTriggerTime(symbol, 'lastPMLNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                
+                if(self.isPriceGreaterThanPWH(symbol) and self.checkLastTriggerTime(symbol, 'lastPWHNotiSent')):
+                    self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
+                    self.setLastTriggerTime(symbol, 'lastPWHNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                    
+
+                if(self.isPriceLowerThanPWL(symbol) and self.checkLastTriggerTime(symbol, 'lastPWLNotiSent')):
+                    self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
+                    self.setLastTriggerTime(symbol, 'lastPWLNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+
+            time.sleep(5)  
+            print('scanning for special alerts')  

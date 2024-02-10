@@ -15,6 +15,7 @@ import requests
 from UIFiles.ui_home import Ui_Home
 from ProjectPages.searchDlg import SearchDlg
 from ProjectPages.myAlertsMW import MyAlerts
+from ProjectPages.specialAlertsMW import SpecialAlerts
 from ProjectPages.holdingsMW import Holdings
 from ProjectPages.watchlistsMW import Watchlists
 from ProjectPages.customDetailsMW import CustomDetails
@@ -23,7 +24,7 @@ from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderDlg import SellOrderDlg
 from ProjectPages.myOrdersMW import MyOrders
-from workers import AlertWorker, HoldingsWorker, TeleApiWorker
+from workers import AlertWorker, HoldingsWorker, SpecialAlertsWorker, TeleApiWorker
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -87,6 +88,10 @@ class Navigation:
         self.myAlerts = MyAlerts()
         self.myAlerts.show()
 
+    def showSpecialAlertsWindow(self):
+        self.specialAlerts = SpecialAlerts()
+        self.specialAlerts.show()
+
     def showMyOrdersWindow(self):
         self.myOrders = MyOrders()
         self.myOrders.show()
@@ -124,6 +129,7 @@ class MainWindow(QMainWindow):
         #navigation code
         self.ui.btnSearch.clicked.connect(self.nav.showSearchDialog)
         self.ui.btnMyAlerts.clicked.connect(self.nav.showMyAlertsWindow)
+        self.ui.btnSpecialAlerts.clicked.connect(self.nav.showSpecialAlertsWindow)
         self.ui.btnMyOrders.clicked.connect(self.nav.showMyOrdersWindow)
         self.ui.btnHoldings.clicked.connect(self.nav.showHoldingsWindow)
         self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlistsWindow)
@@ -187,7 +193,7 @@ if __name__ == "__main__":
 
     widget.show()
     holdingsFetchingThread.start()
-    holdingsProcessThread.start()
+    # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
     teleApiWorker = TeleApiWorker(loop)
@@ -202,5 +208,14 @@ if __name__ == "__main__":
     teleApiThread.start()
     
     alertThread.start() #this thread should be started later than the teleApiThread
+
+    specialAlertWorker = SpecialAlertsWorker()
+    specialAlertThread = QThread()
+    specialAlertWorker.moveToThread(specialAlertThread)
+    specialAlertWorker.isRunning = True 
+
+    specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
+    specialAlertThread.started.connect(specialAlertWorker.check)
+    specialAlertThread.start()
 
     sys.exit(app.exec())

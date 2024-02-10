@@ -55,25 +55,31 @@ class Ui_Home(object):
         self.btnHoldings.setObjectName(u"btnHoldings")
         self.btnHoldings.setFont(font)
 
-        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnHoldings)
+        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnHoldings)
 
         self.btnWatchlists = QPushButton(self.frmNavBar)
         self.btnWatchlists.setObjectName(u"btnWatchlists")
         self.btnWatchlists.setFont(font)
 
-        self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnWatchlists)
+        self.formLayout.setWidget(5, QFormLayout.SpanningRole, self.btnWatchlists)
 
         self.btnMyOrders = QPushButton(self.frmNavBar)
         self.btnMyOrders.setObjectName(u"btnMyOrders")
         self.btnMyOrders.setFont(font)
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnMyOrders)
+        self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnMyOrders)
 
         self.btnCustomDetails = QPushButton(self.frmNavBar)
         self.btnCustomDetails.setObjectName(u"btnCustomDetails")
         self.btnCustomDetails.setFont(font)
 
-        self.formLayout.setWidget(5, QFormLayout.SpanningRole, self.btnCustomDetails)
+        self.formLayout.setWidget(6, QFormLayout.SpanningRole, self.btnCustomDetails)
+
+        self.btnSpecialAlerts = QPushButton(self.frmNavBar)
+        self.btnSpecialAlerts.setObjectName(u"btnSpecialAlerts")
+        self.btnSpecialAlerts.setFont(font)
+
+        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnSpecialAlerts)
 
 
         self.horizontalLayout.addWidget(self.frmNavBar)
@@ -252,6 +258,7 @@ class Ui_Home(object):
         self.btnWatchlists.setText(QCoreApplication.translate("Home", u"Watchlists", None))
         self.btnMyOrders.setText(QCoreApplication.translate("Home", u"MyOrders", None))
         self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
+        self.btnSpecialAlerts.setText(QCoreApplication.translate("Home", u"SpecialAlerts", None))
         self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
         self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
         self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))

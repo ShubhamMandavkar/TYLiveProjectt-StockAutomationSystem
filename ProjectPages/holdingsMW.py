@@ -19,6 +19,12 @@ class TableModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             value = self._data.iloc[index.row(), index.column()]
             return str(value)
+        # ADDED LINES
+        elif role == Qt.TextAlignmentRole:
+            if(index.column() == 0):
+                return Qt.AlignLeft
+            return Qt.AlignRight
+        ###
 
     def rowCount(self, index):
         return self._data.shape[0]
@@ -35,6 +41,7 @@ class TableModel(QAbstractTableModel):
 
             if orientation == Qt.Vertical:
                 return str(self._data.index[section])
+
 
     def sort(self, Ncol, order):
         """Sort table by given column number."""

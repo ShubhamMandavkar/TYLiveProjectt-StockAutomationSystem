@@ -56,7 +56,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
+       <item row="4" column="0" colspan="2">
         <widget class="QPushButton" name="btnHoldings">
          <property name="font">
           <font>
@@ -69,7 +69,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
+       <item row="5" column="0" colspan="2">
         <widget class="QPushButton" name="btnWatchlists">
          <property name="font">
           <font>
@@ -82,7 +82,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="3" column="0" colspan="2">
         <widget class="QPushButton" name="btnMyOrders">
          <property name="font">
           <font>
@@ -95,7 +95,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
+       <item row="6" column="0" colspan="2">
         <widget class="QPushButton" name="btnCustomDetails">
          <property name="font">
           <font>
@@ -105,6 +105,19 @@
          </property>
          <property name="text">
           <string>CustomDetails</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="btnSpecialAlerts">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>SpecialAlerts</string>
          </property>
         </widget>
        </item>
