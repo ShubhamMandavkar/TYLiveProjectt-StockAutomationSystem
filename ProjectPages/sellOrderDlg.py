@@ -36,6 +36,11 @@ class UserDetails:
             cursor.close()
             con.close()
 
+class ApiException(Exception):
+    def __init__(self, message):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+        self.msg = message
 
 class SellOrderDlg(QDialog):
     def __init__(self, stkSymbol, parent=None):
@@ -63,7 +68,7 @@ class SellOrderDlg(QDialog):
 
     def getHoldings(self):
         self.holdings = json.loads(json.dumps(self.algomojo.Holdings('tc')))
-        '''holdings = {"status": "success",
+        '''self.holdings = {"status": "success",
                         "data":[
                             {"exchange": "NSE",
                                 "token": "3478273",
@@ -116,16 +121,19 @@ class SellOrderDlg(QDialog):
                                 # }
                             }]
                         }'''
-        self.holdings = pd.DataFrame(self.holdings['data'])
+
+        if(self.holdings['status'] == 'success'):
+            self.holdings = pd.DataFrame(self.holdings['data'])
+        else: 
+            raise ApiException(self.holdings['error_msg'])
 
     def setQuantity(self):
         self.stkHoldingDetails = self.holdings.loc[self.holdings['symbol'] == self.stkSymbol+'-EQ']
-        print(self.stkHoldingDetails)
 
-        if(self.stkHoldingDetails.size == 0):
-            self.ui.lblAvailQuantityVal.setText('0')
-        else:
+        if(self.stkHoldingDetails.size != 0):
             self.ui.lblAvailQuantityVal.setText(str(self.stkHoldingDetails['holdqty'].iloc[0]))
+        else:
+            self.ui.lblAvailQuantityVal.setText('0')
 
     
     def validateQuantity(self):

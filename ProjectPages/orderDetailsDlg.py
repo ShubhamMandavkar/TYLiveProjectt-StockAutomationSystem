@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import QDialog
+from ProjectPages.messageDlg import MessageDlg
 from UIFiles.ui_orderDetailsDlg import Ui_OrderDetailsDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderDlg import SellOrderDlg
+from ProjectPages.sellOrderDlg import ApiException, SellOrderDlg
 
 class OrderDetailsDlg(QDialog):
     def __init__(self, order, parent=None):
@@ -55,13 +56,18 @@ class OrderDetailsDlg(QDialog):
             self.orderDlg.show()
             print('Modified buy order')
         else:
-            self.orderDlg = SellOrderDlg(symbol)
-            self.orderDlg.setOrderDetails(self.order)
-            self.orderDlg.validateQuantity()
-            self.orderDlg.ui.btnOrder.clicked.disconnect(self.orderDlg.placeSellOrder)
-            self.orderDlg.ui.btnOrder.clicked.connect(lambda:self.orderDlg.modifyOrder(self.order))
-            self.orderDlg.show()
-            print('Modified sell order')
+            try:
+                self.orderDlg = SellOrderDlg(symbol)
+                self.orderDlg.setOrderDetails(self.order)
+                self.orderDlg.validateQuantity()
+                self.orderDlg.ui.btnOrder.clicked.disconnect(self.orderDlg.placeSellOrder)
+                self.orderDlg.ui.btnOrder.clicked.connect(lambda:self.orderDlg.modifyOrder(self.order))
+                self.orderDlg.show()
+                print('Modified sell order')
+            except ApiException as e:
+                self.msgDlg = MessageDlg(e.msg)
+                self.msgDlg.show()
+                print(e)
 
 
     def hideButtonsFrame(self):
