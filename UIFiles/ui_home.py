@@ -42,42 +42,49 @@ class Ui_Home(object):
         font.setPointSize(12)
         font.setBold(True)
         self.btnHome.setFont(font)
+        self.btnHome.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.btnHome)
 
         self.btnMyAlerts = QPushButton(self.frmNavBar)
         self.btnMyAlerts.setObjectName(u"btnMyAlerts")
         self.btnMyAlerts.setFont(font)
+        self.btnMyAlerts.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.btnMyAlerts)
 
         self.btnHoldings = QPushButton(self.frmNavBar)
         self.btnHoldings.setObjectName(u"btnHoldings")
         self.btnHoldings.setFont(font)
+        self.btnHoldings.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(4, QFormLayout.SpanningRole, self.btnHoldings)
 
         self.btnWatchlists = QPushButton(self.frmNavBar)
         self.btnWatchlists.setObjectName(u"btnWatchlists")
         self.btnWatchlists.setFont(font)
+        self.btnWatchlists.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(5, QFormLayout.SpanningRole, self.btnWatchlists)
 
         self.btnMyOrders = QPushButton(self.frmNavBar)
         self.btnMyOrders.setObjectName(u"btnMyOrders")
         self.btnMyOrders.setFont(font)
+        self.btnMyOrders.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(3, QFormLayout.SpanningRole, self.btnMyOrders)
 
         self.btnCustomDetails = QPushButton(self.frmNavBar)
         self.btnCustomDetails.setObjectName(u"btnCustomDetails")
         self.btnCustomDetails.setFont(font)
+        self.btnCustomDetails.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(6, QFormLayout.SpanningRole, self.btnCustomDetails)
 
         self.btnSpecialAlerts = QPushButton(self.frmNavBar)
         self.btnSpecialAlerts.setObjectName(u"btnSpecialAlerts")
         self.btnSpecialAlerts.setFont(font)
+        self.btnSpecialAlerts.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.btnSpecialAlerts)
 
@@ -100,6 +107,7 @@ class Ui_Home(object):
         self.btnSearch.setObjectName(u"btnSearch")
         self.btnSearch.setGeometry(QRect(580, 30, 141, 41))
         self.btnSearch.setFont(font)
+        self.btnSearch.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.verticalLayout.addWidget(self.frame)
 

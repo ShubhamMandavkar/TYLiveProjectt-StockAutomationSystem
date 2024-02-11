@@ -48,8 +48,10 @@ class SearchDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgSearch()
         self.ui.setupUi(self)
+        self.ui.tblvSuggestions.horizontalHeader().setStretchLastSection(True)
+        self.ui.tblvSuggestions.horizontalHeader().setDefaultSectionSize(200)
+        # self.ui.tblvSuggestions.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-        self.ui.tblvSuggestions.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.addConnectors()
         self.showSuggestions()
     
@@ -71,6 +73,7 @@ class SearchDlg(QDialog):
                 data.append([symbol,name])
 
             data = pd.DataFrame(data)
+            data.columns = ['Symbol', 'Name']
             model = TableModel(data)    
             self.ui.tblvSuggestions.setModel(model) 
 

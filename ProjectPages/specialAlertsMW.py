@@ -67,6 +67,9 @@ class SpecialAlerts(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_specialAlerts()
         self.ui.setupUi(self)
+        self.ui.tbvSpecialAlertsStkList.horizontalHeader().setStretchLastSection(True)
+        self.ui.tbvSpecialAlertsStkList.horizontalHeader().setDefaultSectionSize(200)
+
 
         self.specialAlertsWorker = SpecialAlertsWorker()
 
@@ -175,6 +178,10 @@ class SpecialAlerts(QMainWindow):
 
     def deleteFromStkList(self):
         modelIndexls = self.ui.tbvSpecialAlertsStkList.selectedIndexes() #return list of QModelIndices i.e. columns in a row
+        
+        if(len(modelIndexls) == 0):
+            return
+
         stkSym = modelIndexls[0].data(0)
         stkName = modelIndexls[1].data(0)
         rowIndex = self.ui.tbvSpecialAlertsStkList.currentIndex().row()

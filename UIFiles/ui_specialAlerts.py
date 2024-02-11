@@ -24,7 +24,7 @@ class Ui_specialAlerts(object):
     def setupUi(self, specialAlerts):
         if not specialAlerts.objectName():
             specialAlerts.setObjectName(u"specialAlerts")
-        specialAlerts.resize(875, 595)
+        specialAlerts.resize(826, 570)
         self.centralwidget = QWidget(specialAlerts)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -61,21 +61,29 @@ class Ui_specialAlerts(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.btnImport = QPushButton(self.frame)
         self.btnImport.setObjectName(u"btnImport")
+        self.btnImport.setMinimumSize(QSize(0, 40))
+        self.btnImport.setMaximumSize(QSize(200, 16777215))
 
         self.gridLayout.addWidget(self.btnImport, 0, 1, 1, 1)
 
         self.btnDelete = QPushButton(self.frame)
         self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(0, 40))
+        self.btnDelete.setMaximumSize(QSize(200, 16777215))
 
         self.gridLayout.addWidget(self.btnDelete, 0, 2, 1, 1)
 
         self.btnAdd = QPushButton(self.frame)
         self.btnAdd.setObjectName(u"btnAdd")
+        self.btnAdd.setMinimumSize(QSize(0, 40))
+        self.btnAdd.setMaximumSize(QSize(200, 16777215))
 
         self.gridLayout.addWidget(self.btnAdd, 0, 0, 1, 1)
 
         self.btnClearAll = QPushButton(self.frame)
         self.btnClearAll.setObjectName(u"btnClearAll")
+        self.btnClearAll.setMinimumSize(QSize(0, 40))
+        self.btnClearAll.setMaximumSize(QSize(200, 16777215))
 
         self.gridLayout.addWidget(self.btnClearAll, 0, 3, 1, 1)
 
@@ -85,7 +93,7 @@ class Ui_specialAlerts(object):
         specialAlerts.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(specialAlerts)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 875, 25))
+        self.menubar.setGeometry(QRect(0, 0, 826, 25))
         specialAlerts.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(specialAlerts)
         self.statusbar.setObjectName(u"statusbar")

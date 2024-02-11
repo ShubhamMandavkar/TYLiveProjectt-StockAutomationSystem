@@ -36,20 +36,15 @@ class Ui_dlgSearch(object):
         self.leSearch = QLineEdit(self.frame)
         self.leSearch.setObjectName(u"leSearch")
         self.leSearch.setMinimumSize(QSize(0, 50))
+        font = QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        self.leSearch.setFont(font)
 
         self.horizontalLayout.addWidget(self.leSearch)
 
 
         self.verticalLayout.addWidget(self.frame)
-
-        self.frame_2 = QFrame(dlgSearch)
-        self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setMinimumSize(QSize(0, 60))
-        self.frame_2.setMaximumSize(QSize(16777215, 60))
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Raised)
-
-        self.verticalLayout.addWidget(self.frame_2)
 
         self.frame_3 = QFrame(dlgSearch)
         self.frame_3.setObjectName(u"frame_3")
@@ -65,13 +60,11 @@ class Ui_dlgSearch(object):
         sizePolicy.setHeightForWidth(self.tblvSuggestions.sizePolicy().hasHeightForWidth())
         self.tblvSuggestions.setSizePolicy(sizePolicy)
         self.tblvSuggestions.setMinimumSize(QSize(500, 300))
-        font = QFont()
-        font.setPointSize(12)
-        font.setBold(True)
         self.tblvSuggestions.setFont(font)
+        self.tblvSuggestions.viewport().setProperty("cursor", QCursor(Qt.ArrowCursor))
         self.tblvSuggestions.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tblvSuggestions.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tblvSuggestions.horizontalHeader().setVisible(False)
+        self.tblvSuggestions.horizontalHeader().setVisible(True)
         self.tblvSuggestions.verticalHeader().setVisible(False)
 
         self.horizontalLayout_2.addWidget(self.tblvSuggestions)
