@@ -34,13 +34,15 @@ class StockDetails(QMainWindow):
 
         self.stockThread.started.connect(self.stockWorker.fetchStockDetails)   
         self.stockWorker.sigShowStkDetails.connect(self.showStkDetails)
-        self.stockWorker.sigShowCheckNetworkMsg.connect(self.showMessage)
+        self.stockWorker.sigShowMsg.connect(self.showMessage)
         '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.stockWorker.finished.connect(self.stockThread.quit) 
         self.stockWorker.finished.connect(self.stockThread.wait)
         self.stockWorker.finished.connect(self.stockWorker.deleteLater)
         self.stockThread.finished.connect(self.stockThread.deleteLater)
         self.stockThread.start()
+
+        self.i = 0
 
     def addConnectors(self):
         self.ui.btnAlert.clicked.connect(self.showAlertDialog)
@@ -63,7 +65,9 @@ class StockDetails(QMainWindow):
         self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
 
     def showStkDetails(self, stkDf):
-        self.ui.lblCompanyVal.setText(self.stkName)
+        self.i = self.i + 1
+        self.ui.lblCompanyVal.setText(str(self.i))
+        # self.ui.lblCompanyVal.setText(self.stkName)
         self.ui.lblExchangeVal.setText('NSE')
         self.ui.lblOpenVal.setText(str(round(stkDf['Open'].iloc[0], 2)))
         self.ui.lblHighVal.setText(str(round(stkDf['High'].iloc[0], 2)))

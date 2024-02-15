@@ -71,6 +71,7 @@ class Ui_myOrders(object):
         self.lsvPendingOrders = QListView(self.pendingOrdersWidget)
         self.lsvPendingOrders.setObjectName(u"lsvPendingOrders")
         self.lsvPendingOrders.setFont(font2)
+        self.lsvPendingOrders.setAlternatingRowColors(True)
 
         self.horizontalLayout_3.addWidget(self.lsvPendingOrders)
 
@@ -92,7 +93,7 @@ class Ui_myOrders(object):
 
         self.retranslateUi(myOrders)
 
-        self.myOrdersTabWidget.setCurrentIndex(0)
+        self.myOrdersTabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(myOrders)

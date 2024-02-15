@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from tokenize import Special
+from types import NoneType
 from PySide6.QtCore import QObject, Signal, QReadWriteLock
 
 import mysql.connector
@@ -17,6 +19,7 @@ from telethon import TelegramClient
 from apiDetails import apiId, apiHashId
 import asyncio
 import requests
+import numpy as np
 
 class TeleApiWorker(QObject):
     finished = Signal()
@@ -628,7 +631,7 @@ class WatchlistWorker(QObject):
 
 class StockWorker(QObject):
     sigShowStkDetails = Signal(pd.DataFrame)
-    sigShowCheckNetworkMsg = Signal(str)
+    sigShowMsg = Signal(str)
     finished = Signal()
 
     def __init__(self, name):
@@ -654,24 +657,31 @@ class StockWorker(QObject):
                 isNetNotConnectedMsgSend = False    
             except requests.exceptions.ConnectionError:
                 if(not isNetNotConnectedMsgSend):
-                    self.sigShowCheckNetworkMsg.emit('Please check your internet connection')   
+                    self.sigShowMsg.emit('Please check your internet connection')   
                     isNetNotConnectedMsgSend = True                                 
             except Exception as e:
+                self.sigShowMsg.emit('Exception in stkDetailsWorker', e)
                 print('Exception in stkDetailsWorker', e)
 
-            print('fetchStockDetails called')
+            self.sigShowMsg.emit ('fetchStockDetails called')
             time.sleep(5)
 
         self.finished.emit()
         print('fetchStockDetails thread ended')
 
 class SpecialAlertsWorker(QObject):
-    isRunning = False
+    sigSpecialAlerts = Signal(pd.DataFrame) #signal to emit specialAlerts satisfying stocks list
+    finished = Signal()
 
     stkSymbolsList = pd.DataFrame({'stkSymbol': [], 
-                                    'lastPMHNotiSent': [], 'lastPMLNotiSent': [],                             
-                                    'lastPWHNotiSent': [], 'lastPWLNotiSent': []})
+                                    'PMHTriggerTime': [], 'PMLTriggerTime': [],                             
+                                    'PWHTriggerTime': [], 'PWLTriggerTime': []})
     stkSymbolsList.set_index('stkSymbol')
+
+    alertsTriggeredList = pd.DataFrame({'stkSymbol': [], 
+                                    'PMHTriggerTime': [], 'PMLTriggerTime': [],                             
+                                    'PWHTriggerTime': [], 'PWLTriggerTime': []})
+    alertsTriggeredList.set_index('stkSymbol')
 
     #desktop notification setup
     zroya.init("StockAutomation", "a", "b", "c", "d")
@@ -682,6 +692,8 @@ class SpecialAlertsWorker(QObject):
 
     def __init__(self):
         super().__init__()
+        self.isRunning = True
+        self.isSpecialAlertsPage = False
         self.lock = QReadWriteLock() #lock to synchronize the use of shared resource between threads
 
     #get the list of symbols
@@ -690,19 +702,20 @@ class SpecialAlertsWorker(QObject):
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select * from special_alerts_stk_list"""
+            query = f"""select stkSymbol, PMHTriggerTime, PMLTriggerTime, PWHTriggerTime, PWLTriggerTime from special_alerts_stk_list"""
             cursor.execute(query)
-            stkList = {'stkSymbol': []}
-            for (stkSymbol, stkName) in cursor:
+            stkList = {'stkSymbol': [], 'PMHTriggerTime': [], 'PMLTriggerTime': [], 'PWHTriggerTime': [], 'PWLTriggerTime': []}
+            for (stkSymbol, PMHTriggerTime,  PMLTriggerTime,  PWHTriggerTime,  PWLTriggerTime) in cursor:
                 stkList['stkSymbol'].append(stkSymbol)
+                stkList['PMHTriggerTime'].append(PMHTriggerTime)
+                stkList['PMLTriggerTime'].append(PMLTriggerTime)
+                stkList['PWHTriggerTime'].append(PWHTriggerTime)
+                stkList['PWLTriggerTime'].append(PWLTriggerTime)
+                
 
             stkList = pd.DataFrame(stkList, columns=stkList.keys())
-            stkList['lastPMHNotiSent'] = None
-            stkList['lastPMLNotiSent'] = None
-            stkList['lastPWHNotiSent'] = None
-            stkList['lastPWLNotiSent'] = None
-
             stkList.set_index('stkSymbol', inplace= True)
+            stkList.fillna('', inplace=True)
 
             self.lock.lockForWrite()
             SpecialAlertsWorker.stkSymbolsList = stkList
@@ -721,12 +734,13 @@ class SpecialAlertsWorker(QObject):
     
     def addToSymbolsList(self, symbol):
         temp = pd.DataFrame({'stkSymbol': [symbol]})
-        temp['lastPMHNotiSent'] = None
-        temp['lastPMLNotiSent'] = None
-        temp['lastPWHNotiSent'] = None
-        temp['lastPWLNotiSent'] = None
-        temp.set_index('stkSymbol', inplace=True)
+        temp['PMHTriggerTime'] = '' 
+        temp['PMLTriggerTime'] = ''
+        temp['PWHTriggerTime'] = ''
+        temp['PWLTriggerTime'] = ''
 
+        temp.set_index('stkSymbol', inplace=True)
+        
         self.lock.lockForWrite()
         SpecialAlertsWorker.stkSymbolsList = pd.concat([SpecialAlertsWorker.stkSymbolsList, temp])
         self.lock.unlock()
@@ -738,9 +752,9 @@ class SpecialAlertsWorker(QObject):
 
     def clearSymbolsList(self):
         self.lock.lockForWrite()
-        SpecialAlertsWorker.stkSymbolsList = pd.DataFrame({'stkSymbol': [], 
-                                    'lastPMHNotiSent': [], 'lastPMLNotiSent': [],                             
-                                    'lastPWHNotiSent': [], 'lastPWLNotiSent': []})
+        SpecialAlertsWorker.stkSymbolsList =  pd.DataFrame({'stkSymbol': [], 
+                                                    'PMHTriggerTime': [], 'PMLTriggerTime': [],                             
+                                                    'PWHTriggerTime': [], 'PWLTriggerTime': []})
         self.lock.unlock()
 
     def myAction(self, nId, actionId):  
@@ -774,6 +788,26 @@ class SpecialAlertsWorker(QObject):
         SpecialAlertsWorker.stkSymbolsList[type].loc[symbol] = lastTriggerTime
         self.lock.unlock()
 
+        try:
+            con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
+            cursor = con.cursor()
+
+            query = f"""update special_alerts_stk_list set {type} = '{lastTriggerTime}' where stkSymbol = '{symbol}'"""
+            print(query)
+            cursor.execute(query)
+            con.commit()
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print("error:",err)
+        finally:
+            cursor.close()
+            con.close()
+    
     def checkLastTriggerTime(self, symbol, type): #check for the lastTriggerTime
         ''' 
             function: checks the last trigger time 
@@ -781,35 +815,38 @@ class SpecialAlertsWorker(QObject):
         '''
         try:
             self.lock.lockForRead()
-            if(SpecialAlertsWorker.stkSymbolsList[type].loc[symbol] == None) :
-                self.lock.unlock()
+            lastTriggerTime = SpecialAlertsWorker.stkSymbolsList[type].loc[symbol]
+            self.lock.unlock()
+
+            if(lastTriggerTime == '') :
                 return True 
 
             self.lock.lockForRead()
             lastTriggerTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList[type].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') 
             self.lock.unlock()
-            currTime = datetime.now() - timedelta(minutes=1)
 
-            return lastTriggerTime < currTime
+            today = datetime(datetime.now().year, datetime.now().month, datetime.now().day, 0, 0, 0, 0)
+            return lastTriggerTime < today #if lastTriggerTime is less than today
+
         except Exception as e:
             print(e)
 
         return False
 
-    def isPriceGreaterThanPMH(self, symbol):
+    def isPriceCrossingPMH(self, symbol):
         '''checks if price is greater than previous month high'''
         try:
-            stk = yf.Ticker(symbol + ".NS")
-            df = stk.history(period="max", interval = '1mo')
+            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo')
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
 
-            Avg = self.calAverage(df['Close'].to_numpy(), 'EMA', 50)
-            currMP = df['Close'].iloc[-1]
+            Avg = self.calAverage(monthDf['Close'].to_numpy(), 'EMA', 50)
+            currMP = monthDf['Close'].iloc[-1]
 
-            if(df.size >= 2):
-                prevHigh = df['Close'].iloc[-2]
+            if(monthDf.size >= 2):
+                prevMonthHigh = monthDf['High'].iloc[-2]
                 
                 if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]:
-                    if currMP > prevHigh:
+                    if(dailyDf['Open'].iloc[-1]<= prevMonthHigh or dailyDf['Close'].iloc[-2] <= prevMonthHigh) and currMP > prevMonthHigh:
                         return True
                     
                 return False
@@ -825,17 +862,17 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is lower than previous month low'''
 
         try:
-            stk = yf.Ticker(symbol + ".NS")
-            df = stk.history(period="max", interval = '1mo')
+            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo')
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
 
-            Avg = self.calAverage(df['Close'].to_numpy(), 'EMA', 50)
-            currMP = df['Close'].iloc[-1]
+            Avg = self.calAverage(monthDf['Close'].to_numpy(), 'EMA', 50)
+            currMP = monthDf['Close'].iloc[-1]
 
-            if(df.size >= 2):
-                prevLow = df['Close'].iloc[-2]
+            if(monthDf.size >= 2):
+                prevMonthLow = monthDf['Low'].iloc[-2]
                 
                 if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]:
-                    if currMP < prevLow:
+                    if (dailyDf['Open'].iloc[-1] >= prevMonthLow or dailyDf['Close'].iloc[-2] >= prevMonthLow) and currMP < prevMonthLow:
                         return True
                     
                 return False
@@ -851,15 +888,17 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is greater than previous week high'''
 
         try:
-            stk = yf.Ticker(symbol + ".NS")
-            df = stk.history(period="1mo", interval = '1wk')
+            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk')
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
 
-            currMP = df['Close'].iloc[-1]
+            currMP = weekDf['Close'].iloc[-1]
 
-            if(df.size >= 2):
-                prevHigh = df['Close'].iloc[-2]
-                if currMP > prevHigh:
-                    return True
+            if(weekDf.size >= 2):
+                prevWeekHigh = weekDf['High'].iloc[-2]
+
+                if (dailyDf['Open'].iloc[-1] <= prevWeekHigh or dailyDf['Close'].iloc[-2] <= prevWeekHigh) and currMP > prevWeekHigh:
+                        return True
+                    
                     
                 return False
             else:
@@ -874,15 +913,16 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is lower than previous month low'''
 
         try:
-            stk = yf.Ticker(symbol + ".NS")
-            df = stk.history(period="1mo", interval = '1wk')
+            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk')
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
 
-            currMP = df['Close'].iloc[-1]
+            currMP = weekDf['Close'].iloc[-1]
 
-            if(df.size >= 2):
-                prevLow = df['Close'].iloc[-2]
-                if currMP < prevLow:
-                    return True
+            if(weekDf.size >= 2):
+                prevWeekLow = weekDf['Low'].iloc[-2]
+
+                if (dailyDf['Open'].iloc[-1] >= prevWeekLow or dailyDf['Close'].iloc[-2] >= prevWeekLow) and currMP < prevWeekLow:
+                        return True
                     
                 return False
             else:
@@ -893,30 +933,88 @@ class SpecialAlertsWorker(QObject):
 
         return False
 
-
     def check(self):
         while(self.isRunning):
             symbols = SpecialAlertsWorker.stkSymbolsList
             print(symbols)
             for symbol in symbols.index:
-                if(self.isPriceGreaterThanPMH(symbol) and self.checkLastTriggerTime(symbol, 'lastPMHNotiSent')):
-                    self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
-                    self.setLastTriggerTime(symbol, 'lastPMHNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-                    
+                if self.isPriceCrossingPMH(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PMHTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
 
-                if(self.isPriceLowerThanPML(symbol) and self.checkLastTriggerTime(symbol, 'lastPMLNotiSent')):
-                    self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
-                    self.setLastTriggerTime(symbol, 'lastPMLNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                    self.setLastTriggerTime(symbol, 'PMHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+     
+                if self.isPriceLowerThanPML(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PMLTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
+
+                    self.setLastTriggerTime(symbol, 'PMLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                 
-                if(self.isPriceGreaterThanPWH(symbol) and self.checkLastTriggerTime(symbol, 'lastPWHNotiSent')):
-                    self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
-                    self.setLastTriggerTime(symbol, 'lastPWHNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                if self.isPriceGreaterThanPWH(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PWHTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
+
+                    self.setLastTriggerTime(symbol, 'PWHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                     
 
-                if(self.isPriceLowerThanPWL(symbol) and self.checkLastTriggerTime(symbol, 'lastPWLNotiSent')):
-                    self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
-                    self.setLastTriggerTime(symbol, 'lastPWLNotiSent', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                if self.isPriceLowerThanPWL(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PWLTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
 
+                    self.setLastTriggerTime(symbol, 'PWLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+                print('scanning of', symbol, 'completed')
 
             time.sleep(5)  
             print('scanning for special alerts')  
+
+    def getAlertsTriggeredStkList(self):
+        while(self.isSpecialAlertsPage):
+            today = datetime(datetime.now().year, datetime.now().month, datetime.now().day, 0, 0, 0, 0)
+            temp = {'stkSymbol': [], 
+                                    'PMHTriggerTime': [], 'PMLTriggerTime': [],                             
+                                    'PWHTriggerTime': [], 'PWLTriggerTime': []}
+
+            self.lock.lockForRead()
+            for symbol in SpecialAlertsWorker.stkSymbolsList.index :
+                if (SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today):
+                    
+                    temp['stkSymbol'].append(symbol)
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != ''):
+                        temp['PMHTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                    else:
+                        temp['PMHTriggerTime'].append('')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol] != ''):
+                        temp['PMLTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                    else:
+                        temp['PMLTriggerTime'].append('')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol] != ''):
+                        tempTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p')
+                        temp['PWHTriggerTime'].append(tempTime)
+                    else:
+                        temp['PWHTriggerTime'].append('')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol] != ''):
+                        temp['PWLTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                    else:
+                        temp['PWLTriggerTime'].append('')
+
+            self.lock.unlock()
+
+            temp = pd.DataFrame(temp)
+            print(temp)
+            self.sigSpecialAlerts.emit(temp)
+
+            print('getAlertsTriggeredStkList called')
+            time.sleep(5)
+        
+        self.finished.emit()
+        print('getAlertsTriggeredStkList finished')
+

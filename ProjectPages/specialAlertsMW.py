@@ -1,5 +1,6 @@
+from datetime import date
 from PySide6.QtWidgets import QMainWindow, QFileDialog
-from PySide6.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt, QThread
 from UIFiles.ui_specialAlerts import Ui_specialAlerts
 
 from ProjectPages.searchDlg import SearchDlg
@@ -61,7 +62,6 @@ class TableModel(QAbstractTableModel):
                                       ascending=order == Qt.AscendingOrder)
         self.layoutChanged.emit()
 
-
 class SpecialAlerts(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -72,15 +72,27 @@ class SpecialAlerts(QMainWindow):
 
 
         self.specialAlertsWorker = SpecialAlertsWorker()
+        self.specialAlertThread = QThread()
+        self.specialAlertsWorker.isSpecialAlertsPage = True
+        self.specialAlertsWorker.moveToThread(self.specialAlertThread)
 
-        self.addConncetors()
+        self.specialAlertThread.started.connect(self.specialAlertsWorker.getAlertsTriggeredStkList)
+        self.specialAlertsWorker.sigSpecialAlerts.connect(self.showSpecialAlertsTriggeredList)
+        self.specialAlertsWorker.finished.connect(self.specialAlertThread.quit)
+        self.specialAlertsWorker.finished.connect(self.specialAlertThread.wait)
+        self.specialAlertsWorker.finished.connect(self.specialAlertsWorker.deleteLater)
+        self.specialAlertsWorker.finished.connect(self.specialAlertThread.deleteLater)
+        self.specialAlertThread.start()
+
+        self.addConnectors()
         self.showSpecialAlertsStkList()
 
-    def addConncetors(self):
+    def addConnectors(self):
         self.ui.btnAdd.clicked.connect(self.showSearchDlg)
         self.ui.btnDelete.clicked.connect(self.deleteFromStkList)
         self.ui.btnImport.clicked.connect(self.importStocksList)
         self.ui.btnClearAll.clicked.connect(self.deleteAllFromStkList)
+        self.ui.btnDownload.clicked.connect(self.downloadSpecialAlertsTriggeredList)
 
     def getSpecialAlertsStkList(self):
         stkList = {'stkSymbol': [], 'stkName' : []}
@@ -88,7 +100,7 @@ class SpecialAlerts(QMainWindow):
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select * from special_alerts_stk_list"""
+            query = f"""select stkSymbol, stkName from special_alerts_stk_list"""
             cursor.execute(query)
             for (stkSymbol, stkName) in cursor:
                 stkList["stkSymbol"].append(stkSymbol) 
@@ -124,7 +136,7 @@ class SpecialAlerts(QMainWindow):
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
-            query = f"""insert into special_alerts_stk_list values('{stkSym}', '{stkName}')"""
+            query = f"""insert into special_alerts_stk_list(stkSymbol, stkName) values('{stkSym}', '{stkName}')"""
             print(query)
             cursor.execute(query)
             con.commit()
@@ -154,7 +166,7 @@ class SpecialAlerts(QMainWindow):
             cursor = con.cursor()
 
             for index, row in df.iterrows():
-                query = f"""insert into special_alerts_stk_list values('{row['stkSymbol']}', '{row['stkName']}')"""
+                query = f"""insert into special_alerts_stk_list(stkSymbol, stkName) values('{row['stkSymbol']}', '{row['stkName']}')"""
                 cursor.execute(query)
                 con.commit()
 
@@ -234,3 +246,24 @@ class SpecialAlerts(QMainWindow):
             print(e)
         else:
             con.close()
+
+
+    def showSpecialAlertsTriggeredList(self, list):
+        model = TableModel(list)
+        self.ui.tbvTodaysTriggered.setModel(model)
+
+        if(len(list.index) != 1):
+            self.ui.lblNotification.setText(str(len(list.index)) + 'stocks have triggered the special alerts condition')
+        else:
+            self.ui.lblNotification.setText('1 stock has triggered the special alerts condition')
+
+    def closeEvent(self, event):
+        print('closing stockDetails Window')
+        self.specialAlertsWorker.isSpecialAlertsPage = False
+        event.accept()
+        print('closed stockDetails Window')
+
+    def downloadSpecialAlertsTriggeredList(self):
+        stkList = self.ui.tbvTodaysTriggered.model()._data['stkSymbol']
+        stkList.to_csv (r'C:\Downloads\stkList'+ date.today().strftime('%d-%m-%Y') +'.csv', index = None, encoding='utf-8', header=True)
+        print('list downloaded')

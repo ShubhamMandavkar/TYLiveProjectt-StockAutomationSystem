@@ -192,7 +192,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    holdingsFetchingThread.start()
+    # holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 
@@ -205,14 +205,13 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    teleApiThread.start()
+    # teleApiThread.start()
     
-    alertThread.start() #this thread should be started later than the teleApiThread
+    # alertThread.start() #this thread should be started later than the teleApiThread
 
     specialAlertWorker = SpecialAlertsWorker()
     specialAlertThread = QThread()
     specialAlertWorker.moveToThread(specialAlertThread)
-    specialAlertWorker.isRunning = True 
 
     specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
     specialAlertThread.started.connect(specialAlertWorker.check)
