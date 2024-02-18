@@ -24,7 +24,7 @@ class Ui_specialAlerts(object):
     def setupUi(self, specialAlerts):
         if not specialAlerts.objectName():
             specialAlerts.setObjectName(u"specialAlerts")
-        specialAlerts.resize(917, 528)
+        specialAlerts.resize(1011, 585)
         self.centralwidget = QWidget(specialAlerts)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -33,17 +33,32 @@ class Ui_specialAlerts(object):
         self.lblHeading.setObjectName(u"lblHeading")
         self.lblHeading.setMinimumSize(QSize(0, 80))
         font = QFont()
-        font.setPointSize(14)
+        font.setPointSize(24)
         font.setBold(True)
         self.lblHeading.setFont(font)
-        self.lblHeading.setStyleSheet(u"color: rgb(0, 0, 0);")
+        self.lblHeading.setStyleSheet(u"QLabel{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color: white;\n"
+"}")
         self.lblHeading.setTextFormat(Qt.AutoText)
         self.lblHeading.setAlignment(Qt.AlignCenter)
         self.lblHeading.setWordWrap(True)
 
         self.verticalLayout.addWidget(self.lblHeading)
 
-        self.frame_2 = QFrame(self.centralwidget)
+        self.frame_6 = QFrame(self.centralwidget)
+        self.frame_6.setObjectName(u"frame_6")
+        self.frame_6.setStyleSheet(u"QFrame{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color:  white;\n"
+"}")
+        self.frame_6.setFrameShape(QFrame.StyledPanel)
+        self.frame_6.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_4 = QVBoxLayout(self.frame_6)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.frame_2 = QFrame(self.frame_6)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
@@ -61,10 +76,10 @@ class Ui_specialAlerts(object):
         self.verticalLayout_3.setContentsMargins(5, 5, 5, 5)
         self.lblStocksList = QLabel(self.frame_3)
         self.lblStocksList.setObjectName(u"lblStocksList")
-        self.lblStocksList.setMinimumSize(QSize(0, 40))
+        self.lblStocksList.setMinimumSize(QSize(0, 52))
         self.lblStocksList.setMaximumSize(QSize(16777215, 100))
         font1 = QFont()
-        font1.setPointSize(12)
+        font1.setPointSize(14)
         font1.setBold(True)
         self.lblStocksList.setFont(font1)
 
@@ -77,8 +92,13 @@ class Ui_specialAlerts(object):
         font2.setPointSize(9)
         font2.setBold(True)
         self.tbvSpecialAlertsStkList.setFont(font2)
+        self.tbvSpecialAlertsStkList.setStyleSheet(u"QTableView{\n"
+"	border-radius : 5px;\n"
+"	border: 2px solid black;\n"
+"}")
         self.tbvSpecialAlertsStkList.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tbvSpecialAlertsStkList.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbvSpecialAlertsStkList.setGridStyle(Qt.DotLine)
         self.tbvSpecialAlertsStkList.horizontalHeader().setVisible(True)
         self.tbvSpecialAlertsStkList.verticalHeader().setVisible(False)
 
@@ -100,6 +120,7 @@ class Ui_specialAlerts(object):
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame_5)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(5, 5, 5, 5)
         self.lblTodaysTriggeredList = QLabel(self.frame_5)
         self.lblTodaysTriggeredList.setObjectName(u"lblTodaysTriggeredList")
         self.lblTodaysTriggeredList.setMinimumSize(QSize(0, 40))
@@ -110,8 +131,19 @@ class Ui_specialAlerts(object):
 
         self.btnDownload = QPushButton(self.frame_5)
         self.btnDownload.setObjectName(u"btnDownload")
-        self.btnDownload.setMinimumSize(QSize(80, 40))
-        self.btnDownload.setMaximumSize(QSize(100, 16777215))
+        self.btnDownload.setMinimumSize(QSize(80, 45))
+        self.btnDownload.setMaximumSize(QSize(125, 100))
+        self.btnDownload.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
         self.btnDownload.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.btnDownload)
@@ -124,8 +156,13 @@ class Ui_specialAlerts(object):
         font3 = QFont()
         font3.setBold(True)
         self.tbvTodaysTriggered.setFont(font3)
+        self.tbvTodaysTriggered.setStyleSheet(u"QTableView{\n"
+"	border: 2px solid black;\n"
+"	border-radius: 5px;\n"
+"}")
         self.tbvTodaysTriggered.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tbvTodaysTriggered.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbvTodaysTriggered.setGridStyle(Qt.DotLine)
         self.tbvTodaysTriggered.horizontalHeader().setDefaultSectionSize(150)
         self.tbvTodaysTriggered.horizontalHeader().setStretchLastSection(True)
         self.tbvTodaysTriggered.verticalHeader().setVisible(False)
@@ -136,9 +173,9 @@ class Ui_specialAlerts(object):
         self.horizontalLayout.addWidget(self.frame_4)
 
 
-        self.verticalLayout.addWidget(self.frame_2)
+        self.verticalLayout_4.addWidget(self.frame_2)
 
-        self.lblNotification = QLabel(self.centralwidget)
+        self.lblNotification = QLabel(self.frame_6)
         self.lblNotification.setObjectName(u"lblNotification")
         font4 = QFont()
         font4.setPointSize(10)
@@ -146,49 +183,106 @@ class Ui_specialAlerts(object):
         self.lblNotification.setFont(font4)
         self.lblNotification.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout.addWidget(self.lblNotification)
+        self.verticalLayout_4.addWidget(self.lblNotification)
 
-        self.frame = QFrame(self.centralwidget)
+        self.line = QFrame(self.frame_6)
+        self.line.setObjectName(u"line")
+        self.line.setStyleSheet(u"QFrame{\n"
+"	border-bottom: 1px solid black;\n"
+"}")
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_4.addWidget(self.line)
+
+        self.frame = QFrame(self.frame_6)
         self.frame.setObjectName(u"frame")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.btnImport = QPushButton(self.frame)
-        self.btnImport.setObjectName(u"btnImport")
-        self.btnImport.setMinimumSize(QSize(0, 40))
-        self.btnImport.setMaximumSize(QSize(200, 16777215))
-
-        self.gridLayout.addWidget(self.btnImport, 0, 1, 1, 1)
-
-        self.btnDelete = QPushButton(self.frame)
-        self.btnDelete.setObjectName(u"btnDelete")
-        self.btnDelete.setMinimumSize(QSize(0, 40))
-        self.btnDelete.setMaximumSize(QSize(200, 16777215))
-
-        self.gridLayout.addWidget(self.btnDelete, 0, 2, 1, 1)
-
         self.btnAdd = QPushButton(self.frame)
         self.btnAdd.setObjectName(u"btnAdd")
-        self.btnAdd.setMinimumSize(QSize(0, 40))
+        self.btnAdd.setMinimumSize(QSize(0, 45))
         self.btnAdd.setMaximumSize(QSize(200, 16777215))
+        self.btnAdd.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
 
         self.gridLayout.addWidget(self.btnAdd, 0, 0, 1, 1)
 
         self.btnClearAll = QPushButton(self.frame)
         self.btnClearAll.setObjectName(u"btnClearAll")
-        self.btnClearAll.setMinimumSize(QSize(0, 40))
+        self.btnClearAll.setMinimumSize(QSize(0, 45))
         self.btnClearAll.setMaximumSize(QSize(200, 16777215))
+        self.btnClearAll.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
 
         self.gridLayout.addWidget(self.btnClearAll, 0, 3, 1, 1)
 
+        self.btnImport = QPushButton(self.frame)
+        self.btnImport.setObjectName(u"btnImport")
+        self.btnImport.setMinimumSize(QSize(0, 45))
+        self.btnImport.setMaximumSize(QSize(200, 16777215))
+        self.btnImport.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
 
-        self.verticalLayout.addWidget(self.frame)
+        self.gridLayout.addWidget(self.btnImport, 0, 1, 1, 1)
+
+        self.btnDelete = QPushButton(self.frame)
+        self.btnDelete.setObjectName(u"btnDelete")
+        self.btnDelete.setMinimumSize(QSize(0, 45))
+        self.btnDelete.setMaximumSize(QSize(200, 16777215))
+        self.btnDelete.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
+
+        self.gridLayout.addWidget(self.btnDelete, 0, 2, 1, 1)
+
+
+        self.verticalLayout_4.addWidget(self.frame)
+
+
+        self.verticalLayout.addWidget(self.frame_6)
 
         specialAlerts.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(specialAlerts)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 917, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1011, 25))
         specialAlerts.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(specialAlerts)
         self.statusbar.setObjectName(u"statusbar")
@@ -206,9 +300,9 @@ class Ui_specialAlerts(object):
         self.lblTodaysTriggeredList.setText(QCoreApplication.translate("specialAlerts", u"Today's Triggered list", None))
         self.btnDownload.setText(QCoreApplication.translate("specialAlerts", u"Download", None))
         self.lblNotification.setText("")
-        self.btnImport.setText(QCoreApplication.translate("specialAlerts", u"Import", None))
-        self.btnDelete.setText(QCoreApplication.translate("specialAlerts", u"Delete", None))
         self.btnAdd.setText(QCoreApplication.translate("specialAlerts", u"Add", None))
         self.btnClearAll.setText(QCoreApplication.translate("specialAlerts", u"ClearAll", None))
+        self.btnImport.setText(QCoreApplication.translate("specialAlerts", u"Import", None))
+        self.btnDelete.setText(QCoreApplication.translate("specialAlerts", u"Delete", None))
     # retranslateUi
 

@@ -641,11 +641,14 @@ class StockWorker(QObject):
 
     def fetchStockDetails(self):
         isNetNotConnectedMsgSend = False
+
         while(self.isRunning):
             try:
                 stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d')
+                print(self.stkSymbol + '.NS')
                 stk = yf.Ticker(self.stkSymbol + '.NS')
                 stkInfo = stk.info
+
                 self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
                                                         'High': stkDf['High'], 
                                                         'Low': stkDf['Low'], 
@@ -654,16 +657,16 @@ class StockWorker(QObject):
                                                         'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
                                                         'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
                                                         }))
+                    
                 isNetNotConnectedMsgSend = False    
             except requests.exceptions.ConnectionError:
                 if(not isNetNotConnectedMsgSend):
                     self.sigShowMsg.emit('Please check your internet connection')   
                     isNetNotConnectedMsgSend = True                                 
             except Exception as e:
-                self.sigShowMsg.emit('Exception in stkDetailsWorker', e)
+                self.sigShowMsg.emit('Exception in stkDetailsWorker' + str(e))
                 print('Exception in stkDetailsWorker', e)
 
-            self.sigShowMsg.emit ('fetchStockDetails called')
             time.sleep(5)
 
         self.finished.emit()
@@ -973,8 +976,8 @@ class SpecialAlertsWorker(QObject):
         while(self.isSpecialAlertsPage):
             today = datetime(datetime.now().year, datetime.now().month, datetime.now().day, 0, 0, 0, 0)
             temp = {'stkSymbol': [], 
-                                    'PMHTriggerTime': [], 'PMLTriggerTime': [],                             
-                                    'PWHTriggerTime': [], 'PWLTriggerTime': []}
+                                    'PMHBroken': [], 'PMLBroken': [],                             
+                                    'PWHBroken': [], 'PWLBroken': []}
 
             self.lock.lockForRead()
             for symbol in SpecialAlertsWorker.stkSymbolsList.index :
@@ -986,25 +989,25 @@ class SpecialAlertsWorker(QObject):
                     temp['stkSymbol'].append(symbol)
 
                     if(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != ''):
-                        temp['PMHTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                        temp['PMHBroken'].append('YES')
                     else:
-                        temp['PMHTriggerTime'].append('')
+                        temp['PMHBroken'].append('NO')
 
                     if(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol] != ''):
-                        temp['PMLTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                        temp['PMLBroken'].append('YES')
                     else:
-                        temp['PMLTriggerTime'].append('')
+                        temp['PMLBroken'].append('NO')
 
                     if(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol] != ''):
-                        tempTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p')
-                        temp['PWHTriggerTime'].append(tempTime)
+                        # tempTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p')
+                        temp['PWHBroken'].append('YES')
                     else:
-                        temp['PWHTriggerTime'].append('')
+                        temp['PWHBroken'].append('No')
 
                     if(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol] != ''):
-                        temp['PWLTriggerTime'].append(datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p'))
+                        temp['PWLBroken'].append('YES')
                     else:
-                        temp['PWLTriggerTime'].append('')
+                        temp['PWLBroken'].append('NO')
 
             self.lock.unlock()
 

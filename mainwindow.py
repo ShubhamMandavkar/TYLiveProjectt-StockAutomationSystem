@@ -215,6 +215,6 @@ if __name__ == "__main__":
 
     specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
     specialAlertThread.started.connect(specialAlertWorker.check)
-    specialAlertThread.start()
+    # specialAlertThread.start()
 
     sys.exit(app.exec())

@@ -42,7 +42,6 @@ class StockDetails(QMainWindow):
         self.stockThread.finished.connect(self.stockThread.deleteLater)
         self.stockThread.start()
 
-        self.i = 0
 
     def addConnectors(self):
         self.ui.btnAlert.clicked.connect(self.showAlertDialog)
@@ -65,9 +64,7 @@ class StockDetails(QMainWindow):
         self.ui.lblVolumeVal.setText(str(stk['data']['volume']))
 
     def showStkDetails(self, stkDf):
-        self.i = self.i + 1
-        self.ui.lblCompanyVal.setText(str(self.i))
-        # self.ui.lblCompanyVal.setText(self.stkName)
+        self.ui.lblCompanyVal.setText(self.stkName)
         self.ui.lblExchangeVal.setText('NSE')
         self.ui.lblOpenVal.setText(str(round(stkDf['Open'].iloc[0], 2)))
         self.ui.lblHighVal.setText(str(round(stkDf['High'].iloc[0], 2)))

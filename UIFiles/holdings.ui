@@ -6,17 +6,63 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>990</width>
-    <height>558</height>
+    <width>1004</width>
+    <height>541</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="lblHeading">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>24</pointsize>
+        <bold>true</bold>
+        <kerning>false</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+	color: rgb(0, 0, 0);
+	border-radius : 15px;
+	background-color: white;
+}</string>
+      </property>
+      <property name="text">
+       <string>Holdings</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QFrame" name="frame_4">
+      <property name="styleSheet">
+       <string notr="true">QFrame{
+	color: rgb(0, 0, 0);
+	border-radius : 15px;
+	background-color:  white;
+}</string>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -25,47 +71,18 @@
       </property>
       <layout class="QFormLayout" name="formLayout">
        <property name="leftMargin">
-        <number>2</number>
+        <number>5</number>
        </property>
        <property name="topMargin">
-        <number>2</number>
+        <number>5</number>
        </property>
        <property name="rightMargin">
-        <number>2</number>
+        <number>5</number>
        </property>
        <property name="bottomMargin">
-        <number>2</number>
+        <number>5</number>
        </property>
        <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="lblHeading">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-           <kerning>false</kerning>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);</string>
-         </property>
-         <property name="text">
-          <string>Holdings</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
         <widget class="QLabel" name="lblNoHoldingsMsg">
          <property name="minimumSize">
           <size>
@@ -94,9 +111,12 @@
          <property name="wordWrap">
           <bool>true</bool>
          </property>
+         <property name="indent">
+          <number>15</number>
+         </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="1" column="0" colspan="2">
         <widget class="QTableView" name="tvHoldings">
          <property name="font">
           <font>
@@ -106,6 +126,12 @@
          </property>
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QTableView{
+	border-radius : 2px;
+	border : 2px solid black;
+}</string>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
@@ -131,7 +157,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>990</width>
+     <width>1004</width>
      <height>25</height>
     </rect>
    </property>

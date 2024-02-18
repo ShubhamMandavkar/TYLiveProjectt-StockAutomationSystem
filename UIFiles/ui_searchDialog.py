@@ -24,6 +24,7 @@ class Ui_dlgSearch(object):
         if not dlgSearch.objectName():
             dlgSearch.setObjectName(u"dlgSearch")
         dlgSearch.resize(869, 494)
+        dlgSearch.setStyleSheet(u"background-color: rgb(239, 239, 239);")
         self.verticalLayout = QVBoxLayout(dlgSearch)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.frame = QFrame(dlgSearch)
@@ -35,11 +36,19 @@ class Ui_dlgSearch(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.leSearch = QLineEdit(self.frame)
         self.leSearch.setObjectName(u"leSearch")
-        self.leSearch.setMinimumSize(QSize(0, 50))
+        self.leSearch.setMinimumSize(QSize(0, 55))
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
         self.leSearch.setFont(font)
+        self.leSearch.setStyleSheet(u"QLineEdit{\n"
+"	background-color: rgb(255, 255, 255);\n"
+"	border-radius : 25px;\n"
+"	padding : 5px;\n"
+"	padding-left : 15px;\n"
+"}\n"
+"")
+        self.leSearch.setCursorPosition(0)
 
         self.horizontalLayout.addWidget(self.leSearch)
 
@@ -48,6 +57,10 @@ class Ui_dlgSearch(object):
 
         self.frame_3 = QFrame(dlgSearch)
         self.frame_3.setObjectName(u"frame_3")
+        self.frame_3.setStyleSheet(u"QFrame{\n"
+"	border-radius : 20px;\n"
+"	background-color: rgb(255, 255, 255);\n"
+"}")
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame_3)
@@ -62,8 +75,10 @@ class Ui_dlgSearch(object):
         self.tblvSuggestions.setMinimumSize(QSize(500, 300))
         self.tblvSuggestions.setFont(font)
         self.tblvSuggestions.viewport().setProperty("cursor", QCursor(Qt.ArrowCursor))
+        self.tblvSuggestions.setStyleSheet(u"")
         self.tblvSuggestions.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tblvSuggestions.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tblvSuggestions.setGridStyle(Qt.DotLine)
         self.tblvSuggestions.horizontalHeader().setVisible(True)
         self.tblvSuggestions.verticalHeader().setVisible(False)
 

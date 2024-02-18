@@ -4,6 +4,7 @@ from PySide6.QtCore import QAbstractTableModel, Qt, QThread
 from UIFiles.ui_specialAlerts import Ui_specialAlerts
 
 from ProjectPages.searchDlg import SearchDlg
+from ProjectPages.messageDlg import MessageDlg
 from workers import SpecialAlertsWorker
 
 import mysql.connector
@@ -253,7 +254,7 @@ class SpecialAlerts(QMainWindow):
         self.ui.tbvTodaysTriggered.setModel(model)
 
         if(len(list.index) != 1):
-            self.ui.lblNotification.setText(str(len(list.index)) + 'stocks have triggered the special alerts condition')
+            self.ui.lblNotification.setText(str(len(list.index)) + ' stocks have triggered the special alerts condition')
         else:
             self.ui.lblNotification.setText('1 stock has triggered the special alerts condition')
 
@@ -263,7 +264,11 @@ class SpecialAlerts(QMainWindow):
         event.accept()
         print('closed stockDetails Window')
 
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
+
     def downloadSpecialAlertsTriggeredList(self):
         stkList = self.ui.tbvTodaysTriggered.model()._data['stkSymbol']
         stkList.to_csv (r'C:\Downloads\stkList'+ date.today().strftime('%d-%m-%Y') +'.csv', index = None, encoding='utf-8', header=True)
-        print('list downloaded')
+        self.showMessage('list downloaded successfully')

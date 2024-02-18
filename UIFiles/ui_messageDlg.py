@@ -31,12 +31,25 @@ class Ui_dlgMessage(object):
         font.setPointSize(10)
         font.setBold(True)
         self.lblMsg.setFont(font)
+        self.lblMsg.setAlignment(Qt.AlignCenter)
         self.lblMsg.setWordWrap(True)
 
         self.verticalLayout.addWidget(self.lblMsg)
 
         self.btnOk = QPushButton(dlgMessage)
         self.btnOk.setObjectName(u"btnOk")
+        self.btnOk.setMinimumSize(QSize(0, 35))
+        self.btnOk.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
 
         self.verticalLayout.addWidget(self.btnOk)
 

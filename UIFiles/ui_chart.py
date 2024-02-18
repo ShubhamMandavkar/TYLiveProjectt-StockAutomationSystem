@@ -24,13 +24,18 @@ class Ui_Chart(object):
     def setupUi(self, Chart):
         if not Chart.objectName():
             Chart.setObjectName(u"Chart")
-        Chart.resize(1159, 492)
+        Chart.resize(729, 444)
         self.centralwidget = QWidget(Chart)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.frame_2 = QFrame(self.centralwidget)
         self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setStyleSheet(u"QFrame{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color:  white;\n"
+"}")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.verticalLayout = QVBoxLayout(self.frame_2)
@@ -39,13 +44,67 @@ class Ui_Chart(object):
         self.verticalLayout.setContentsMargins(2, 2, 2, 2)
         self.frame_3 = QFrame(self.frame_2)
         self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setMinimumSize(QSize(0, 50))
+        self.frame_3.setMinimumSize(QSize(0, 80))
         self.frame_3.setMaximumSize(QSize(16777215, 100))
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
+        self.gridLayout = QGridLayout(self.frame_3)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.lblTimeFrame = QLabel(self.frame_3)
         self.lblTimeFrame.setObjectName(u"lblTimeFrame")
-        self.lblTimeFrame.setGeometry(QRect(10, 20, 81, 20))
+        font = QFont()
+        font.setPointSize(10)
+        self.lblTimeFrame.setFont(font)
+
+        self.gridLayout.addWidget(self.lblTimeFrame, 0, 0, 1, 1)
+
+        self.lblIndicators = QLabel(self.frame_3)
+        self.lblIndicators.setObjectName(u"lblIndicators")
+        self.lblIndicators.setFont(font)
+
+        self.gridLayout.addWidget(self.lblIndicators, 0, 3, 1, 1)
+
+        self.lblIndicatorsAdded = QLabel(self.frame_3)
+        self.lblIndicatorsAdded.setObjectName(u"lblIndicatorsAdded")
+        self.lblIndicatorsAdded.setFont(font)
+
+        self.gridLayout.addWidget(self.lblIndicatorsAdded, 1, 0, 1, 1)
+
+        self.cmbIndicators = QComboBox(self.frame_3)
+        self.cmbIndicators.addItem("")
+        self.cmbIndicators.addItem("")
+        self.cmbIndicators.addItem("")
+        self.cmbIndicators.setObjectName(u"cmbIndicators")
+        self.cmbIndicators.setMinimumSize(QSize(0, 30))
+        self.cmbIndicators.setFont(font)
+
+        self.gridLayout.addWidget(self.cmbIndicators, 0, 4, 1, 1)
+
+        self.cmbIndicatorsAdded = QComboBox(self.frame_3)
+        self.cmbIndicatorsAdded.setObjectName(u"cmbIndicatorsAdded")
+        self.cmbIndicatorsAdded.setMinimumSize(QSize(0, 30))
+        self.cmbIndicatorsAdded.setFont(font)
+
+        self.gridLayout.addWidget(self.cmbIndicatorsAdded, 1, 1, 1, 1)
+
+        self.btnSearch = QPushButton(self.frame_3)
+        self.btnSearch.setObjectName(u"btnSearch")
+        self.btnSearch.setMinimumSize(QSize(0, 30))
+        self.btnSearch.setFont(font)
+        self.btnSearch.setStyleSheet(u"QPushButton{\n"
+"	background-color: #2AAA8A;\n"
+"	color: rgb(255, 255, 255);\n"
+"	border-radius : 10px;\n"
+"	padding: 5px;	\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}")
+
+        self.gridLayout.addWidget(self.btnSearch, 1, 4, 1, 1)
+
         self.cmbTimeFrame = QComboBox(self.frame_3)
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.addItem("")
@@ -60,27 +119,23 @@ class Ui_Chart(object):
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.setObjectName(u"cmbTimeFrame")
-        self.cmbTimeFrame.setGeometry(QRect(100, 20, 101, 28))
-        self.lblIndicators = QLabel(self.frame_3)
-        self.lblIndicators.setObjectName(u"lblIndicators")
-        self.lblIndicators.setGeometry(QRect(220, 20, 71, 20))
-        self.cmbIndicators = QComboBox(self.frame_3)
-        self.cmbIndicators.addItem("")
-        self.cmbIndicators.addItem("")
-        self.cmbIndicators.addItem("")
-        self.cmbIndicators.setObjectName(u"cmbIndicators")
-        self.cmbIndicators.setGeometry(QRect(290, 20, 211, 28))
-        self.lblIndicatorsAdded = QLabel(self.frame_3)
-        self.lblIndicatorsAdded.setObjectName(u"lblIndicatorsAdded")
-        self.lblIndicatorsAdded.setGeometry(QRect(532, 20, 121, 20))
-        self.cmbIndicatorsAdded = QComboBox(self.frame_3)
-        self.cmbIndicatorsAdded.setObjectName(u"cmbIndicatorsAdded")
-        self.cmbIndicatorsAdded.setGeometry(QRect(660, 20, 191, 28))
-        self.btnSearch = QPushButton(self.frame_3)
-        self.btnSearch.setObjectName(u"btnSearch")
-        self.btnSearch.setGeometry(QRect(710, 60, 141, 29))
+        self.cmbTimeFrame.setMinimumSize(QSize(0, 30))
+        self.cmbTimeFrame.setFont(font)
+
+        self.gridLayout.addWidget(self.cmbTimeFrame, 0, 1, 1, 1)
+
 
         self.verticalLayout.addWidget(self.frame_3)
+
+        self.line = QFrame(self.frame_2)
+        self.line.setObjectName(u"line")
+        self.line.setStyleSheet(u"QFrame{\n"
+"	border-bottom: 1px solid black;\n"
+"}")
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line)
 
         self.frmCandleDetails = QFrame(self.frame_2)
         self.frmCandleDetails.setObjectName(u"frmCandleDetails")
@@ -123,10 +178,10 @@ class Ui_Chart(object):
 
         self.lblStkName = QLabel(self.frmCandleDetails)
         self.lblStkName.setObjectName(u"lblStkName")
-        font = QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        self.lblStkName.setFont(font)
+        font1 = QFont()
+        font1.setPointSize(14)
+        font1.setBold(True)
+        self.lblStkName.setFont(font1)
 
         self.Gridlayout.addWidget(self.lblStkName, 0, 0, 1, 1)
 
@@ -179,7 +234,7 @@ class Ui_Chart(object):
         Chart.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Chart)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1159, 25))
+        self.menubar.setGeometry(QRect(0, 0, 729, 25))
         Chart.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Chart)
         self.statusbar.setObjectName(u"statusbar")
@@ -196,6 +251,13 @@ class Ui_Chart(object):
     def retranslateUi(self, Chart):
         Chart.setWindowTitle(QCoreApplication.translate("Chart", u"MainWindow", None))
         self.lblTimeFrame.setText(QCoreApplication.translate("Chart", u"Time Frame", None))
+        self.lblIndicators.setText(QCoreApplication.translate("Chart", u"Indicators", None))
+        self.lblIndicatorsAdded.setText(QCoreApplication.translate("Chart", u"Indicators Added", None))
+        self.cmbIndicators.setItemText(0, QCoreApplication.translate("Chart", u"None", None))
+        self.cmbIndicators.setItemText(1, QCoreApplication.translate("Chart", u"Exponential Moving Average", None))
+        self.cmbIndicators.setItemText(2, QCoreApplication.translate("Chart", u"Hull Moving Average", None))
+
+        self.btnSearch.setText(QCoreApplication.translate("Chart", u"Search", None))
         self.cmbTimeFrame.setItemText(0, QCoreApplication.translate("Chart", u"1 minute", None))
         self.cmbTimeFrame.setItemText(1, QCoreApplication.translate("Chart", u"2 minute", None))
         self.cmbTimeFrame.setItemText(2, QCoreApplication.translate("Chart", u"5 minute", None))
@@ -209,13 +271,6 @@ class Ui_Chart(object):
         self.cmbTimeFrame.setItemText(10, QCoreApplication.translate("Chart", u"1 month", None))
         self.cmbTimeFrame.setItemText(11, QCoreApplication.translate("Chart", u"3 month", None))
 
-        self.lblIndicators.setText(QCoreApplication.translate("Chart", u"Indicators", None))
-        self.cmbIndicators.setItemText(0, QCoreApplication.translate("Chart", u"None", None))
-        self.cmbIndicators.setItemText(1, QCoreApplication.translate("Chart", u"Exponential Moving Average", None))
-        self.cmbIndicators.setItemText(2, QCoreApplication.translate("Chart", u"Hull Moving Average", None))
-
-        self.lblIndicatorsAdded.setText(QCoreApplication.translate("Chart", u"Indicators Added", None))
-        self.btnSearch.setText(QCoreApplication.translate("Chart", u"Search", None))
         self.lblClose.setText(QCoreApplication.translate("Chart", u"C", None))
         self.lblOpenVal.setText(QCoreApplication.translate("Chart", u"0.0", None))
         self.lblLow.setText(QCoreApplication.translate("Chart", u"L", None))

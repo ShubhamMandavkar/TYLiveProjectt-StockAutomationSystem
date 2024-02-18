@@ -16,39 +16,50 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFormLayout, QFrame,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QMenuBar, QSizePolicy, QStatusBar, QTableView,
+    QHeaderView, QLabel, QMainWindow, QMenuBar,
+    QSizePolicy, QStatusBar, QTableView, QVBoxLayout,
     QWidget)
 
 class Ui_holdings(object):
     def setupUi(self, holdings):
         if not holdings.objectName():
             holdings.setObjectName(u"holdings")
-        holdings.resize(990, 558)
+        holdings.resize(1004, 541)
         self.centralwidget = QWidget(holdings)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.horizontalLayout = QHBoxLayout(self.centralwidget)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.lblHeading = QLabel(self.centralwidget)
+        self.lblHeading.setObjectName(u"lblHeading")
+        self.lblHeading.setMinimumSize(QSize(0, 80))
+        self.lblHeading.setMaximumSize(QSize(16777215, 80))
+        font = QFont()
+        font.setPointSize(24)
+        font.setBold(True)
+        font.setKerning(False)
+        self.lblHeading.setFont(font)
+        self.lblHeading.setStyleSheet(u"QLabel{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color: white;\n"
+"}")
+        self.lblHeading.setAlignment(Qt.AlignCenter)
+        self.lblHeading.setMargin(0)
+
+        self.verticalLayout.addWidget(self.lblHeading)
+
         self.frame_4 = QFrame(self.centralwidget)
         self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setStyleSheet(u"QFrame{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color:  white;\n"
+"}")
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
         self.formLayout = QFormLayout(self.frame_4)
         self.formLayout.setObjectName(u"formLayout")
-        self.formLayout.setContentsMargins(2, 2, 2, 2)
-        self.lblHeading = QLabel(self.frame_4)
-        self.lblHeading.setObjectName(u"lblHeading")
-        self.lblHeading.setMinimumSize(QSize(0, 50))
-        self.lblHeading.setMaximumSize(QSize(16777215, 50))
-        font = QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setKerning(False)
-        self.lblHeading.setFont(font)
-        self.lblHeading.setStyleSheet(u"color: rgb(0, 0, 0);")
-
-        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.lblHeading)
-
+        self.formLayout.setContentsMargins(5, 5, 5, 5)
         self.lblNoHoldingsMsg = QLabel(self.frame_4)
         self.lblNoHoldingsMsg.setObjectName(u"lblNoHoldingsMsg")
         self.lblNoHoldingsMsg.setMinimumSize(QSize(0, 50))
@@ -59,8 +70,9 @@ class Ui_holdings(object):
         self.lblNoHoldingsMsg.setFont(font1)
         self.lblNoHoldingsMsg.setStyleSheet(u"color: rgb(0, 0, 0);")
         self.lblNoHoldingsMsg.setWordWrap(True)
+        self.lblNoHoldingsMsg.setIndent(15)
 
-        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.lblNoHoldingsMsg)
+        self.formLayout.setWidget(0, QFormLayout.SpanningRole, self.lblNoHoldingsMsg)
 
         self.tvHoldings = QTableView(self.frame_4)
         self.tvHoldings.setObjectName(u"tvHoldings")
@@ -69,20 +81,24 @@ class Ui_holdings(object):
         font2.setBold(True)
         self.tvHoldings.setFont(font2)
         self.tvHoldings.setLayoutDirection(Qt.LeftToRight)
+        self.tvHoldings.setStyleSheet(u"QTableView{\n"
+"	border-radius : 2px;\n"
+"	border : 2px solid black;\n"
+"}")
         self.tvHoldings.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.tvHoldings.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tvHoldings.setSortingEnabled(True)
         self.tvHoldings.verticalHeader().setVisible(False)
 
-        self.formLayout.setWidget(2, QFormLayout.SpanningRole, self.tvHoldings)
+        self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.tvHoldings)
 
 
-        self.horizontalLayout.addWidget(self.frame_4)
+        self.verticalLayout.addWidget(self.frame_4)
 
         holdings.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(holdings)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 990, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1004, 25))
         holdings.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(holdings)
         self.statusbar.setObjectName(u"statusbar")

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>473</width>
-    <height>415</height>
+    <width>475</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,166 +15,404 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="frame_2">
+     <property name="styleSheet">
+      <string notr="true">QFrame{
+	color: rgb(0, 0, 0);
+	border-radius : 15px;
+	background-color:  white;
+}
+</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QLabel" name="lblAlertType">
-        <property name="text">
-         <string>Type</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QSpinBox" name="sbLen1">
-        <property name="maximum">
-         <number>5000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="lblAlertMsg">
-        <property name="text">
-         <string>Message</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="lblAlertVal">
-        <property name="text">
-         <string>Value</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lblTimeFrame">
-        <property name="text">
-         <string>Time Frame</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="lblAlertCond">
-        <property name="text">
-         <string>Condition</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="QDoubleSpinBox" name="dsbAlertVal">
-        <property name="maximum">
-         <double>10000000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="cmbAlertType">
-        <item>
-         <property name="text">
-          <string>Price</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Price + EMA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Price + HMA</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QComboBox" name="cmbAlertCond">
-        <item>
-         <property name="text">
-          <string>Greater Than</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Less Than</string>
-         </property>
-        </item>
-       </widget>
-      </item>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLabel" name="lblStkName">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblAlertType">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Type</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QSpinBox" name="sbLen1">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSpinBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <property name="maximum">
+            <number>5000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="lblAlertMsg">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Message</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblAlertVal">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblTimeFrame">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Time Frame</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblAlertCond">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Condition</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QDoubleSpinBox" name="dsbAlertVal">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QDoubleSpinBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <property name="maximum">
+            <double>10000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QComboBox" name="cmbAlertType">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Price</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>MA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Price + EMA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Price + HMA</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QComboBox" name="cmbAlertCond">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Greater Than</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Less Than</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblStkName">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Stock Name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="leStkName">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblLen2">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Length2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="QSpinBox" name="sbLen2">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSpinBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <property name="maximum">
+            <number>5000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="2" colspan="2">
+          <widget class="QTextEdit" name="txteMsg">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QTextEdit{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 10px;
+}</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblLen1">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Length1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QComboBox" name="cmbTimeFrame">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Daily</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Weekly</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Monthly</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="btnSetAlert">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	background-color: #2AAA8A;
+	color: rgb(255, 255, 255);
+	border-radius : 10px;
+	padding: 5px;	
+}
+
+QPushButton:hover{
+	background-color: rgb(46, 186, 151);
+	color: rgb(0, 0, 0);
+}</string>
+        </property>
         <property name="text">
-         <string>Stock Name</string>
+         <string>Set Alert</string>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="leStkName">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="lblLen2">
-        <property name="text">
-         <string>Length2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2">
-       <widget class="QSpinBox" name="sbLen2">
-        <property name="maximum">
-         <number>5000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="2" colspan="2">
-       <widget class="QTextEdit" name="txteMsg"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="lblLen1">
-        <property name="text">
-         <string>Length1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QComboBox" name="cmbTimeFrame">
-        <item>
-         <property name="text">
-          <string>Daily</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Weekly</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Monthly</string>
-         </property>
-        </item>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnSetAlert">
-     <property name="text">
-      <string>set Alert</string>
-     </property>
     </widget>
    </item>
   </layout>

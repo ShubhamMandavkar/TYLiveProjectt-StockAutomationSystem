@@ -25,6 +25,9 @@
      <property name="text">
       <string/>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
@@ -32,6 +35,25 @@
    </item>
    <item>
     <widget class="QPushButton" name="btnOk">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>35</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+	background-color: #2AAA8A;
+	color: rgb(255, 255, 255);
+	border-radius : 10px;
+	padding: 5px;	
+}
+
+QPushButton:hover{
+	background-color: rgb(46, 186, 151);
+	color: rgb(0, 0, 0);
+}</string>
+     </property>
      <property name="text">
       <string>OK</string>
      </property>

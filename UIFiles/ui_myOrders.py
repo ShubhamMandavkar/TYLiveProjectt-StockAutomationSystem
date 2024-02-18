@@ -23,32 +23,59 @@ class Ui_myOrders(object):
     def setupUi(self, myOrders):
         if not myOrders.objectName():
             myOrders.setObjectName(u"myOrders")
-        myOrders.resize(866, 507)
+        myOrders.resize(977, 646)
+        myOrders.setStyleSheet(u"background-color: rgb(239, 239, 239);")
         self.centralwidget = QWidget(myOrders)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
-        self.label.setMaximumSize(QSize(16777215, 50))
+        self.label.setMinimumSize(QSize(0, 70))
+        self.label.setMaximumSize(QSize(16777215, 80))
         font = QFont()
-        font.setPointSize(14)
+        font.setPointSize(24)
         font.setBold(True)
         self.label.setFont(font)
+        self.label.setStyleSheet(u"QLabel{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color: white;\n"
+"}")
+        self.label.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout.addWidget(self.label)
 
         self.frame = QFrame(self.centralwidget)
         self.frame.setObjectName(u"frame")
+        self.frame.setStyleSheet(u"QFrame{\n"
+"	color: rgb(0, 0, 0);\n"
+"	border-radius : 15px;\n"
+"	background-color:  white;\n"
+"}")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.myOrdersTabWidget = QTabWidget(self.frame)
         self.myOrdersTabWidget.setObjectName(u"myOrdersTabWidget")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.myOrdersTabWidget.sizePolicy().hasHeightForWidth())
+        self.myOrdersTabWidget.setSizePolicy(sizePolicy)
         font1 = QFont()
-        font1.setPointSize(9)
+        font1.setPointSize(12)
+        font1.setBold(False)
         self.myOrdersTabWidget.setFont(font1)
+        self.myOrdersTabWidget.setStyleSheet(u"QWidget{\n"
+"	border-radius : 5px;\n"
+"	background-color: rgb(255, 255, 255);\n"
+"	color: rgb(0, 0, 0);\n"
+"}\n"
+"")
+        self.myOrdersTabWidget.setTabPosition(QTabWidget.North)
+        self.myOrdersTabWidget.setTabShape(QTabWidget.Triangular)
         self.allOrdersWidget = QWidget()
         self.allOrdersWidget.setObjectName(u"allOrdersWidget")
         self.horizontalLayout_2 = QHBoxLayout(self.allOrdersWidget)
@@ -59,7 +86,13 @@ class Ui_myOrders(object):
         font2.setPointSize(12)
         font2.setBold(True)
         self.lsvAllOrders.setFont(font2)
+        self.lsvAllOrders.setStyleSheet(u"QListView{\n"
+"	border : 2px solid black;\n"
+"	border-radius : 2px;\n"
+"}")
         self.lsvAllOrders.setAlternatingRowColors(True)
+        self.lsvAllOrders.setResizeMode(QListView.Adjust)
+        self.lsvAllOrders.setSpacing(0)
 
         self.horizontalLayout_2.addWidget(self.lsvAllOrders)
 
@@ -71,6 +104,10 @@ class Ui_myOrders(object):
         self.lsvPendingOrders = QListView(self.pendingOrdersWidget)
         self.lsvPendingOrders.setObjectName(u"lsvPendingOrders")
         self.lsvPendingOrders.setFont(font2)
+        self.lsvPendingOrders.setStyleSheet(u"QListView{\n"
+"	border : 2px solid black;\n"
+"	border-radius : 2px;\n"
+"}")
         self.lsvPendingOrders.setAlternatingRowColors(True)
 
         self.horizontalLayout_3.addWidget(self.lsvPendingOrders)
@@ -85,7 +122,7 @@ class Ui_myOrders(object):
         myOrders.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(myOrders)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 866, 25))
+        self.menubar.setGeometry(QRect(0, 0, 977, 25))
         myOrders.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(myOrders)
         self.statusbar.setObjectName(u"statusbar")
@@ -93,7 +130,7 @@ class Ui_myOrders(object):
 
         self.retranslateUi(myOrders)
 
-        self.myOrdersTabWidget.setCurrentIndex(1)
+        self.myOrdersTabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(myOrders)
