@@ -5,8 +5,6 @@ from ProjectPages.messageDlg import MessageDlg
 
 from workers import HoldingsWorker
 
-import time
-
 class TableModel(QAbstractTableModel):
     Ncol = None
     order = None

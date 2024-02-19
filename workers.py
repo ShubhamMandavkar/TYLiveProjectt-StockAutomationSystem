@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-from tokenize import Special
-from types import NoneType
 from PySide6.QtCore import QObject, Signal, QReadWriteLock
 
 import mysql.connector
@@ -367,7 +365,7 @@ class HoldingsWorker(QObject):
     holdings = { "status": "success", "data": []}   #static variable to share holdings for all objects
     lastNotificationSentTime = pd.DataFrame()
     isRunning = True
-    isNetConnected = False
+    isNetConnected = True
 
     sigChngHoldData = Signal(pd.DataFrame)   #signals to communicate with other threads
     sigNoHoldData = Signal()
@@ -390,7 +388,6 @@ class HoldingsWorker(QObject):
         #to show holdings in holdings page
         self.isHoldingsPage = False
 
-
     def changeDetails(self, key='', sKey='', profitTh = 100000, brCode = 'tc'):
         self.apiKey = key
         self.apiSecretKey = sKey
@@ -398,7 +395,10 @@ class HoldingsWorker(QObject):
         self.profitThreshold = profitTh
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
 
-    def tempFunction(self):
+    def tempFunction(self): #this function is useful for sending the notification at a specific interval
+        if(HoldingsWorker.holdings['status'] == 'error'):
+            return
+
         tempHoldings = pd.DataFrame(pd.DataFrame(HoldingsWorker.holdings['data'])['symbol'])
         tempHoldings['lastNotiSent'] = None
         tempHoldings.set_index('symbol', inplace= True)
@@ -408,8 +408,7 @@ class HoldingsWorker(QObject):
         else:
             #HoldingsWorker.lastNotificationSentTime contains symbols which are present in both and symbols which are only present in tempHoldings
             HoldingsWorker.lastNotificationSentTime = pd.concat([HoldingsWorker.lastNotificationSentTime[HoldingsWorker.lastNotificationSentTime.index.isin(tempHoldings.index) == True], tempHoldings[tempHoldings.index.isin(HoldingsWorker.lastNotificationSentTime.index) == False]])
-        
-        
+            
     def checkLastNotiSend(self, stkSymbol):
         if(stkSymbol not in HoldingsWorker.lastNotificationSentTime.index):
             return False
@@ -425,14 +424,14 @@ class HoldingsWorker(QObject):
     def fetchHoldings(self, brCode = 'tc'):
         while(HoldingsWorker.isRunning):
             try :
-                # HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
+                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
                 # print(HoldingsWorker.holdings['error_msg'])
                 # print(HoldingsWorker.holdings['error_type'])
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
-                HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
+                # HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
                 self.tempFunction()
 
                 HoldingsWorker.isNetConnected = True
@@ -540,6 +539,7 @@ class WatchlistWorker(QObject):
         self.isWLChanged = False
         self.stkList = {}
         self.currWL = None
+        self.lock = QReadWriteLock() #lock to synchronize the use of shared resource between threads
 
     def getWLSymbols(self, watchlist):
         try:
@@ -548,8 +548,10 @@ class WatchlistWorker(QObject):
             query = f"""select * from {watchlist}"""
             cursor.execute(query)
 
+            self.lock.lockForWrite()
             for stkSym, stkName in cursor:
                 self.stkList[stkSym] = stkName
+            self.lock.unlock()
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -561,11 +563,22 @@ class WatchlistWorker(QObject):
         finally:
             con.close()
 
+    def addSymbolToWL(self, stkSym, stkName):
+        self.lock.lockForWrite()
+        self.stkList[stkSym] = stkName #add stock in worker list
+        self.lock.unlock()
+
+    def deleteSymbolFromWL(self, stkSym):
+        self.lock.lockForWrite()
+        self.stkList.pop(stkSym)
+        self.lock.unlock()
+
     def fetchWLData(self):    
         data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
         
         stkList = copy.deepcopy(self.stkList)
         
+        self.lock.lockForRead()
         for key in stkList.keys():
             if(not isNetworkConnected()): #if network is not connected stop the operation
                 break
@@ -575,7 +588,7 @@ class WatchlistWorker(QObject):
 
             # importing data from yfinance
             try:
-                hist = yf.download(key + '.NS', period='1d', interval='1d')
+                hist = yf.download(key + '.NS', period='1d', interval='1d', progress= False)
 
                 # #item method is used to retrieve data only else it return data with index
                 open =  round(hist['Open'].item(), 2)
@@ -591,7 +604,8 @@ class WatchlistWorker(QObject):
                 data['Close'].append(close)
             except Exception as e:
                 print('Exception in watchlist thread', e)
-
+        self.lock.unlock()
+        
         return pd.DataFrame(data)
         
     def updateWL(self):
@@ -644,8 +658,7 @@ class StockWorker(QObject):
 
         while(self.isRunning):
             try:
-                stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d')
-                print(self.stkSymbol + '.NS')
+                stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d', progress= False)
                 stk = yf.Ticker(self.stkSymbol + '.NS')
                 stkInfo = stk.info
 
@@ -839,8 +852,8 @@ class SpecialAlertsWorker(QObject):
     def isPriceCrossingPMH(self, symbol):
         '''checks if price is greater than previous month high'''
         try:
-            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo')
-            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
+            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo', progress= False)
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
             Avg = self.calAverage(monthDf['Close'].to_numpy(), 'EMA', 50)
             currMP = monthDf['Close'].iloc[-1]
@@ -865,8 +878,8 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is lower than previous month low'''
 
         try:
-            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo')
-            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
+            monthDf = yf.download(symbol + ".NS", period="max", interval = '1mo', progress= False)
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
             Avg = self.calAverage(monthDf['Close'].to_numpy(), 'EMA', 50)
             currMP = monthDf['Close'].iloc[-1]
@@ -891,8 +904,8 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is greater than previous week high'''
 
         try:
-            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk')
-            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
+            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk', progress= False)
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
             currMP = weekDf['Close'].iloc[-1]
 
@@ -916,8 +929,8 @@ class SpecialAlertsWorker(QObject):
         '''checks if price is lower than previous month low'''
 
         try:
-            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk')
-            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d')
+            weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk', progress= False)
+            dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
             currMP = weekDf['Close'].iloc[-1]
 
@@ -1020,4 +1033,3 @@ class SpecialAlertsWorker(QObject):
         
         self.finished.emit()
         print('getAlertsTriggeredStkList finished')
-

@@ -94,7 +94,7 @@ class Navigation:
 
     def showMyOrdersWindow(self):
         self.myOrders = MyOrders()
-        self.myOrders.show()
+        # self.myOrders.show() # show() method is called in the constructor
 
     def showHoldingsWindow(self):
         self.holdings.append(Holdings()) 
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
 
     widget.show()
-    # holdingsFetchingThread.start()
+    holdingsFetchingThread.start()
     # holdingsProcessThread.start()
 
     loop = asyncio.new_event_loop() 

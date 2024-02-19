@@ -93,7 +93,6 @@ class Watchlists(QMainWindow):
         self.watchlistThread.finished.connect(self.watchlistThread.deleteLater)
         self.watchlistThread.start()
 
-    
     def addConnectors(self):
         self.ui.tbvWatchlist.clicked.connect(self.saveSelectedIndex)
         self.ui.btnCreateWL.clicked.connect(self.getWatchlistDetails)
@@ -179,7 +178,10 @@ class Watchlists(QMainWindow):
             cursor.execute(query)
             con.commit()
 
-            self.watchlistWorker.stkList[stkSym] = stkName #add stock in worker list
+            # self.watchlistWorker.lock.lockForWrite()
+            # self.watchlistWorker.stkList[stkSym] = stkName #add stock in worker list
+            # self.watchlistWorker.lock.unlock()
+            self.watchlistWorker.addSymbolToWL(stkSym=stkSym, stkName=stkName) #add stock in worker list
             
             try:
                 # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
@@ -223,8 +225,8 @@ class Watchlists(QMainWindow):
                 cursor.execute(query)
                 con.commit()
 
-                self.watchlistWorker.stkList[row['symbol']] = row['name'] #add stock in worker list
-
+                # self.watchlistWorker.stkList[row['symbol']] = row['name'] #add stock in worker list
+                self.watchlistWorker.addSymbolToWL(stkSym = row['symbol'], stkName = row['name'])
 
             print('data imported successfully')
 
@@ -260,8 +262,11 @@ class Watchlists(QMainWindow):
             cursor.execute(query)
             con.commit()
 
-            self.watchlistWorker.stkList.pop(stkSym) #delete from worker list
+            # self.watchlistWorker.stkList.pop(stkSym) #delete from worker list
+            self.watchlistWorker.deleteSymbolFromWL(stkSym) #delete from worker list
+            
             self.model.delRow(rowIndex)
+            self.ui.tbvWatchlist.clearSelection()
             print(stkName, 'deleted from watchlist', watchlist)
 
         except mysql.connector.Error as err:

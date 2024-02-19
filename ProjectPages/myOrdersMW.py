@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import errorcode
 from algomojo.pyapi import *
 import pandas as pd
+from ProjectPages.messageDlg import MessageDlg
 
 from UIFiles.ui_myOrders import Ui_myOrders
 from ProjectPages.orderDetailsDlg import OrderDetailsDlg
@@ -25,7 +26,6 @@ class ListModel(QAbstractListModel):
 
     def rowCount(self, index):
         return len(self._data)  
-
 
 class UserDetails:
     def __init__(self):
@@ -53,17 +53,6 @@ class UserDetails:
         finally:
             cursor.close()
             con.close()
-
-def fetchAllOrders(userDetails):
-    try:
-        algomojo = api(api_key = userDetails.apiKey, api_secret= userDetails.apiSecretKey)
-
-        orders = algomojo.OrderBook(broker='tc')
-        return orders
-    except Exception as e:
-        print(e)
-
-    return {"status": "error"}
 
 def fetchAllOrders2(userDetails):
     orders = {
@@ -210,6 +199,7 @@ class MyOrders(QMainWindow):
         self.userDetails = UserDetails()
         self.userDetails.getUserDetails()
         self.addConnectors()
+        self.show()  #show the gui window
 
         self.loadAllOrders()
 
@@ -217,9 +207,23 @@ class MyOrders(QMainWindow):
         self.ui.lsvAllOrders.doubleClicked.connect(self.showOrderDetails)
         self.ui.lsvPendingOrders.doubleClicked.connect(self.showPendingOrderDetails)
 
-    
+    def fetchAllOrders(self, userDetails):
+        try:
+            algomojo = api(api_key = userDetails.apiKey, api_secret= userDetails.apiSecretKey)
+
+            orders = algomojo.OrderBook(broker='tc')
+            return orders
+        except requests.exceptions.ConnectionError:
+            return {"status": "error", 'error_msg': 'Please check your internet connection'}
+        except Exception as e:
+            print('Exception : ', e)
+            return {"status": "error", 'error_msg': e}
+
+        
+
     def loadAllOrders(self):
-        self.myOrders = fetchAllOrders2(self.userDetails)
+        # self.myOrders = fetchAllOrders2(self.userDetails)
+        self.myOrders = self.fetchAllOrders(self.userDetails)
 
         if(self.myOrders['status'] == 'success'):
             orders = pd.DataFrame(self.myOrders['data'])
@@ -248,7 +252,8 @@ class MyOrders(QMainWindow):
             pendingOrdersModel = ListModel(pendingOrders)
             self.ui.lsvPendingOrders.setModel(pendingOrdersModel)
         else:
-            print(self.myOrders['error_msg'])
+            self.showMessage(self.myOrders['error_msg'])
+            print('MyOrders :', self.myOrders['error_msg'])
 
     def showOrderDetails(self):
         modelIndexls = self.ui.lsvAllOrders.selectedIndexes()
@@ -265,3 +270,7 @@ class MyOrders(QMainWindow):
 
         self.orderDetails = OrderDetailsDlg(order)
         self.orderDetails.show()
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
