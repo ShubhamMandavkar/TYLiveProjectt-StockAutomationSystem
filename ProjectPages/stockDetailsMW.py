@@ -10,7 +10,7 @@ from ProjectPages.alertDlg import AlertDlg
 from ProjectPages.chartMW import Chart
 from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderDlg import SellOrderDlg
+from ProjectPages.sellOrderDlg import MyException, SellOrderDlg
 
 class StockDetails(QMainWindow):
     def __init__(self, stkSym, stkName, parent=None):
@@ -76,12 +76,18 @@ class StockDetails(QMainWindow):
         self.ui.lbl52wkLowVal.setText(str(stkDf['fiftyTwoWeekLow'].iloc[0]))
 
     def showBuyOrderWidget(self):
-        self.orderWidget = BuyOrderDlg(self.stkSymbol)
-        self.orderWidget.show()
+        try:
+            self.orderWidget = BuyOrderDlg(self.stkSymbol)
+            self.orderWidget.show()
+        except MyException as e:
+            self.showMessage(e.msg)
     
     def showSellOrderWidget(self):
-        self.orderWidget = SellOrderDlg(self.stkSymbol)
-        self.orderWidget.show()
+        try: 
+            self.orderWidget = SellOrderDlg(self.stkSymbol)
+            self.orderWidget.show()
+        except MyException as e:
+            self.showMessage(e.msg)
     
     def showAlertDialog(self):
         self.dlgAlert = AlertDlg(self.stkSymbol, self.stkName)

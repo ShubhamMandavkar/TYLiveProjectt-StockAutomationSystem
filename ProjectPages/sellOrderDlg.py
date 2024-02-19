@@ -36,7 +36,7 @@ class UserDetails:
             cursor.close()
             con.close()
 
-class ApiException(Exception):
+class MyException(Exception):
     def __init__(self, message):            
         # Call the base class constructor with the parameters it needs
         super().__init__(message)
@@ -67,65 +67,72 @@ class SellOrderDlg(QDialog):
         self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
 
     def getHoldings(self):
-        self.holdings = json.loads(json.dumps(self.algomojo.Holdings('tc')))
-        '''self.holdings = {"status": "success",
-                        "data":[
-                            {"exchange": "NSE",
-                                "token": "3478273",
-                                "symbol": "5PAISA",
-                                "isin": "INE731H01025",
-                                "holdqty": 150,
-                                "btst_qty": 0,
-                                "sellable_qty": 0,
-                                "average_price": 323.6,
-                                "ltp": 31.85,
-                                "product": "CNC",
-                                "coll_qty": 0,
-                                "coll_type": "",
-                                "invest_val": 47377.5,
-                                "hld_val": 47377.5,
-                                "PL": 0,
-                                "broker_exchange": "BSE",
-                                "broker_token": "3478273",
-                                "tick_size": 0,
-                                "lot_size": 0,
-                                "holdtype": "HLD",
-                                # "ws_msg": {
-                                #     "exchange": "BSE",
-                                #     "token": "3478273"
-                                # }
-                            },
-                            {"exchange": "NSE",
-                                "token": "3478273",
-                                "symbol": "PNB-EQ",
-                                "isin": "INE731H01025",
-                                "holdqty": 150,
-                                "btst_qty": 0,
-                                "sellable_qty": 0,
-                                "average_price": 323.6,
-                                "ltp": 31.85,
-                                "product": "CNC",
-                                "coll_qty": 0,
-                                "coll_type": "",
-                                "invest_val": 47377.5,
-                                "hld_val": 47377.5,
-                                "PL": 0,
-                                "broker_exchange": "BSE",
-                                "broker_token": "3478273",
-                                "tick_size": 0,
-                                "lot_size": 0,
-                                "holdtype": "HLD",
-                                # "ws_msg": {
-                                #     "exchange": "BSE",
-                                #     "token": "3478273"
-                                # }
-                            }]
-                        }'''
+        try:
+            self.holdings = json.loads(json.dumps(self.algomojo.Holdings('tc')))
+            '''self.holdings = {"status": "success",
+                            "data":[
+                                {"exchange": "NSE",
+                                    "token": "3478273",
+                                    "symbol": "5PAISA",
+                                    "isin": "INE731H01025",
+                                    "holdqty": 150,
+                                    "btst_qty": 0,
+                                    "sellable_qty": 0,
+                                    "average_price": 323.6,
+                                    "ltp": 31.85,
+                                    "product": "CNC",
+                                    "coll_qty": 0,
+                                    "coll_type": "",
+                                    "invest_val": 47377.5,
+                                    "hld_val": 47377.5,
+                                    "PL": 0,
+                                    "broker_exchange": "BSE",
+                                    "broker_token": "3478273",
+                                    "tick_size": 0,
+                                    "lot_size": 0,
+                                    "holdtype": "HLD",
+                                    # "ws_msg": {
+                                    #     "exchange": "BSE",
+                                    #     "token": "3478273"
+                                    # }
+                                },
+                                {"exchange": "NSE",
+                                    "token": "3478273",
+                                    "symbol": "PNB-EQ",
+                                    "isin": "INE731H01025",
+                                    "holdqty": 150,
+                                    "btst_qty": 0,
+                                    "sellable_qty": 0,
+                                    "average_price": 323.6,
+                                    "ltp": 31.85,
+                                    "product": "CNC",
+                                    "coll_qty": 0,
+                                    "coll_type": "",
+                                    "invest_val": 47377.5,
+                                    "hld_val": 47377.5,
+                                    "PL": 0,
+                                    "broker_exchange": "BSE",
+                                    "broker_token": "3478273",
+                                    "tick_size": 0,
+                                    "lot_size": 0,
+                                    "holdtype": "HLD",
+                                    # "ws_msg": {
+                                    #     "exchange": "BSE",
+                                    #     "token": "3478273"
+                                    # }
+                                }]
+                            }'''
+        except requests.exceptions.ConnectionError:
+            raise MyException('Please check your internet connection')
+        except Exception as e:
+            print('Exception in SellOrderDlg : ', e)
+            raise MyException(str(e))
 
         if(self.holdings['status'] == 'success'):
             self.holdings = pd.DataFrame(self.holdings['data'])
         else: 
-            raise ApiException(self.holdings['error_msg'])
+            raise MyException('API EXCEPTION : ' + self.holdings['error_msg'])
+
 
     def setQuantity(self):
         self.stkHoldingDetails = self.holdings.loc[self.holdings['symbol'] == self.stkSymbol+'-EQ']
@@ -179,8 +186,12 @@ class SellOrderDlg(QDialog):
                 print('Order can not be placed due to', responseDict['error_msg'])
 
             self.msgDlg.show()
+        except requests.exceptions.ConnectionError:
+            self.showMessage('Please check your internet connection')
         except Exception as e:
             print(e)
+            self.showMessage(str(e))
+
 
     def modifyOrder(self, order):
             self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
@@ -208,5 +219,12 @@ class SellOrderDlg(QDialog):
                     print('Order can not be modified due to', responseDict['error_msg'])
 
                 self.msgDlg.show()
+            except requests.exceptions.ConnectionError:
+                self.showMessage('Please check your internet connection')
             except Exception as e: 
                 print(e)
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
+

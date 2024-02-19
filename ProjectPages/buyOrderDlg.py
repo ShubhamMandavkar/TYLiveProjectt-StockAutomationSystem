@@ -7,6 +7,12 @@ from ProjectPages.messageDlg import MessageDlg
 import mysql.connector
 from mysql.connector import errorcode
 
+class MyException(Exception):
+    def __init__(self, message):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+        self.msg = message
+
 class UserDetails:
     def __init__(self):
         self.apiKey = ''
@@ -96,8 +102,12 @@ class BuyOrderDlg(QDialog):
                 print('Order can not be placed due to', responseDict['error_msg'])
 
             self.msgDlg.show()
+        except requests.exceptions.ConnectionError:
+            self.showMessage('Please check your internet connection')
         except Exception as e:
             print(e)
+            self.showMessage(str(e))
+
 
     def modifyOrder(self, order):
         self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
@@ -125,5 +135,12 @@ class BuyOrderDlg(QDialog):
                 print('Order can not be modified due to', responseDict['error_msg'])
 
             self.msgDlg.show()
+        except requests.exceptions.ConnectionError:
+            self.showMessage('Please check your internet connection')
         except Exception as e: 
             print(e)
+            raise MyException(str(e))
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()

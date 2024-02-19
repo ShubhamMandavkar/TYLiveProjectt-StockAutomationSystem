@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QDialog
 from ProjectPages.messageDlg import MessageDlg
 from UIFiles.ui_orderDetailsDlg import Ui_OrderDetailsDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderDlg import ApiException, SellOrderDlg
+from ProjectPages.sellOrderDlg import MyException, SellOrderDlg
 
 class OrderDetailsDlg(QDialog):
     def __init__(self, order, parent=None):
@@ -64,11 +64,10 @@ class OrderDetailsDlg(QDialog):
                 self.orderDlg.ui.btnOrder.clicked.connect(lambda:self.orderDlg.modifyOrder(self.order))
                 self.orderDlg.show()
                 print('Modified sell order')
-            except ApiException as e:
+            except MyException as e:
                 self.msgDlg = MessageDlg(e.msg)
                 self.msgDlg.show()
                 print(e)
-
 
     def hideButtonsFrame(self):
         self.ui.frmButtons.hide()

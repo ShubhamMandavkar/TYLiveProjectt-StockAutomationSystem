@@ -123,7 +123,6 @@ class MainWindow(QMainWindow):
         self.nav = Navigation()
 
         self.addConnectors()
-
     
     def addConnectors(self):
         #navigation code
