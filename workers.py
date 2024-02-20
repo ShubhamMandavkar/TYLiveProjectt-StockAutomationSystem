@@ -617,8 +617,7 @@ class WatchlistWorker(QObject):
             i = i + 1
 
         self.lock.unlock()
-
-        
+    
     def updateWL(self):
         isNetNotConnectedMsgSend = False
         while(self.isRunning):
@@ -962,10 +961,19 @@ class SpecialAlertsWorker(QObject):
         while(self.isRunning):
             symbols = SpecialAlertsWorker.stkSymbolsList
             print(symbols)
-            for symbol in symbols.index:
+
+            #work in progress start
+            i = 0
+
+            self.lock.lockForRead()
+            while(i < len(SpecialAlertsWorker.stkSymbolsList.index)):
+                symbol = SpecialAlertsWorker.stkSymbolsList.index[i]
+                self.lock.unlock()
+
                 if self.isPriceCrossingPMH(symbol):
                     if self.checkLastTriggerTime(symbol, 'PMHTriggerTime'):
                         self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous month high'), TeleApiWorker.loop)
 
                     self.setLastTriggerTime(symbol, 'PMHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
 
@@ -973,12 +981,14 @@ class SpecialAlertsWorker(QObject):
                 if self.isPriceLowerThanPML(symbol):
                     if self.checkLastTriggerTime(symbol, 'PMLTriggerTime'):
                         self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous month low'), TeleApiWorker.loop)
 
                     self.setLastTriggerTime(symbol, 'PMLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                 
                 if self.isPriceGreaterThanPWH(symbol):
                     if self.checkLastTriggerTime(symbol, 'PWHTriggerTime'):
                         self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous week high'), TeleApiWorker.loop)
 
                     self.setLastTriggerTime(symbol, 'PWHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                     
@@ -986,13 +996,55 @@ class SpecialAlertsWorker(QObject):
                 if self.isPriceLowerThanPWL(symbol):
                     if self.checkLastTriggerTime(symbol, 'PWLTriggerTime'):
                         self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous week low'), TeleApiWorker.loop)
+
+                    self.setLastTriggerTime(symbol, 'PWLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+                print('scanning of', symbol, 'completed')
+                i = i + 1
+                self.lock.lockForRead()      
+            self.lock.unlock()
+
+            time.sleep(5)  
+            print('scanning for special alerts')  
+            #work in progress ends
+
+            '''
+            for symbol in symbols.index:
+                if self.isPriceCrossingPMH(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PMHTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous month high'), TeleApiWorker.loop)
+
+                    self.setLastTriggerTime(symbol, 'PMHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+     
+                if self.isPriceLowerThanPML(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PMLTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous month low'), TeleApiWorker.loop)
+
+                    self.setLastTriggerTime(symbol, 'PMLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                
+                if self.isPriceGreaterThanPWH(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PWHTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous week high'), TeleApiWorker.loop)
+
+                    self.setLastTriggerTime(symbol, 'PWHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+                    
+
+                if self.isPriceLowerThanPWL(symbol):
+                    if self.checkLastTriggerTime(symbol, 'PWLTriggerTime'):
+                        self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
+                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous week low'), TeleApiWorker.loop)
 
                     self.setLastTriggerTime(symbol, 'PWLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
 
                 print('scanning of', symbol, 'completed')
 
             time.sleep(5)  
-            print('scanning for special alerts')  
+            print('scanning for special alerts') ''' 
 
     def getAlertsTriggeredStkList(self):
         while(self.isSpecialAlertsPage):
@@ -1001,6 +1053,60 @@ class SpecialAlertsWorker(QObject):
                                     'PMHBroken': [], 'PMLBroken': [],                             
                                     'PWHBroken': [], 'PWLBroken': []}
 
+            #work in progress start
+            i = 0
+
+            self.lock.lockForRead()
+            while(i < len(SpecialAlertsWorker.stkSymbolsList.index)):
+                symbol = SpecialAlertsWorker.stkSymbolsList.index[i]
+
+                if (SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
+                    (SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today):
+                    
+                    temp['stkSymbol'].append(symbol)
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != ''):
+                        temp['PMHBroken'].append('YES')
+                    else:
+                        temp['PMHBroken'].append('NO')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PMLTriggerTime'].loc[symbol] != ''):
+                        temp['PMLBroken'].append('YES')
+                    else:
+                        temp['PMLBroken'].append('NO')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol] != ''):
+                        # tempTime = datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PWHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f').strftime('%I:%M:%S %p')
+                        temp['PWHBroken'].append('YES')
+                    else:
+                        temp['PWHBroken'].append('No')
+
+                    if(SpecialAlertsWorker.stkSymbolsList['PWLTriggerTime'].loc[symbol] != ''):
+                        temp['PWLBroken'].append('YES')
+                    else:
+                        temp['PWLBroken'].append('NO')
+
+                i = i + 1
+                self.lock.unlock()
+                time.sleep(0.1)
+                self.lock.lockForRead()
+            self.lock.unlock()
+
+            temp = pd.DataFrame(temp)
+            print(temp)
+            self.sigSpecialAlerts.emit(temp)
+
+            print('getAlertsTriggeredStkList called')
+            time.sleep(5)
+        
+        self.finished.emit()
+        print('getAlertsTriggeredStkList finished')
+
+        #work in progress ends
+
+        '''
             self.lock.lockForRead()
             for symbol in SpecialAlertsWorker.stkSymbolsList.index :
                 if (SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol] != '' and datetime.strptime(SpecialAlertsWorker.stkSymbolsList['PMHTriggerTime'].loc[symbol], '%Y-%m-%d %H:%M:%S.%f') >= today) or \
@@ -1042,3 +1148,4 @@ class SpecialAlertsWorker(QObject):
         
         self.finished.emit()
         print('getAlertsTriggeredStkList finished')
+        '''

@@ -249,7 +249,6 @@ class SpecialAlerts(QMainWindow):
         else:
             con.close()
 
-
     def showSpecialAlertsTriggeredList(self, list):
         model = TableModel(list)
         self.ui.tbvTodaysTriggered.setModel(model)
@@ -259,12 +258,6 @@ class SpecialAlerts(QMainWindow):
         else:
             self.ui.lblNotification.setText('1 stock has triggered the special alerts condition')
 
-    def closeEvent(self, event):
-        print('closing stockDetails Window')
-        self.specialAlertsWorker.isSpecialAlertsPage = False
-        event.accept()
-        print('closed stockDetails Window')
-
     def showMessage(self, msg):
         self.msgDlg = MessageDlg(msg)
         self.msgDlg.show()
@@ -273,3 +266,10 @@ class SpecialAlerts(QMainWindow):
         stkList = self.ui.tbvTodaysTriggered.model()._data['stkSymbol']
         stkList.to_csv (r'C:\Downloads\stkList'+ date.today().strftime('%d-%m-%Y') +'.csv', index = None, encoding='utf-8', header=True)
         self.showMessage('list downloaded successfully')
+
+    def closeEvent(self, event):
+        print('closing stockDetails Window')
+        self.specialAlertsWorker.isSpecialAlertsPage = False
+        event.accept()
+        print('closed stockDetails Window')
+

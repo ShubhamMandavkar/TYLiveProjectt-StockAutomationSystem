@@ -327,6 +327,8 @@ class Watchlists(QMainWindow):
             print(e)
         else:
             con.close()
+        
+        self.manageVisibility()
             
     def showMessage(self, msg):
         self.msgDlg = MessageDlg(msg)

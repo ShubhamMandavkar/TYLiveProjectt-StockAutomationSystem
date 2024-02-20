@@ -203,7 +203,7 @@ if __name__ == "__main__":
     teleApiWorker.finished.connect(teleApiWorker.deleteLater)
     teleApiThread.finished.connect(teleApiThread.deleteLater)
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    # teleApiThread.start()
+    teleApiThread.start()
     
     # alertThread.start() #this thread should be started later than the teleApiThread
 
@@ -213,6 +213,6 @@ if __name__ == "__main__":
 
     specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
     specialAlertThread.started.connect(specialAlertWorker.check)
-    # specialAlertThread.start()
+    specialAlertThread.start()
 
     sys.exit(app.exec())
