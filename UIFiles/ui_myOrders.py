@@ -70,12 +70,14 @@ class Ui_myOrders(object):
         self.myOrdersTabWidget.setFont(font1)
         self.myOrdersTabWidget.setStyleSheet(u"QWidget{\n"
 "	border-radius : 5px;\n"
-"	background-color: rgb(255, 255, 255);\n"
+"	background-color: rgb(239, 239, 239);\n"
 "	color: rgb(0, 0, 0);\n"
 "}\n"
-"")
+"QWidget::selection{\n"
+"	color: rgb(170, 255, 127);\n"
+"}")
         self.myOrdersTabWidget.setTabPosition(QTabWidget.North)
-        self.myOrdersTabWidget.setTabShape(QTabWidget.Triangular)
+        self.myOrdersTabWidget.setTabShape(QTabWidget.Rounded)
         self.allOrdersWidget = QWidget()
         self.allOrdersWidget.setObjectName(u"allOrdersWidget")
         self.horizontalLayout_2 = QHBoxLayout(self.allOrdersWidget)

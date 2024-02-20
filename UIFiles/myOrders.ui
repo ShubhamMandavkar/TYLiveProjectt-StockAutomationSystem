@@ -86,16 +86,18 @@
          <property name="styleSheet">
           <string notr="true">QWidget{
 	border-radius : 5px;
-	background-color: rgb(255, 255, 255);
+	background-color: rgb(239, 239, 239);
 	color: rgb(0, 0, 0);
 }
-</string>
+QWidget::selection{
+	color: rgb(170, 255, 127);
+}</string>
          </property>
          <property name="tabPosition">
           <enum>QTabWidget::North</enum>
          </property>
          <property name="tabShape">
-          <enum>QTabWidget::Triangular</enum>
+          <enum>QTabWidget::Rounded</enum>
          </property>
          <property name="currentIndex">
           <number>0</number>

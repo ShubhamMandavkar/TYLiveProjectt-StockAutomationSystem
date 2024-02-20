@@ -570,21 +570,33 @@ class WatchlistWorker(QObject):
 
     def deleteSymbolFromWL(self, stkSym):
         self.lock.lockForWrite()
-        self.stkList.pop(stkSym)
+        try:
+            self.stkList.pop(stkSym)
+        except Exception as e:
+            print(e)
+        self.lock.unlock()
+
+    def clearWL(self):
+        self.lock.lockForWrite()
+        self.stkList.clear()  #clear stocks list of previous watchlist
         self.lock.unlock()
 
     def fetchWLData(self):    
-        data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
+        # data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
         
-        stkList = copy.deepcopy(self.stkList)
+        # stkList = copy.deepcopy(self.stkList)
         
         self.lock.lockForRead()
-        for key in stkList.keys():
+        i = 0
+        while(i < len(self.stkList.keys())):
             if(not isNetworkConnected()): #if network is not connected stop the operation
                 break
 
             if(self.isRunning == False or self.isWLChanged): #watchlist closed or watchlist changed
                 break
+            
+            key = list(self.stkList.keys())[i]
+            name = self.stkList[key]
 
             # importing data from yfinance
             try:
@@ -596,27 +608,29 @@ class WatchlistWorker(QObject):
                 low =  round(hist['Low'].item(), 2)
                 close =  round(hist['Close'].item(), 2)
 
-                data['Symbol'].append(key)
-                data['Name'].append(stkList[key])
-                data['Open'].append(open)
-                data['High'].append(high)
-                data['Low'].append(low)
-                data['Close'].append(close)
+                self.lock.unlock()
+                time.sleep(0.1)
+                self.lock.lockForRead()
+
+                if(key in self.stkList.keys()):
+                    self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [key], 'Name' : [name], 'Open' : [open], 'High' : [high], 'Low' : [low], 'Close' : [close]}))
+                    
             except Exception as e:
                 print('Exception in watchlist thread', e)
+
+            i = i + 1
+
         self.lock.unlock()
-        
-        return pd.DataFrame(data)
+
         
     def updateWL(self):
         isNetNotConnectedMsgSend = False
         while(self.isRunning):
         # for i in range(3):
             if(isNetworkConnected()):
-                data = self.fetchWLData()
+                self.fetchWLData()
 
             if(isNetworkConnected()):
-                self.sigShowWLData.emit(data)
                 isNetNotConnectedMsgSend = False
             else:
                 if(not isNetNotConnectedMsgSend):
@@ -627,7 +641,7 @@ class WatchlistWorker(QObject):
                 continue
             
             if(self.isWLChanged): #if watchlist changed
-                self.stkList.clear()
+                self.clearWL()
                 self.getWLSymbols(self.currWL)
                 self.isWLChanged = False
                 continue
@@ -641,7 +655,6 @@ class WatchlistWorker(QObject):
     def setWatchlistChanged(self, wlName):
         self.isWLChanged  = True
         self.currWL = wlName
-        self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
 
 class StockWorker(QObject):
     sigShowStkDetails = Signal(pd.DataFrame)

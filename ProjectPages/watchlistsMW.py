@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractTableModel, Qt, QThread
+from PySide6.QtCore import QAbstractTableModel, Qt, QThread, QReadWriteLock
 from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ProjectPages.watchlistDetailsDlg import WatchlistDetailsDlg
 from ProjectPages.searchDlg import SearchDlg
@@ -18,29 +18,72 @@ class TableModel(QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
+        self.lock = QReadWriteLock() #lock to synchronize the use of shared resource between threads
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
+            self.lock.lockForRead()
             value = self._data.iloc[index.row(), index.column()]
+            self.lock.unlock()
             return str(value)
         return None
 
     def rowCount(self, index):
-        return self._data.shape[0]
+        self.lock.lockForRead()
+        rows = self._data.shape[0]
+        self.lock.unlock()
+        return rows
 
     def columnCount(self, index):
-        return self._data.shape[1]
+        self.lock.lockForRead()
+        cols = self._data.shape[1]
+        self.lock.unlock()
+        return cols
     
     def delRow(self, index):
         self.layoutAboutToBeChanged.emit()
+        self.lock.lockForWrite()
         self._data.drop(index, axis = 0, inplace = True)
+        self._data.reset_index(drop= True, inplace= True)
+        self.lock.unlock()
         self.layoutChanged.emit()
+
+    # def addRow(self, row):
+    #     self.layoutAboutToBeChanged.emit()
+    #     self.lock.lockForWrite()
+    #     self._data = pd.concat([self._data, row], ignore_index= True)
+    #     self.lock.unlock()
+    #     self.layoutChanged.emit()
 
     def addRow(self, row):
-        self.layoutAboutToBeChanged.emit()
-        self._data = pd.concat([self._data, row], ignore_index= True)
-        self.layoutChanged.emit()
+        self.lock.lockForRead()
+        print(self._data)
+        isPresent = row['Symbol'].isin(self._data['Symbol']).iloc[0]
+        self.lock.unlock()
 
+        if(isPresent):
+            self.layoutAboutToBeChanged.emit()
+            self.lock.lockForWrite()
+            self._data['Open'].where(self._data['Symbol'] != row['Symbol'].iloc[0], row['Open'].iloc[0], inplace=True)
+            self._data['High'].where(self._data['Symbol'] != row['Symbol'].iloc[0], row['High'].iloc[0], inplace=True)
+            self._data['Low'].where(self._data['Symbol'] != row['Symbol'].iloc[0], row['Low'].iloc[0], inplace=True)
+            self._data['Close'].where(self._data['Symbol'] != row['Symbol'].iloc[0], row['Close'].iloc[0], inplace=True)
+            self.lock.unlock()
+            self.layoutChanged.emit()
+        else:
+            self.layoutAboutToBeChanged.emit()
+            self.lock.lockForWrite()
+            self._data = pd.concat([self._data, row], ignore_index= True)
+            self.lock.unlock()
+            self.layoutChanged.emit()
+    
+    def clear(self):
+        self.layoutAboutToBeChanged.emit()
+        self.lock.lockForWrite()
+        self._data.drop(self._data.index, inplace=True)
+        self.lock.unlock()
+        self.layoutChanged.emit()
+    
     #essential to overide for custom header
     def headerData(self, section, orientation, role):
         # section is the index of the column/row.
@@ -66,6 +109,9 @@ class Watchlists(QMainWindow):
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
 
+        self.model = TableModel(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
+        self.ui.tbvWatchlist.setModel(self.model)
+
         self.selectedRow = None #to store the selection
 
         self.watchlistWorker = WatchlistWorker()
@@ -84,7 +130,8 @@ class Watchlists(QMainWindow):
         self.manageVisibility()
 
         self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
-        self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData)
+        # self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData2)
+        self.watchlistWorker.sigShowWLData.connect(self.model.addRow)
         self.watchlistWorker.sigShowMsg.connect(self.showMessage)
         '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.watchlistWorker.finished.connect(self.watchlistThread.quit) 
@@ -101,6 +148,7 @@ class Watchlists(QMainWindow):
         self.ui.btnImport.clicked.connect(self.importStocksList)
 
         self.ui.cmbWatchlists.currentTextChanged.connect(lambda : self.watchlistWorker.setWatchlistChanged(self.ui.cmbWatchlists.currentText()))         
+        self.ui.cmbWatchlists.currentTextChanged.connect(self.model.clear)         
 
     def saveSelectedIndex(self):
         self.selectedRow = self.ui.tbvWatchlist.currentIndex().row()
@@ -130,7 +178,11 @@ class Watchlists(QMainWindow):
         self.ui.tbvWatchlist.setModel(self.model)
         if(self.selectedRow != None):
             self.ui.tbvWatchlist.selectRow(self.selectedRow)
-        
+
+    def showWatchlistData2(self, symbol):
+        print(symbol)
+        self.model.addRow(symbol)    
+
     def getWatchlistDetails(self):
         #get watchlist details
         self.watchlistDetails = WatchlistDetailsDlg()
@@ -262,10 +314,9 @@ class Watchlists(QMainWindow):
             cursor.execute(query)
             con.commit()
 
-            # self.watchlistWorker.stkList.pop(stkSym) #delete from worker list
+            self.model.delRow(rowIndex)
             self.watchlistWorker.deleteSymbolFromWL(stkSym) #delete from worker list
             
-            self.model.delRow(rowIndex)
             self.ui.tbvWatchlist.clearSelection()
             print(stkName, 'deleted from watchlist', watchlist)
 

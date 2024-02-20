@@ -5,12 +5,10 @@ from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
 import requests
 
-
 # Important:
 # You need to run the following command to generate the ui_form.py file
 #     pyside6-uic form.ui -o ui_form.py, or
 #     pyside2-uic form.ui -o ui_form.py 
-
 
 from UIFiles.ui_home import Ui_Home
 from ProjectPages.searchDlg import SearchDlg
