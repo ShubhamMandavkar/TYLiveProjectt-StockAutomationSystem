@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1005</width>
-    <height>614</height>
+    <width>964</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,12 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
         <height>80</height>
        </size>
       </property>
@@ -98,8 +104,8 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0" colspan="2">
               <widget class="QComboBox" name="cmbWatchlists">
                <property name="minimumSize">
                 <size>
@@ -109,12 +115,18 @@
                </property>
               </widget>
              </item>
-             <item>
+             <item row="1" column="0" colspan="2">
               <widget class="QLabel" name="lblMsg">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>40</height>
+                </size>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>20</height>
+                 <height>50</height>
                 </size>
                </property>
                <property name="font">
@@ -126,12 +138,15 @@
                <property name="text">
                 <string>No Stocks in Watchlist</string>
                </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
                <property name="wordWrap">
                 <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item>
+             <item row="2" column="0" colspan="2">
               <widget class="QTableView" name="tbvWatchlist">
                <property name="styleSheet">
                 <string notr="true">QTableView{
@@ -299,6 +314,12 @@ QPushButton:hover{
            <height>40</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>70</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -364,7 +385,7 @@ QPushButton:hover{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1005</width>
+     <width>964</width>
      <height>25</height>
     </rect>
    </property>

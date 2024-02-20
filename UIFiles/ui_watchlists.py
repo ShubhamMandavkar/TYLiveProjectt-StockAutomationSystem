@@ -25,7 +25,7 @@ class Ui_watchlists(object):
     def setupUi(self, watchlists):
         if not watchlists.objectName():
             watchlists.setObjectName(u"watchlists")
-        watchlists.resize(1005, 614)
+        watchlists.resize(964, 616)
         watchlists.setStyleSheet(u"background-color: rgb(239, 239, 239);")
         self.centralwidget = QWidget(watchlists)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -34,6 +34,7 @@ class Ui_watchlists(object):
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setMinimumSize(QSize(0, 80))
+        self.label.setMaximumSize(QSize(16777215, 80))
         font = QFont()
         font.setPointSize(24)
         font.setBold(True)
@@ -71,24 +72,26 @@ class Ui_watchlists(object):
         self.frame_5.setObjectName(u"frame_5")
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_3 = QVBoxLayout(self.frame_5)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.formLayout_2 = QFormLayout(self.frame_5)
+        self.formLayout_2.setObjectName(u"formLayout_2")
         self.cmbWatchlists = QComboBox(self.frame_5)
         self.cmbWatchlists.setObjectName(u"cmbWatchlists")
         self.cmbWatchlists.setMinimumSize(QSize(0, 40))
 
-        self.verticalLayout_3.addWidget(self.cmbWatchlists)
+        self.formLayout_2.setWidget(0, QFormLayout.SpanningRole, self.cmbWatchlists)
 
         self.lblMsg = QLabel(self.frame_5)
         self.lblMsg.setObjectName(u"lblMsg")
-        self.lblMsg.setMaximumSize(QSize(16777215, 20))
+        self.lblMsg.setMinimumSize(QSize(0, 40))
+        self.lblMsg.setMaximumSize(QSize(16777215, 50))
         font1 = QFont()
         font1.setPointSize(12)
         font1.setBold(True)
         self.lblMsg.setFont(font1)
+        self.lblMsg.setAlignment(Qt.AlignCenter)
         self.lblMsg.setWordWrap(True)
 
-        self.verticalLayout_3.addWidget(self.lblMsg)
+        self.formLayout_2.setWidget(1, QFormLayout.SpanningRole, self.lblMsg)
 
         self.tbvWatchlist = QTableView(self.frame_5)
         self.tbvWatchlist.setObjectName(u"tbvWatchlist")
@@ -103,7 +106,7 @@ class Ui_watchlists(object):
         self.tbvWatchlist.horizontalHeader().setStretchLastSection(True)
         self.tbvWatchlist.verticalHeader().setVisible(False)
 
-        self.verticalLayout_3.addWidget(self.tbvWatchlist)
+        self.formLayout_2.setWidget(2, QFormLayout.SpanningRole, self.tbvWatchlist)
 
 
         self.horizontalLayout_2.addWidget(self.frame_5)
@@ -196,6 +199,7 @@ class Ui_watchlists(object):
         self.frame_7 = QFrame(self.frame_3)
         self.frame_7.setObjectName(u"frame_7")
         self.frame_7.setMinimumSize(QSize(0, 40))
+        self.frame_7.setMaximumSize(QSize(16777215, 70))
         self.frame_7.setFrameShape(QFrame.StyledPanel)
         self.frame_7.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame_7)
@@ -231,7 +235,7 @@ class Ui_watchlists(object):
         watchlists.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(watchlists)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1005, 25))
+        self.menubar.setGeometry(QRect(0, 0, 964, 25))
         watchlists.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(watchlists)
         self.statusbar.setObjectName(u"statusbar")

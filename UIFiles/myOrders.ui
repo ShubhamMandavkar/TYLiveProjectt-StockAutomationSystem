@@ -118,7 +118,7 @@ QWidget::selection{
              <property name="styleSheet">
               <string notr="true">QListView{
 	border : 2px solid black;
-	border-radius : 2px;
+	border-radius : 5px;
 }</string>
              </property>
              <property name="alternatingRowColors">

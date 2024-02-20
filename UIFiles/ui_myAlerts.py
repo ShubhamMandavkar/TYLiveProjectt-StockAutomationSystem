@@ -83,6 +83,10 @@ class Ui_myAlerts(object):
         font1.setPointSize(14)
         font1.setBold(True)
         self.lsvMyAlerts.setFont(font1)
+        self.lsvMyAlerts.setStyleSheet(u"QListView{\n"
+"	border : 2px solid black;\n"
+"	border-radius : 5px;\n"
+"}")
         self.lsvMyAlerts.setSizeAdjustPolicy(QAbstractScrollArea.AdjustIgnored)
         self.lsvMyAlerts.setAlternatingRowColors(True)
         self.lsvMyAlerts.setProperty("isWrapping", False)

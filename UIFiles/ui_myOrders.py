@@ -90,7 +90,7 @@ class Ui_myOrders(object):
         self.lsvAllOrders.setFont(font2)
         self.lsvAllOrders.setStyleSheet(u"QListView{\n"
 "	border : 2px solid black;\n"
-"	border-radius : 2px;\n"
+"	border-radius : 5px;\n"
 "}")
         self.lsvAllOrders.setAlternatingRowColors(True)
         self.lsvAllOrders.setResizeMode(QListView.Adjust)

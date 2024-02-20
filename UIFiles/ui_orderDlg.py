@@ -80,6 +80,12 @@ class Ui_OrderDlg(object):
         self.sbQuantity.setObjectName(u"sbQuantity")
         self.sbQuantity.setMinimumSize(QSize(0, 30))
         self.sbQuantity.setFont(font1)
+        self.sbQuantity.setStyleSheet(u"QSpinBox{\n"
+"	color: rgb(0, 0, 0);\n"
+"	background-color: rgb(239, 239, 239);\n"
+"	border : 1px solid black;\n"
+"	border-radius : 5px;\n"
+"}")
         self.sbQuantity.setMaximum(1000000000)
 
         self.gridLayout_3.addWidget(self.sbQuantity, 0, 1, 1, 1)
@@ -105,6 +111,12 @@ class Ui_OrderDlg(object):
         self.cmbPriceType.setObjectName(u"cmbPriceType")
         self.cmbPriceType.setMinimumSize(QSize(100, 30))
         self.cmbPriceType.setFont(font1)
+        self.cmbPriceType.setStyleSheet(u"QComboBox{\n"
+"	color: rgb(0, 0, 0);\n"
+"	background-color: rgb(239, 239, 239);\n"
+"	border : 1px solid black;\n"
+"	border-radius : 5px;\n"
+"}")
 
         self.gridLayout_3.addWidget(self.cmbPriceType, 2, 0, 1, 1)
 
@@ -112,6 +124,12 @@ class Ui_OrderDlg(object):
         self.dsbPriceValue.setObjectName(u"dsbPriceValue")
         self.dsbPriceValue.setMinimumSize(QSize(0, 30))
         self.dsbPriceValue.setFont(font1)
+        self.dsbPriceValue.setStyleSheet(u"QDoubleSpinBox{\n"
+"	color: rgb(0, 0, 0);\n"
+"	background-color: rgb(239, 239, 239);\n"
+"	border : 1px solid black;\n"
+"	border-radius : 5px;\n"
+"}")
         self.dsbPriceValue.setMaximum(1000000000.000000000000000)
 
         self.gridLayout_3.addWidget(self.dsbPriceValue, 2, 1, 1, 1)
@@ -132,6 +150,12 @@ class Ui_OrderDlg(object):
 "\n"
 "QPushButton:hover{\n"
 "	background-color: rgb(46, 186, 151);\n"
+"	color: rgb(0, 0, 0);\n"
+"}\n"
+"\n"
+"QPushButton:disabled{\n"
+"	background-color: rgb(239, 239, 239);\n"
+"	border : 1px solid black;\n"
 "	color: rgb(0, 0, 0);\n"
 "}")
 

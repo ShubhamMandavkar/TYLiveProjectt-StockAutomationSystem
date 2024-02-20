@@ -144,6 +144,14 @@
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QSpinBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
            <property name="maximum">
             <number>1000000000</number>
            </property>
@@ -189,6 +197,14 @@
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
            <item>
             <property name="text">
              <string>MARKET</string>
@@ -224,6 +240,14 @@
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QDoubleSpinBox{
+	color: rgb(0, 0, 0);
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
+	border-radius : 5px;
+}</string>
+           </property>
            <property name="maximum">
             <double>1000000000.000000000000000</double>
            </property>
@@ -256,6 +280,12 @@
 
 QPushButton:hover{
 	background-color: rgb(46, 186, 151);
+	color: rgb(0, 0, 0);
+}
+
+QPushButton:disabled{
+	background-color: rgb(239, 239, 239);
+	border : 1px solid black;
 	color: rgb(0, 0, 0);
 }</string>
         </property>

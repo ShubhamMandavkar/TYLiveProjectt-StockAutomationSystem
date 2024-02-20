@@ -82,7 +82,7 @@ class Ui_holdings(object):
         self.tvHoldings.setFont(font2)
         self.tvHoldings.setLayoutDirection(Qt.LeftToRight)
         self.tvHoldings.setStyleSheet(u"QTableView{\n"
-"	border-radius : 2px;\n"
+"	border-radius : 5px;\n"
 "	border : 2px solid black;\n"
 "}")
         self.tvHoldings.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
