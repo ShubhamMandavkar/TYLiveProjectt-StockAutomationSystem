@@ -195,6 +195,7 @@ class MyOrders(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_myOrders()
         self.ui.setupUi(self)
+        self.setWindowTitle('My Orders')
 
         self.userDetails = UserDetails()
         self.userDetails.getUserDetails()

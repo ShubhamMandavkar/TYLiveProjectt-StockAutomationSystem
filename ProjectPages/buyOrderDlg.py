@@ -46,6 +46,7 @@ class BuyOrderDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_OrderDlg()
         self.ui.setupUi(self)
+        self.setWindowTitle('Buy Details')
 
         self.ui.lblAvailQuantity.setVisible(False)
         self.ui.lblAvailQuantityVal.setVisible(False)

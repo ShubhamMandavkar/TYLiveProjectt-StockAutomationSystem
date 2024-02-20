@@ -9,6 +9,7 @@ class OrderDetailsDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_OrderDetailsDlg()
         self.ui.setupUi(self)
+        self.setWindowTitle('Order')
         self.order = order
 
         self.setDetails()

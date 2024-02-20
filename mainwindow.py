@@ -113,6 +113,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_Home()
         self.ui.setupUi(self)
+        self.setWindowTitle('Dashboard')
 
         self.userDetails = UserDetails()
         self.userDetails.getUserDetails()

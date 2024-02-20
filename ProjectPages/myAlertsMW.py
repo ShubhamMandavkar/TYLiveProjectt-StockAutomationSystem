@@ -84,6 +84,7 @@ class MyAlerts(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_myAlerts()
         self.ui.setupUi(self)
+        self.setWindowTitle('My Alerts')
 
         self.addConnectors()
         self.addAlertsToList()

@@ -7,6 +7,8 @@ class IndicatorDetailsDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgIndicatorDetails()
         self.ui.setupUi(self)
+        self.setWindowTitle('Indicator Details')
+
         self.ui.btnDelete.hide()
         self.ui.lblNameVal.setText(name)
 

@@ -48,6 +48,8 @@ class SearchDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgSearch()
         self.ui.setupUi(self)
+        self.setWindowTitle('Search')
+
         self.ui.tblvSuggestions.horizontalHeader().setStretchLastSection(True)
         self.ui.tblvSuggestions.horizontalHeader().setDefaultSectionSize(200)
         # self.ui.tblvSuggestions.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)

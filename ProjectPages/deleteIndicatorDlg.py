@@ -7,6 +7,7 @@ class DeleteIndicatorDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgDeleteIndicator()
         self.ui.setupUi(self)
+        self.setWindowTitle('Indicator Details')
 
         self.indicatorName = name
         self.length = length

@@ -7,6 +7,7 @@ class MessageDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgMessage()
         self.ui.setupUi(self)
+        self.setWindowTitle('MessageBox')
         self.ui.lblMsg.setText(msg)
 
         self.addConnectors()

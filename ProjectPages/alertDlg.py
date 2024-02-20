@@ -14,6 +14,7 @@ class AlertDlg(QDialog):
         super().__init__(parent)
         self.ui = Ui_dlgAlert()
         self.ui.setupUi(self)
+        self.setWindowTitle('Alert')
 
         self.stkSymbol = stkSym
         self.stkName = stkName

@@ -17,6 +17,7 @@ class StockDetails(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_stockDetails()
         self.ui.setupUi(self)
+        self.setWindowTitle(stkSym)
         self.ui.lblChange.hide()
         self.ui.lblChangeVal.hide()
 

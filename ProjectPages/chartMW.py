@@ -375,6 +375,7 @@ class Chart(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_Chart()
         self.ui.setupUi(self)
+        self.setWindowTitle(stkSym)
 
         self.stkSymbol = stkSym
         self.stkName = stkName

@@ -10,6 +10,7 @@ class CustomDetails(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_customDetails()
         self.ui.setupUi(self)
+        self.setWindowTitle('Custom Details')
 
         self.addConnector()
         self.loadCstmDetails()

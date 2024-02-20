@@ -56,6 +56,7 @@ class Holdings(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_holdings()
         self.ui.setupUi(self)
+        self.setWindowTitle('Holdings')
         self.ui.tvHoldings.setVisible(False)
 
         self.holdingsWorker = HoldingsWorker()

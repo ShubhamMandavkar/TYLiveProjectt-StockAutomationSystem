@@ -581,11 +581,7 @@ class WatchlistWorker(QObject):
         self.stkList.clear()  #clear stocks list of previous watchlist
         self.lock.unlock()
 
-    def fetchWLData(self):    
-        # data = {'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}
-        
-        # stkList = copy.deepcopy(self.stkList)
-        
+    def fetchWLData(self):            
         self.lock.lockForRead()
         i = 0
         while(i < len(self.stkList.keys())):
@@ -614,7 +610,7 @@ class WatchlistWorker(QObject):
 
                 if(key in self.stkList.keys()):
                     self.sigShowWLData.emit(pd.DataFrame({'Symbol' : [key], 'Name' : [name], 'Open' : [open], 'High' : [high], 'Low' : [low], 'Close' : [close]}))
-                    
+
             except Exception as e:
                 print('Exception in watchlist thread', e)
 

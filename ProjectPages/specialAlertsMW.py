@@ -68,6 +68,7 @@ class SpecialAlerts(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_specialAlerts()
         self.ui.setupUi(self)
+        self.setWindowTitle('Special Alerts')
         self.ui.tbvSpecialAlertsStkList.horizontalHeader().setStretchLastSection(True)
         self.ui.tbvSpecialAlertsStkList.horizontalHeader().setDefaultSectionSize(200)
 

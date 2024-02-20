@@ -108,6 +108,7 @@ class Watchlists(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_watchlists()
         self.ui.setupUi(self)
+        self.setWindowTitle('Watchlists')
 
         self.model = TableModel(pd.DataFrame({'Symbol' : [], 'Name' : [], 'Open' : [], 'High' : [], 'Low' : [], 'Close' : []}))
         self.ui.tbvWatchlist.setModel(self.model)
@@ -130,8 +131,7 @@ class Watchlists(QMainWindow):
         self.manageVisibility()
 
         self.watchlistThread.started.connect(self.watchlistWorker.updateWL)   
-        # self.watchlistWorker.sigShowWLData.connect(self.showWatchlistData2)
-        self.watchlistWorker.sigShowWLData.connect(self.model.addRow)
+        self.watchlistWorker.sigShowWLData.connect(self.model.addRow) #connect updated data to addRow method of model
         self.watchlistWorker.sigShowMsg.connect(self.showMessage)
         '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.watchlistWorker.finished.connect(self.watchlistThread.quit) 
@@ -178,10 +178,6 @@ class Watchlists(QMainWindow):
         self.ui.tbvWatchlist.setModel(self.model)
         if(self.selectedRow != None):
             self.ui.tbvWatchlist.selectRow(self.selectedRow)
-
-    def showWatchlistData2(self, symbol):
-        print(symbol)
-        self.model.addRow(symbol)    
 
     def getWatchlistDetails(self):
         #get watchlist details
