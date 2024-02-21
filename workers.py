@@ -685,7 +685,7 @@ class StockWorker(QObject):
                     self.sigShowMsg.emit('Please check your internet connection')   
                     isNetNotConnectedMsgSend = True                                 
             except Exception as e:
-                self.sigShowMsg.emit('Exception in stkDetailsWorker' + str(e))
+                # self.sigShowMsg.emit('Exception in stkDetailsWorker' + str(e))
                 print('Exception in stkDetailsWorker', e)
 
             time.sleep(5)
@@ -1149,3 +1149,249 @@ class SpecialAlertsWorker(QObject):
         self.finished.emit()
         print('getAlertsTriggeredStkList finished')
         '''
+
+
+class MyOrdersWorker(QObject):
+    myOrders = { "status": "success", "data": []}   #static variable to share holdings for all objects
+    isRunning = True
+    isNetConnected = True
+
+    sigChngMyOrdersData = Signal(pd.DataFrame)   #signals to communicate with other threads
+    sigNoMyOrdersData = Signal()
+    sigMyOrdersDetails = Signal(pd.DataFrame) #signal to emit holding details to be shown on home page
+    sigShowMsg = Signal(str)
+    finished = Signal() 
+
+    def __init__(self, key='', sKey='', brCode='tc'):
+        super().__init__()
+        self.lock = QReadWriteLock()
+        self.apiKey = key
+        self.apiSecretKey = sKey
+        self.brCode = brCode
+
+        self.pendingOrdersCnt = 0
+        self.closedOrdersCnt = 0
+        self.rejectedOrdersCnt = 0
+        self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
+
+        #to show myOrders in myOrders page
+        self.isMyOrdersPage = False
+
+    def changeDetails(self, key='', sKey='', brCode = 'tc'):
+        self.apiKey = key
+        self.apiSecretKey = sKey
+        self.brCode = brCode
+        self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)            
+
+    def fetchAllOrders2(self):
+        orders = {
+            "status": "success",
+            "data": [
+                {
+                "exchange": "NSE",
+                "token": "11915",
+                "symbol": "YESBANK-EQ",
+                "product": "CNC",
+                "pricetype": "MARKET",
+                "Ret": "DAY",
+                "price": 0,
+                "trigger_price": 0,
+                "quantity": 1,
+                "disclosed_quantity": 0,
+                "action": "BUY",
+                "avgprc": 13.95,
+                "fillshares": 1,
+                "remarks": "ARROW",
+                "exchordid": "1300000016630228",
+                "parentorderid": "",
+                "order_id": "220113000041330",
+                "orderentrytime": "Jan 13 2022 13:24:00",
+                "exchconfrmtime": "13-Jan-2022 13:24:00",
+                "status": "rejected",
+                "ordvaldate": "",
+                "rejreason": "",
+                "broker_exchange": "NSE",
+                "broker_token": "14366",
+                "tick_size": 0.05,
+                "lot_size": 1,
+                "ws_msg": {
+                    "exchange": "NSE",
+                    "token": "14366"
+                }
+            }, 
+            {
+                "exchange": "NSE",
+                "token": "11915",
+                "symbol": "INFY-EQ",
+                "product": "CNC",
+                "pricetype": "MARKET",
+                "Ret": "DAY",
+                "price": 0,
+                "trigger_price": 0,
+                "quantity": 1,
+                "disclosed_quantity": 0,
+                "action": "BUY",
+                "avgprc": 13.95,
+                "fillshares": 1,
+                "remarks": "ARROW",
+                "exchordid": "1300000016630228",
+                "parentorderid": "",
+                "order_id": "220113000041330",
+                "orderentrytime": "Jan 13 2022 13:24:00",
+                "exchconfrmtime": "13-Jan-2022 13:24:00",
+                "status": "completed",
+                "ordvaldate": "",
+                "rejreason": "",
+                "broker_exchange": "NSE",
+                "broker_token": "14366",
+                "tick_size": 0.05,
+                "lot_size": 1,
+                "ws_msg": {
+                    "exchange": "NSE",
+                    "token": "14366"
+                }
+            }, 
+            {
+                "exchange": "NSE",
+                "token": "11915",
+                "symbol": "INFY-EQ",
+                "product": "CNC",
+                "pricetype": "MARKET",
+                "Ret": "DAY",
+                "price": 0,
+                "trigger_price": 0,
+                "quantity": 1,
+                "disclosed_quantity": 0,
+                "action": "BUY",
+                "avgprc": 13.95,
+                "fillshares": 1,
+                "remarks": "ARROW",
+                "exchordid": "1300000016630228",
+                "parentorderid": "",
+                "order_id": "220113000041330",
+                "orderentrytime": "Jan 13 2022 13:24:00",
+                "exchconfrmtime": "13-Jan-2022 13:24:00",
+                "status": "open",
+                "ordvaldate": "",
+                "rejreason": "",
+                "broker_exchange": "NSE",
+                "broker_token": "14366",
+                "tick_size": 0.05,
+                "lot_size": 1,
+                "ws_msg": {
+                    "exchange": "NSE",
+                    "token": "14366"
+                }
+            }, 
+            {
+                "exchange": "NSE",
+                "token": "11915",
+                "symbol": "PNB-EQ",
+                "product": "CNC",
+                "pricetype": "MARKET",
+                "Ret": "DAY",
+                "price": 0,
+                "trigger_price": 0,
+                "quantity": 1,
+                "disclosed_quantity": 0,
+                "action": "SELL",
+                "avgprc": 13.95,
+                "fillshares": 1,
+                "remarks": "ARROW",
+                "exchordid": "1300000016630228",
+                "parentorderid": "",
+                "order_id": "220113000041330",
+                "orderentrytime": "Jan 13 2022 13:24:00",
+                "exchconfrmtime": "13-Jan-2022 13:24:00",
+                "status": "pending",
+                "ordvaldate": "",
+                "rejreason": "",
+                "broker_exchange": "NSE",
+                "broker_token": "14366",
+                "tick_size": 0.05,
+                "lot_size": 1,
+                "ws_msg": {
+                    "exchange": "NSE",
+                    "token": "14366"
+                }
+            }]
+        }
+        return orders
+        
+    def fetchMyOrders(self, brCode = 'tc'):
+        while(MyOrdersWorker.isRunning):
+            try :
+                self.lock.lockForWrite()
+                # MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker=brCode)))
+                MyOrdersWorker.myOrders = self.fetchAllOrders2()
+                self.lock.unlock()
+                
+                self.lock.lockForRead()
+                if(MyOrdersWorker.myOrders['status'] == 'success'):
+                    orders = pd.DataFrame(MyOrdersWorker.myOrders['data'])
+                    orders.drop(['ws_msg'], axis = 1, inplace= True)
+
+                    successfulOrdersFilter = orders['status'] == 'completed'
+                    rejectedOrdersFilter = orders['status'] == 'rejected'
+                    cancelledOrdersFilter = orders['status'] == 'cancelled'
+                    pendingOrdersFilter = orders['status'] == 'pending'
+                    openOrdersFilter = orders['status'] == 'open'
+
+                    '''for Pending orders'''
+                    pendingOrders = orders.where(pendingOrdersFilter) #filter pending orders
+                    pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
+                    self.pendingOrdersCnt = len(pendingOrders)
+
+                    '''for Closed orders'''
+                    closedOrders = orders.where(successfulOrdersFilter) #filter pending orders
+                    closedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
+                    self.closedOrdersCnt = len(closedOrders)
+
+                    '''for Rejected orders'''
+                    rejectedOrders = orders.where(rejectedOrdersFilter) #filter pending orders
+                    rejectedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
+                    self.rejectedOrdersCnt = len(rejectedOrders)
+
+                    self.sigMyOrdersDetails.emit( pd.DataFrame({'pendingOrdersCnt': [self.pendingOrdersCnt], 'closedOrdersCnt': [self.closedOrdersCnt], 'rejectedOrdersCnt': [self.rejectedOrdersCnt]})) #emit data to show on home page
+                
+                self.lock.unlock()
+                MyOrdersWorker.isNetConnected = True
+            except requests.exceptions.ConnectionError:
+                MyOrdersWorker.isNetConnected = False
+            except Exception as e:
+                print(e)
+            
+            print('MyOrdersfetchingThread called')
+            time.sleep(5)
+    
+
+    def getMyOrdersTableModel(self):
+        self.isApiInvalidMsgShown = False 
+        isNetNotConnectedMsgSend = False
+        
+        while(self.isMyOrdersPage):
+            if(not HoldingsWorker.isNetConnected): #if network is not connected
+                if(not isNetNotConnectedMsgSend):
+                    self.sigShowMsg.emit('Please check your internet connection')
+                    isNetNotConnectedMsgSend = True
+                continue
+
+            self.lock.lockForRead()
+            if(MyOrdersWorker.myOrders['status'] == 'success'):
+                self.sigChngMyOrdersData.emit(pd.DataFrame(MyOrdersWorker.myOrders['data']))
+
+                self.isApiInvalidMsgShown = False
+            else:
+                if(not self.isApiInvalidMsgShown):
+                    #show message
+                    self.sigShowMsg.emit(MyOrdersWorker.myOrders['error_msg'])
+                    self.isApiInvalidMsgShown = True
+            
+            self.lock.unlock()
+            isNetNotConnectedMsgSend = False
+
+            time.sleep(5)
+            print("getHoldingTbleModel function ")
+
+        self.finished.emit()
+        print('getHoldingTbleModel finished')

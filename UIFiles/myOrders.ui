@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>977</width>
-    <height>646</height>
+    <width>1089</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,8 +106,30 @@ QWidget::selection{
           <attribute name="title">
            <string>ALL Orders</string>
           </attribute>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblNoOrders">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>No Data</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QListView" name="lsvAllOrders">
              <property name="font">
               <font>
@@ -138,8 +160,8 @@ QWidget::selection{
           <attribute name="title">
            <string>Open Orders</string>
           </attribute>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
             <widget class="QListView" name="lsvPendingOrders">
              <property name="font">
               <font>
@@ -158,6 +180,33 @@ QWidget::selection{
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblNoPendingOrders">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>No Data</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -172,7 +221,7 @@ QWidget::selection{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>977</width>
+     <width>1089</width>
      <height>25</height>
     </rect>
    </property>

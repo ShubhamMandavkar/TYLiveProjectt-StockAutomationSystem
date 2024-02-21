@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import QAbstractListModel, Qt
+from PySide6.QtCore import QAbstractListModel, Qt, QThread
 import mysql.connector
 from mysql.connector import errorcode
 from algomojo.pyapi import *
@@ -8,6 +8,7 @@ from ProjectPages.messageDlg import MessageDlg
 
 from UIFiles.ui_myOrders import Ui_myOrders
 from ProjectPages.orderDetailsDlg import OrderDetailsDlg
+from workers import MyOrdersWorker
 
 
 class ListModel(QAbstractListModel):
@@ -202,7 +203,25 @@ class MyOrders(QMainWindow):
         self.addConnectors()
         self.show()  #show the gui window
 
-        self.loadAllOrders()
+        # self.loadAllOrders()
+
+        #worker to fetch MyOrders 
+        self.myOrdersWorker = MyOrdersWorker()
+        #Thread for fetching MyOrders
+        self.myOrdersThread = QThread()
+        self.myOrdersWorker.moveToThread(self.myOrdersThread)
+        self.myOrdersWorker.isMyOrdersPage = True
+
+        self.myOrdersThread.started.connect(self.myOrdersWorker.getMyOrdersTableModel)
+        '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
+        self.myOrdersWorker.finished.connect(self.myOrdersThread.quit)
+        self.myOrdersWorker.finished.connect(self.myOrdersThread.wait)
+        self.myOrdersWorker.finished.connect(self.myOrdersWorker.deleteLater)
+        self.myOrdersThread.finished.connect(self.myOrdersThread.deleteLater)
+
+        self.myOrdersWorker.sigChngMyOrdersData.connect(self.showOrders)
+        self.myOrdersWorker.sigShowMsg.connect(self.showMessage)
+        self.myOrdersThread.start()
 
     def addConnectors(self):
         self.ui.lsvAllOrders.doubleClicked.connect(self.showOrderDetails)
@@ -218,9 +237,7 @@ class MyOrders(QMainWindow):
             return {"status": "error", 'error_msg': 'Please check your internet connection'}
         except Exception as e:
             print('Exception : ', e)
-            return {"status": "error", 'error_msg': e}
-
-        
+            return {"status": "error", 'error_msg': e}     
 
     def loadAllOrders(self):
         # self.myOrders = fetchAllOrders2(self.userDetails)
@@ -255,6 +272,46 @@ class MyOrders(QMainWindow):
         else:
             self.showMessage(self.myOrders['error_msg'])
             print('MyOrders :', self.myOrders['error_msg'])
+    
+    def showOrders(self, orders):
+        orders.drop(['ws_msg'], axis = 1, inplace= True)
+
+        successfulOrders = orders['status'] == 'completed'
+        rejectedOrders = orders['status'] == 'rejected'
+        cancelledOrders = orders['status'] == 'cancelled'
+        pendingOrders = orders['status'] == 'pending'
+        openOrders = orders['status'] == 'open'
+
+        # allOrders = orders.where(successfulOrders | rejectedOrders | cancelledOrders) #filter successful or rejected orders
+        allOrders = orders
+        # allOrders = orders.where(successfulOrders)  
+        allOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
+        allOrders.reset_index(inplace=True) #reset the index after removing records with na values
+
+        if(len(allOrders) != 0):
+            self.ui.lblNoOrders.hide()
+            self.ui.lsvAllOrders.setVisible(True)
+
+            allOrdersModel = ListModel(allOrders)
+            self.ui.lsvAllOrders.setModel(allOrdersModel)
+        else:
+            self.ui.lblNoOrders.setVisible(True)
+            self.ui.lsvAllOrders.hide()
+
+        pendingOrders = orders.where(pendingOrders | openOrders) #filter open or pending orders
+        # allOrders = orders.where(successfulOrders)  
+        pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
+        pendingOrders.reset_index(inplace=True) #reset the index after removing records with na values
+
+        if(len(pendingOrders) != 0):
+            self.ui.lblNoPendingOrders.hide()
+            self.ui.lsvPendingOrders.setVisible(True)
+            
+            pendingOrdersModel = ListModel(pendingOrders)
+            self.ui.lsvPendingOrders.setModel(pendingOrdersModel)
+        else:
+            self.ui.lblNoPendingOrders.setVisible(True)
+            self.ui.lsvPendingOrders.hide()
 
     def showOrderDetails(self):
         modelIndexls = self.ui.lsvAllOrders.selectedIndexes()

@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QListView, QMainWindow, QMenuBar, QSizePolicy,
-    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+    QLabel, QListView, QMainWindow, QMenuBar,
+    QSizePolicy, QStatusBar, QTabWidget, QVBoxLayout,
+    QWidget)
 
 class Ui_myOrders(object):
     def setupUi(self, myOrders):
         if not myOrders.objectName():
             myOrders.setObjectName(u"myOrders")
-        myOrders.resize(977, 646)
+        myOrders.resize(1089, 578)
         myOrders.setStyleSheet(u"background-color: rgb(239, 239, 239);")
         self.centralwidget = QWidget(myOrders)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -80,8 +81,16 @@ class Ui_myOrders(object):
         self.myOrdersTabWidget.setTabShape(QTabWidget.Rounded)
         self.allOrdersWidget = QWidget()
         self.allOrdersWidget.setObjectName(u"allOrdersWidget")
-        self.horizontalLayout_2 = QHBoxLayout(self.allOrdersWidget)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.gridLayout_2 = QGridLayout(self.allOrdersWidget)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.lblNoOrders = QLabel(self.allOrdersWidget)
+        self.lblNoOrders.setObjectName(u"lblNoOrders")
+        self.lblNoOrders.setMaximumSize(QSize(16777215, 40))
+        self.lblNoOrders.setFont(font1)
+        self.lblNoOrders.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.lblNoOrders, 0, 0, 1, 1)
+
         self.lsvAllOrders = QListView(self.allOrdersWidget)
         self.lsvAllOrders.setObjectName(u"lsvAllOrders")
         font2 = QFont()
@@ -96,13 +105,13 @@ class Ui_myOrders(object):
         self.lsvAllOrders.setResizeMode(QListView.Adjust)
         self.lsvAllOrders.setSpacing(0)
 
-        self.horizontalLayout_2.addWidget(self.lsvAllOrders)
+        self.gridLayout_2.addWidget(self.lsvAllOrders, 1, 0, 1, 1)
 
         self.myOrdersTabWidget.addTab(self.allOrdersWidget, "")
         self.pendingOrdersWidget = QWidget()
         self.pendingOrdersWidget.setObjectName(u"pendingOrdersWidget")
-        self.horizontalLayout_3 = QHBoxLayout(self.pendingOrdersWidget)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.gridLayout = QGridLayout(self.pendingOrdersWidget)
+        self.gridLayout.setObjectName(u"gridLayout")
         self.lsvPendingOrders = QListView(self.pendingOrdersWidget)
         self.lsvPendingOrders.setObjectName(u"lsvPendingOrders")
         self.lsvPendingOrders.setFont(font2)
@@ -112,7 +121,18 @@ class Ui_myOrders(object):
 "}")
         self.lsvPendingOrders.setAlternatingRowColors(True)
 
-        self.horizontalLayout_3.addWidget(self.lsvPendingOrders)
+        self.gridLayout.addWidget(self.lsvPendingOrders, 1, 0, 1, 1)
+
+        self.lblNoPendingOrders = QLabel(self.pendingOrdersWidget)
+        self.lblNoPendingOrders.setObjectName(u"lblNoPendingOrders")
+        self.lblNoPendingOrders.setMinimumSize(QSize(0, 0))
+        self.lblNoPendingOrders.setMaximumSize(QSize(16777215, 40))
+        font3 = QFont()
+        font3.setPointSize(12)
+        self.lblNoPendingOrders.setFont(font3)
+        self.lblNoPendingOrders.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout.addWidget(self.lblNoPendingOrders, 0, 0, 1, 1)
 
         self.myOrdersTabWidget.addTab(self.pendingOrdersWidget, "")
 
@@ -124,7 +144,7 @@ class Ui_myOrders(object):
         myOrders.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(myOrders)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 977, 25))
+        self.menubar.setGeometry(QRect(0, 0, 1089, 25))
         myOrders.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(myOrders)
         self.statusbar.setObjectName(u"statusbar")
@@ -141,7 +161,9 @@ class Ui_myOrders(object):
     def retranslateUi(self, myOrders):
         myOrders.setWindowTitle(QCoreApplication.translate("myOrders", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("myOrders", u"My Orders", None))
+        self.lblNoOrders.setText(QCoreApplication.translate("myOrders", u"No Data", None))
         self.myOrdersTabWidget.setTabText(self.myOrdersTabWidget.indexOf(self.allOrdersWidget), QCoreApplication.translate("myOrders", u"ALL Orders", None))
+        self.lblNoPendingOrders.setText(QCoreApplication.translate("myOrders", u"No Data", None))
         self.myOrdersTabWidget.setTabText(self.myOrdersTabWidget.indexOf(self.pendingOrdersWidget), QCoreApplication.translate("myOrders", u"Open Orders", None))
     # retranslateUi
 

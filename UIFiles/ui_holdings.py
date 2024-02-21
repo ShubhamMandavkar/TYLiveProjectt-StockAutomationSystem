@@ -88,6 +88,8 @@ class Ui_holdings(object):
         self.tvHoldings.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.tvHoldings.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tvHoldings.setSortingEnabled(True)
+        self.tvHoldings.horizontalHeader().setDefaultSectionSize(150)
+        self.tvHoldings.horizontalHeader().setStretchLastSection(True)
         self.tvHoldings.verticalHeader().setVisible(False)
 
         self.formLayout.setWidget(1, QFormLayout.SpanningRole, self.tvHoldings)

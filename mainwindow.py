@@ -22,7 +22,7 @@ from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderDlg import SellOrderDlg
 from ProjectPages.myOrdersMW import MyOrders
-from workers import AlertWorker, HoldingsWorker, SpecialAlertsWorker, TeleApiWorker
+from workers import AlertWorker, HoldingsWorker, MyOrdersWorker, SpecialAlertsWorker, TeleApiWorker
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -61,6 +61,7 @@ class UserDetails:
 class Navigation: 
     holdings = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
     stkDetails  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
+    myOrders  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
@@ -91,8 +92,7 @@ class Navigation:
         self.specialAlerts.show()
 
     def showMyOrdersWindow(self):
-        self.myOrders = MyOrders()
-        # self.myOrders.show() # show() method is called in the constructor
+        self.myOrders.append(MyOrders()) 
 
     def showHoldingsWindow(self):
         self.holdings.append(Holdings()) 
@@ -149,6 +149,11 @@ class MainWindow(QMainWindow):
         self.ui.lbalCurrentValueVal.setText(str(round(holdDetails['currentValue'].iloc[0], 2)))
         self.ui.lblPandLVal.setText(str(round(holdDetails['profitAndLoss'].iloc[0], 2)))
 
+    def showMyOrdersDetails(self, myOrdersDetails):
+        self.ui.lblPendingsVal.setText(str(myOrdersDetails['pendingOrdersCnt'].iloc[0]))
+        self.ui.lblClosedVal.setText(str(myOrdersDetails['closedOrdersCnt'].iloc[0]))
+        self.ui.lblRejectedVal.setText(str(myOrdersDetails['rejectedOrdersCnt'].iloc[0]))
+
 def chnageHoldingsFetchingWorkerDetails():
     widget.userDetails.getUserDetails()
     holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
@@ -188,10 +193,20 @@ if __name__ == "__main__":
     holdingsProcessThread = QThread()
     holdingsProcessWorker.moveToThread(holdingsProcessThread)
     holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
+    
+    #worker to fetch MyOrders 
+    myOrdersFetchingWorker = MyOrdersWorker()
+    myOrdersFetchingWorker.sigMyOrdersDetails.connect(widget.showMyOrdersDetails)
+    #Thread to fetching MyOrders
+    myOrdersFetchingThread = QThread()
+    myOrdersFetchingWorker.moveToThread(myOrdersFetchingThread)
+    myOrdersFetchingThread.started.connect(myOrdersFetchingWorker.fetchMyOrders)
 
     widget.show()
     holdingsFetchingThread.start()
     # holdingsProcessThread.start()
+
+    myOrdersFetchingThread.start()
 
     loop = asyncio.new_event_loop() 
     teleApiWorker = TeleApiWorker(loop)
@@ -213,6 +228,6 @@ if __name__ == "__main__":
 
     specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
     specialAlertThread.started.connect(specialAlertWorker.check)
-    specialAlertThread.start()
+    # specialAlertThread.start()
 
     sys.exit(app.exec())
