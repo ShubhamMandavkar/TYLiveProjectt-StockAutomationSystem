@@ -85,9 +85,12 @@ class Ui_myOrders(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.lblNoOrders = QLabel(self.allOrdersWidget)
         self.lblNoOrders.setObjectName(u"lblNoOrders")
-        self.lblNoOrders.setMaximumSize(QSize(16777215, 40))
+        self.lblNoOrders.setMaximumSize(QSize(16777215, 16777215))
         self.lblNoOrders.setFont(font1)
-        self.lblNoOrders.setAlignment(Qt.AlignCenter)
+        self.lblNoOrders.setStyleSheet(u"QLabel{\n"
+"	padding-top: 20px;\n"
+"}")
+        self.lblNoOrders.setAlignment(Qt.AlignHCenter|Qt.AlignTop)
 
         self.gridLayout_2.addWidget(self.lblNoOrders, 0, 0, 1, 1)
 
@@ -98,6 +101,7 @@ class Ui_myOrders(object):
         font2.setBold(True)
         self.lsvAllOrders.setFont(font2)
         self.lsvAllOrders.setStyleSheet(u"QListView{\n"
+"	background-color: rgb(255, 255, 255);\n"
 "	border : 2px solid black;\n"
 "	border-radius : 5px;\n"
 "}")
@@ -112,27 +116,31 @@ class Ui_myOrders(object):
         self.pendingOrdersWidget.setObjectName(u"pendingOrdersWidget")
         self.gridLayout = QGridLayout(self.pendingOrdersWidget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.lblNoPendingOrders = QLabel(self.pendingOrdersWidget)
+        self.lblNoPendingOrders.setObjectName(u"lblNoPendingOrders")
+        self.lblNoPendingOrders.setMinimumSize(QSize(0, 0))
+        self.lblNoPendingOrders.setMaximumSize(QSize(16777215, 16777215))
+        font3 = QFont()
+        font3.setPointSize(12)
+        self.lblNoPendingOrders.setFont(font3)
+        self.lblNoPendingOrders.setStyleSheet(u"QLabel{\n"
+"	padding-top: 20px;\n"
+"}")
+        self.lblNoPendingOrders.setAlignment(Qt.AlignHCenter|Qt.AlignTop)
+
+        self.gridLayout.addWidget(self.lblNoPendingOrders, 0, 0, 1, 1)
+
         self.lsvPendingOrders = QListView(self.pendingOrdersWidget)
         self.lsvPendingOrders.setObjectName(u"lsvPendingOrders")
         self.lsvPendingOrders.setFont(font2)
         self.lsvPendingOrders.setStyleSheet(u"QListView{\n"
+"	background-color: rgb(255, 255, 255);\n"
 "	border : 2px solid black;\n"
 "	border-radius : 2px;\n"
 "}")
         self.lsvPendingOrders.setAlternatingRowColors(True)
 
         self.gridLayout.addWidget(self.lsvPendingOrders, 1, 0, 1, 1)
-
-        self.lblNoPendingOrders = QLabel(self.pendingOrdersWidget)
-        self.lblNoPendingOrders.setObjectName(u"lblNoPendingOrders")
-        self.lblNoPendingOrders.setMinimumSize(QSize(0, 0))
-        self.lblNoPendingOrders.setMaximumSize(QSize(16777215, 40))
-        font3 = QFont()
-        font3.setPointSize(12)
-        self.lblNoPendingOrders.setFont(font3)
-        self.lblNoPendingOrders.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout.addWidget(self.lblNoPendingOrders, 0, 0, 1, 1)
 
         self.myOrdersTabWidget.addTab(self.pendingOrdersWidget, "")
 

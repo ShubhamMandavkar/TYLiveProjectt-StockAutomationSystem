@@ -197,6 +197,8 @@ class MyOrders(QMainWindow):
         self.ui = Ui_myOrders()
         self.ui.setupUi(self)
         self.setWindowTitle('My Orders')
+        self.ui.lsvAllOrders.hide()
+        self.ui.lsvPendingOrders.hide()
 
         self.userDetails = UserDetails()
         self.userDetails.getUserDetails()

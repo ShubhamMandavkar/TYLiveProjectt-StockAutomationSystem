@@ -3,7 +3,7 @@ from PySide6.QtCore import QObject, Signal, QReadWriteLock
 
 import mysql.connector
 from mysql.connector import errorcode
-from APIMethods import getQuote2, getQuote, getHoldings2, getQuoteFromYfinance
+from APIMethods import getHoldings2, getQuoteFromYfinance
 import json
 import math
 import time
@@ -375,6 +375,7 @@ class HoldingsWorker(QObject):
 
     def __init__(self, key='', sKey='', profitTh = 100000, brCode='tc'):
         super().__init__()
+        self.lock = QReadWriteLock()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.profitThreshold = profitTh
@@ -396,10 +397,17 @@ class HoldingsWorker(QObject):
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
 
     def tempFunction(self): #this function is useful for sending the notification at a specific interval
-        if(HoldingsWorker.holdings['status'] == 'error'):
+        self.lock.lockForRead()
+        status = HoldingsWorker.holdings['status']
+        self.lock.unlock()
+
+        if(status == 'error'):
             return
 
+        self.lock.lockForRead()
         tempHoldings = pd.DataFrame(pd.DataFrame(HoldingsWorker.holdings['data'])['symbol'])
+        self.lock.unlock()
+
         tempHoldings['lastNotiSent'] = None
         tempHoldings.set_index('symbol', inplace= True)
 
@@ -424,6 +432,7 @@ class HoldingsWorker(QObject):
     def fetchHoldings(self, brCode = 'tc'):
         while(HoldingsWorker.isRunning):
             try :
+                self.lock.lockForWrite()
                 HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
@@ -432,6 +441,8 @@ class HoldingsWorker(QObject):
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
                 # HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
+                self.lock.unlock()
+
                 self.tempFunction()
 
                 HoldingsWorker.isNetConnected = True
@@ -452,11 +463,14 @@ class HoldingsWorker(QObject):
 
     def processHoldings(self):
         while(HoldingsWorker.isRunning):
+            self.lock.lockForRead()
             myData = HoldingsWorker.holdings
+            self.lock.unlock()
+
             tempInvestedValue = 0
             tempCurrentValue = 0
             tempProfitAndLoss = 0
-
+            
             if(myData['status'] == 'success'):
                 for holding in myData['data']:
                     tempInvestedValue += holding['invest_val']
@@ -472,7 +486,7 @@ class HoldingsWorker(QObject):
                         zroya.show(self.noti)
 
                         HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-
+                    
             
             self.investedValue = tempInvestedValue
             self.currentValue = tempCurrentValue
@@ -497,11 +511,10 @@ class HoldingsWorker(QObject):
                     isNetNotConnectedMsgSend = True
                 continue
 
-            self.myData = HoldingsWorker.holdings
-
-            if(self.myData['status'] == 'success'):
-                if(len(self.myData['data']) != 0):
-                    self.dfHoldings = pd.DataFrame(self.myData['data'], columns=['symbol', 'ltp', 'holdqty','average_price','invest_val','hld_val','PL'])
+            self.lock.lockForRead()
+            if(HoldingsWorker.holdings['status'] == 'success'):
+                if(len(HoldingsWorker.holdings['data']) != 0):
+                    self.dfHoldings = pd.DataFrame(HoldingsWorker.holdings['data'], columns=['symbol', 'ltp', 'holdqty','average_price','invest_val','hld_val','PL'])
 
                     self.dfHoldings['ltp'] = self.dfHoldings['ltp'].apply(self.roundDigit) 
                     self.dfHoldings['average_price'] = self.dfHoldings['average_price'].apply(self.roundDigit) 
@@ -519,7 +532,8 @@ class HoldingsWorker(QObject):
                     self.sigShowMsg.emit(self.myData['error_msg'])
                     self.sigNoHoldData.emit()
                     self.isApiInvalidMsgShown = True
-            
+
+            self.lock.unlock()
             isNetNotConnectedMsgSend = False
 
             time.sleep(5)
@@ -1157,7 +1171,6 @@ class MyOrdersWorker(QObject):
     isNetConnected = True
 
     sigChngMyOrdersData = Signal(pd.DataFrame)   #signals to communicate with other threads
-    sigNoMyOrdersData = Signal()
     sigMyOrdersDetails = Signal(pd.DataFrame) #signal to emit holding details to be shown on home page
     sigShowMsg = Signal(str)
     finished = Signal() 
@@ -1322,8 +1335,8 @@ class MyOrdersWorker(QObject):
         while(MyOrdersWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                # MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker=brCode)))
-                MyOrdersWorker.myOrders = self.fetchAllOrders2()
+                MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker=brCode)))
+                # MyOrdersWorker.myOrders = self.fetchAllOrders2()
                 self.lock.unlock()
                 
                 self.lock.lockForRead()
@@ -1364,7 +1377,6 @@ class MyOrdersWorker(QObject):
             print('MyOrdersfetchingThread called')
             time.sleep(5)
     
-
     def getMyOrdersTableModel(self):
         self.isApiInvalidMsgShown = False 
         isNetNotConnectedMsgSend = False
@@ -1378,6 +1390,8 @@ class MyOrdersWorker(QObject):
 
             self.lock.lockForRead()
             if(MyOrdersWorker.myOrders['status'] == 'success'):
+                print('success')
+                print(MyOrdersWorker.myOrders)
                 self.sigChngMyOrdersData.emit(pd.DataFrame(MyOrdersWorker.myOrders['data']))
 
                 self.isApiInvalidMsgShown = False

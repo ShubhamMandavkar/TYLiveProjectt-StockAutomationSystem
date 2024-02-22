@@ -112,7 +112,7 @@ QWidget::selection{
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>40</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="font">
@@ -121,11 +121,16 @@ QWidget::selection{
                <bold>false</bold>
               </font>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel{
+	padding-top: 20px;
+}</string>
+             </property>
              <property name="text">
               <string>No Data</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignHCenter|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -139,6 +144,7 @@ QWidget::selection{
              </property>
              <property name="styleSheet">
               <string notr="true">QListView{
+	background-color: rgb(255, 255, 255);
 	border : 2px solid black;
 	border-radius : 5px;
 }</string>
@@ -161,25 +167,6 @@ QWidget::selection{
            <string>Open Orders</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="1" column="0">
-            <widget class="QListView" name="lsvPendingOrders">
-             <property name="font">
-              <font>
-               <pointsize>12</pointsize>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QListView{
-	border : 2px solid black;
-	border-radius : 2px;
-}</string>
-             </property>
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="lblNoPendingOrders">
              <property name="minimumSize">
@@ -191,7 +178,7 @@ QWidget::selection{
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>40</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="font">
@@ -199,11 +186,36 @@ QWidget::selection{
                <pointsize>12</pointsize>
               </font>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel{
+	padding-top: 20px;
+}</string>
+             </property>
              <property name="text">
               <string>No Data</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignHCenter|Qt::AlignTop</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QListView" name="lsvPendingOrders">
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QListView{
+	background-color: rgb(255, 255, 255);
+	border : 2px solid black;
+	border-radius : 2px;
+}</string>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
