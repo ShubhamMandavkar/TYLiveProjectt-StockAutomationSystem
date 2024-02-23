@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
     widget.show()
     holdingsFetchingThread.start()
-    # holdingsProcessThread.start()
+    holdingsProcessThread.start()
 
     myOrdersFetchingThread.start()
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     teleApiThread.finished.connect(lambda: print('thread finished completely'))
     teleApiThread.start()
     
-    # alertThread.start() #this thread should be started later than the teleApiThread
+    alertThread.start() #this thread should be started later than the teleApiThread
 
     specialAlertWorker = SpecialAlertsWorker()
     specialAlertThread = QThread()
@@ -228,6 +228,6 @@ if __name__ == "__main__":
 
     specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
     specialAlertThread.started.connect(specialAlertWorker.check)
-    # specialAlertThread.start()
+    specialAlertThread.start()
 
     sys.exit(app.exec())
