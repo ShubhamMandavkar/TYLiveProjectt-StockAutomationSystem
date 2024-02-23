@@ -268,8 +268,8 @@ class SpecialAlerts(QMainWindow):
         self.showMessage('list downloaded successfully')
 
     def closeEvent(self, event):
-        print('closing stockDetails Window')
+        print('closing specialAlerts Window')
         self.specialAlertsWorker.isSpecialAlertsPage = False
         event.accept()
-        print('closed stockDetails Window')
+        print('closed specialAlerts Window')
 

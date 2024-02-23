@@ -334,3 +334,11 @@ class MyOrders(QMainWindow):
     def showMessage(self, msg):
         self.msgDlg = MessageDlg(msg)
         self.msgDlg.show()
+
+    def closeEvent(self, event):
+        print('closing myOrders window')
+        self.myOrdersWorker.isMyOrdersPage = False
+        # TableModel.order = None
+        # TableModel.Ncol = None
+        event.accept()
+        print('called closeWindow')

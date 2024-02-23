@@ -683,14 +683,16 @@ class StockWorker(QObject):
                 stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d', progress= False)
                 stk = yf.Ticker(self.stkSymbol + '.NS')
                 stkInfo = stk.info
-
-                self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
+                if not stkDf.empty :
+                    self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
                                                         'High': stkDf['High'], 
                                                         'Low': stkDf['Low'], 
                                                         'Close': stkDf['Close'], 
                                                         'Volume': stkDf['Volume'], 
-                                                        'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
-                                                        'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
+                                                        # 'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
+                                                        'fiftyTwoWeekHigh': 100, 
+                                                        # 'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
+                                                        'fiftyTwoWeekLow': 100 
                                                         }))
                     
                 isNetNotConnectedMsgSend = False    
@@ -1164,7 +1166,6 @@ class SpecialAlertsWorker(QObject):
         print('getAlertsTriggeredStkList finished')
         '''
 
-
 class MyOrdersWorker(QObject):
     myOrders = { "status": "success", "data": []}   #static variable to share holdings for all objects
     isRunning = True
@@ -1405,7 +1406,7 @@ class MyOrdersWorker(QObject):
             isNetNotConnectedMsgSend = False
 
             time.sleep(5)
-            print("getHoldingTbleModel function ")
+            print("getMyOrdersTbleModel function ")
 
         self.finished.emit()
-        print('getHoldingTbleModel finished')
+        print('getMyOrdersTbleModel finished')
