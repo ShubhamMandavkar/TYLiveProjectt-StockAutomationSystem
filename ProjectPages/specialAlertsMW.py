@@ -71,23 +71,25 @@ class SpecialAlerts(QMainWindow):
         self.setWindowTitle('Special Alerts')
         self.ui.tbvSpecialAlertsStkList.horizontalHeader().setStretchLastSection(True)
         self.ui.tbvSpecialAlertsStkList.horizontalHeader().setDefaultSectionSize(200)
+        self.addConnectors()
+        self.showSpecialAlertsStkList()
 
 
         self.specialAlertsWorker = SpecialAlertsWorker()
         self.specialAlertThread = QThread()
-        self.specialAlertsWorker.isSpecialAlertsPage = True
         self.specialAlertsWorker.moveToThread(self.specialAlertThread)
 
+        self.specialAlertsWorker.isSpecialAlertsPage = True
         self.specialAlertThread.started.connect(self.specialAlertsWorker.getAlertsTriggeredStkList)
         self.specialAlertsWorker.sigSpecialAlerts.connect(self.showSpecialAlertsTriggeredList)
+        '''the below thread.quit() and thread.wait() needs to be called to properly quit the thread'''
         self.specialAlertsWorker.finished.connect(self.specialAlertThread.quit)
         self.specialAlertsWorker.finished.connect(self.specialAlertThread.wait)
         self.specialAlertsWorker.finished.connect(self.specialAlertsWorker.deleteLater)
-        self.specialAlertsWorker.finished.connect(self.specialAlertThread.deleteLater)
-        self.specialAlertThread.start()
+        self.specialAlertThread.finished.connect(self.specialAlertThread.deleteLater)
 
-        self.addConnectors()
-        self.showSpecialAlertsStkList()
+        self.specialAlertsWorker.sigShowMsg.connect(self.showMessage)
+        self.specialAlertThread.start()
 
     def addConnectors(self):
         self.ui.btnAdd.clicked.connect(self.showSearchDlg)
@@ -266,6 +268,10 @@ class SpecialAlerts(QMainWindow):
         stkList = self.ui.tbvTodaysTriggered.model()._data['stkSymbol']
         stkList.to_csv (r'C:\Downloads\stkList'+ date.today().strftime('%d-%m-%Y') +'.csv', index = None, encoding='utf-8', header=True)
         self.showMessage('list downloaded successfully')
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
 
     def closeEvent(self, event):
         print('closing specialAlerts Window')

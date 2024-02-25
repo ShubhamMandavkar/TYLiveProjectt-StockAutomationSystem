@@ -24,19 +24,16 @@ class CustomDetails(QMainWindow):
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
-            query = f"""select apiKey, apiSecretKey, profitThreshold, averageThreshold, quantity, deskNoti, wpNoti, wpNo from customer_details WHERE userId = 'shubh'"""
+            query = f"""select apiKey, apiSecretKey, profitThreshold, quantity, deskNoti, teleNoti from customer_details WHERE userId = 'shubh'"""
 
             cursor.execute(query)
-            for (apiKey, apiSecretKey, profitThreshold, averageThreshold, quantity, deskNoti, wpNoti, wpNo) in cursor:
+            for (apiKey, apiSecretKey, profitThreshold, quantity, deskNoti, teleNoti) in cursor:
                 self.ui.leApiKey.setText(apiKey)
                 self.ui.leApiSecretKey.setText(apiSecretKey)
                 self.ui.dsbProfitThrld.setValue(profitThreshold)
-                self.ui.dsbAverageThrld.setValue(averageThreshold)
                 self.ui.sbQuantity.setValue(quantity)
                 self.ui.cbDesktopNoti.setChecked(deskNoti)
-                self.ui.cbWhatsappNoti.setChecked(wpNoti)
-                if wpNo != 'NULL':
-                    self.ui.leWhatsappNo.setText(wpNo)
+                self.ui.cbTelegramNoti.setChecked(teleNoti)
                     
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -52,21 +49,16 @@ class CustomDetails(QMainWindow):
             apiKey = self.ui.leApiKey.text()
             apiSecretKey = self.ui.leApiSecretKey.text()
             profitTh = self.ui.dsbProfitThrld.value()
-            avgTh = self.ui.dsbAverageThrld.value()
             quantity = self.ui.sbQuantity.value()
 
             deskNoti = int(self.ui.cbDesktopNoti.isChecked())
-            wpNoti = int(self.ui.cbWhatsappNoti.isChecked())
+            teleNoti = int(self.ui.cbTelegramNoti.isChecked())
 
-            if self.ui.leWhatsappNo.text().strip().isdigit():
-                wpNo = self.ui.leWhatsappNo.text()
-            else:
-                wpNo = 'NULL'
 
             try:
                 con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
                 cursor = con.cursor()
-                query = f"""UPDATE customer_details SET apiKey = '{apiKey}', apiSecretKey = '{apiSecretKey}',    profitThreshold = {profitTh}, averageThreshold = {avgTh}, quantity = {quantity}, deskNoti = {deskNoti}, wpNoti = {wpNoti}, wpNo = '{wpNo}' WHERE userId = 'shubh'"""
+                query = f"""UPDATE customer_details SET apiKey = '{apiKey}', apiSecretKey = '{apiSecretKey}',    profitThreshold = {profitTh}, quantity = {quantity}, deskNoti = {deskNoti}, teleNoti = {teleNoti} WHERE userId = 'shubh'"""
 
                 print(query)
                 cursor.execute(query)

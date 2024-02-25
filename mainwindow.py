@@ -34,18 +34,22 @@ class UserDetails:
         self.apiKey = ''
         self.apiSecretKey = ''
         self.profitThreshold = 100000
+        self.deskNoti = True
+        self.teleNoti = True
     
     def getUserDetails(self):
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey, profitThreshold from customer_details where userId = '{'shubh'}'"""
+            query = f"""select apiKey, apiSecretKey, profitThreshold, deskNoti, teleNoti from customer_details where userId = '{'shubh'}'"""
             cursor.execute(query)
-            for (key, sKey, profitThld) in cursor:
+            for (key, sKey, profitThld, deskNoti, teleNoti) in cursor:
                 self.apiKey = key
                 self.apiSecretKey = sKey 
-                self.profitThreshold = profitThld           
+                self.profitThreshold = profitThld     
+                self.deskNoti = deskNoti      
+                self.teleNoti = teleNoti
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -62,6 +66,8 @@ class Navigation:
     holdings = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
     stkDetails  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
     myOrders  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
+    specialAlerts  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
+
     def showSearchDialog(self):
         self.dlgSearch = SearchDlg()
         self.dlgSearch.show()
@@ -88,8 +94,8 @@ class Navigation:
         self.myAlerts.show()
 
     def showSpecialAlertsWindow(self):
-        self.specialAlerts = SpecialAlerts()
-        self.specialAlerts.show()
+        self.specialAlerts.append(SpecialAlerts())
+        self.specialAlerts[-1].show()
 
     def showMyOrdersWindow(self):
         self.myOrders.append(MyOrders()) 
@@ -104,8 +110,10 @@ class Navigation:
       
     def showCustomDetailsWindow(self):
         self.customDetails = CustomDetails()
+        self.customDetails.ui.btnSave.clicked.connect(widget.userDetails.getUserDetails())
         self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsFetchingWorkerDetails)
         self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsProcessingWorkerDetails)
+        self.customDetails.ui.btnSave.clicked.connect(changeAlertWorderDetails)
         self.customDetails.show()
 
 class MainWindow(QMainWindow):
@@ -154,6 +162,7 @@ class MainWindow(QMainWindow):
         self.ui.lblClosedVal.setText(str(myOrdersDetails['closedOrdersCnt'].iloc[0]))
         self.ui.lblRejectedVal.setText(str(myOrdersDetails['rejectedOrdersCnt'].iloc[0]))
 
+
 def chnageHoldingsFetchingWorkerDetails():
     widget.userDetails.getUserDetails()
     holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
@@ -162,12 +171,17 @@ def chnageHoldingsProcessingWorkerDetails():
     widget.userDetails.getUserDetails()
     holdingsProcessWorker.changeDetails(profitTh= widget.userDetails.profitThreshold) 
 
+def changeAlertWorderDetails():
+    alertWorker.changeDetails(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
+
+def changeSpecialAlertWorderDetails():
+    specialAlertWorker.changeDetails(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = MainWindow()
 
-    alertWorker = AlertWorker()
+    alertWorker = AlertWorker(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
     alertThread = QThread()
     alertWorker.moveToThread(alertThread)
     alertWorker.isRunning = True 
@@ -222,7 +236,7 @@ if __name__ == "__main__":
     
     alertThread.start() #this thread should be started later than the teleApiThread
 
-    specialAlertWorker = SpecialAlertsWorker()
+    specialAlertWorker = SpecialAlertsWorker(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
     specialAlertThread = QThread()
     specialAlertWorker.moveToThread(specialAlertThread)
 

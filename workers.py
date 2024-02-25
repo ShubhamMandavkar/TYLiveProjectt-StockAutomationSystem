@@ -59,6 +59,18 @@ class AlertWorker(QObject):
     noti.addAction("SELL")
     
     tf = {'Daily' : '1d', 'Monthly' : '1mo', 'Weekly' : '1wk'}
+    def __init__(self, desktopNoti, teleNoti):
+        super().__init__()
+        self.notiLock = QReadWriteLock()
+        self.desktopNoti = desktopNoti
+        self.teleNoti = teleNoti
+    
+    def changeDetails(self, desktopNoti, teleNoti):
+        self.notiLock.lockForWrite()
+        self.desktopNoti = desktopNoti
+        self.teleNoti = teleNoti
+        self.notiLock.unlock()
+
     def getAlertList():
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
@@ -159,7 +171,7 @@ class AlertWorker(QObject):
         currTime = datetime.now() - timedelta(minutes=1)
 
         return lastTriggerTime < currTime
-        
+    
     def myAction(self, nId, actionId):  
         if(actionId == 0):
             self.sigShowBuyOrderWidget.emit(self.noti.getFirstLine())
@@ -169,24 +181,19 @@ class AlertWorker(QObject):
             print("Thank you for response")
 
     def sendNotiToDesktop(self, title, message):
-        self.noti.setFirstLine(title) 
-        self.noti.setSecondLine(message)
-        zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
-        # zroya.show(self.noti) #notificatoin sent to desktop
+        self.notiLock.lockForRead()
+        if(self.desktopNoti):
+            self.noti.setFirstLine(title) 
+            self.noti.setSecondLine(message)
+            zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
+            # zroya.show(self.noti) #notificatoin sent to desktop
+        self.notiLock.unlock()
 
     def processAlerts(self):
-        isSentNetworkWarning = False
         while(self.isRunning):
             for alert in AlertWorker.alertList:
                 if(alert['isPaused']):
                     continue
-
-                if(not isNetworkConnected()):
-                    if(not isSentNetworkWarning):
-                        isSentNetworkWarning = True
-                        print('check network')
-                else:
-                    isSentNetworkWarning = False
 
                 try:
                     # currPrice = json.loads(getQuote2('shubh',alert['stkSymbol'], 'tc', 'NSE'))['data']['close']
@@ -204,7 +211,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than ' + str(alert['alertVal']))
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -220,7 +231,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                            
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -233,7 +248,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is less than ' + str(alert['alertVal']))
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
                                 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -249,7 +268,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -266,7 +289,11 @@ class AlertWorker(QObject):
                             title = alert['stkSymbol']
                             msg = str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal']))
                             self.sendNotiToDesktop(title, msg)
-                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
+                            self.notiLock.lockForRead()
+                            if self.teleNoti :
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                            self.notiLock.unlock()
 
                             alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                             self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -284,7 +311,11 @@ class AlertWorker(QObject):
                             title = alert['stkSymbol']
                             msg = str(str(alert['stkName']) + ' crosses down the price ' + str(alert['alertVal']))
                             self.sendNotiToDesktop(title, msg)
-                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+
+                            self.notiLock.lockForRead()
+                            if self.teleNoti :
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                            self.notiLock.unlock()
 
                             alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                             self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -305,7 +336,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' Breaks the previous month high')
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -326,7 +361,11 @@ class AlertWorker(QObject):
                                 title = alert['stkSymbol']
                                 msg = str(str(alert['stkName']) + ' Breaks the previous month low')
                                 self.sendNotiToDesktop(title, msg)
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
@@ -347,13 +386,17 @@ class AlertWorker(QObject):
                             title = alert['stkSymbol']
                             msg = str('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
                             self.sendNotiToDesktop(title, msg)
-                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                            
+                            self.notiLock.lockForRead()
+                            if self.teleNoti :
+                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                            self.notiLock.unlock()
 
                             alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                             self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
-            time.sleep(5)
             print("processAlerts Called")  
+            time.sleep(5)
 
 class HoldingsWorker(QObject):
     zroya.init("StockAutomation", "a", "b", "c", "d")
@@ -373,13 +416,17 @@ class HoldingsWorker(QObject):
     sigShowMsg = Signal(str)
     finished = Signal() 
 
-    def __init__(self, key='', sKey='', profitTh = 100000, brCode='tc'):
+    def __init__(self, key='', sKey='', profitTh = 100000, brCode='tc', desktopNoti = False, teleNoti = False):
         super().__init__()
         self.lock = QReadWriteLock()
+        self.notiLock = QReadWriteLock()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.profitThreshold = profitTh
         self.brCode = brCode
+
+        self.desktopNoti = desktopNoti #tells whether to send notification to desktop or not
+        self.teleNoti = teleNoti
 
         self.investedValue = 0
         self.currentValue = 0
@@ -389,12 +436,19 @@ class HoldingsWorker(QObject):
         #to show holdings in holdings page
         self.isHoldingsPage = False
 
-    def changeDetails(self, key='', sKey='', profitTh = 100000, brCode = 'tc'):
+    def changeDetails(self, key='', sKey='', profitTh = 100000, brCode = 'tc', desktopNoti = False, teleNoti = False):
+        self.lock.lockForWrite()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.brCode = brCode
         self.profitThreshold = profitTh
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
+        self.lock.unlock()
+
+        self.notiLock.lockForWrite()
+        self.desktopNoti = desktopNoti 
+        self.teleNoti = teleNoti
+        self.notiLock.unlock()
 
     def tempFunction(self): #this function is useful for sending the notification at a specific interval
         self.lock.lockForRead()
@@ -480,12 +534,19 @@ class HoldingsWorker(QObject):
                     if(((holding['invest_val']+(holding['invest_val'] * self.profitThreshold)/100) <= holding['hld_val']) and self.checkLastNotiSend(holding['symbol'])):
                         print('Above given% profit')
                         
-                        self.noti.setFirstLine("Stock Profit Notification")
-                        self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")
-                        # zroya.show(self.noti, on_action= self.myActio)
-                        zroya.show(self.noti)
+                        self.notiLock.lockForRead()
+                        if(self.desktopNoti):
+                            self.noti.setFirstLine("Stock Profit Notification")
+                            self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")
+                            # zroya.show(self.noti, on_action= self.myActio)
+                            zroya.show(self.noti)
 
-                        HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                            HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+
+                        if self.teleNoti :
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(str(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")), TeleApiWorker.loop)
+                        self.notiLock.unlock()
+
                     
             
             self.investedValue = tempInvestedValue
@@ -529,7 +590,7 @@ class HoldingsWorker(QObject):
             else:
                 if(not self.isApiInvalidMsgShown):
                     #show message
-                    self.sigShowMsg.emit(self.myData['error_msg'])
+                    self.sigShowMsg.emit(HoldingsWorker.holdings['error_msg'])
                     self.sigNoHoldData.emit()
                     self.isApiInvalidMsgShown = True
 
@@ -539,8 +600,8 @@ class HoldingsWorker(QObject):
             time.sleep(5)
             print("getHoldingTbleModel function ")
 
-        self.finished.emit()
         print('getHoldingTbleModel finished')
+        self.finished.emit()
 
 class WatchlistWorker(QObject):
     sigShowWLData = Signal(pd.DataFrame)   #signals to communicate with other threads
@@ -689,10 +750,8 @@ class StockWorker(QObject):
                                                         'Low': stkDf['Low'], 
                                                         'Close': stkDf['Close'], 
                                                         'Volume': stkDf['Volume'], 
-                                                        # 'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
-                                                        'fiftyTwoWeekHigh': 100, 
-                                                        # 'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
-                                                        'fiftyTwoWeekLow': 100 
+                                                        'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
+                                                        'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
                                                         }))
                     
                 isNetNotConnectedMsgSend = False    
@@ -711,6 +770,7 @@ class StockWorker(QObject):
 
 class SpecialAlertsWorker(QObject):
     sigSpecialAlerts = Signal(pd.DataFrame) #signal to emit specialAlerts satisfying stocks list
+    sigShowMsg = Signal(str)
     finished = Signal()
 
     stkSymbolsList = pd.DataFrame({'stkSymbol': [], 
@@ -730,11 +790,21 @@ class SpecialAlertsWorker(QObject):
     noti.addAction("BUY")
     noti.addAction("SELL")
 
-    def __init__(self):
+    def __init__(self, desktopNoti = False, teleNoti = False):
         super().__init__()
         self.isRunning = True
         self.isSpecialAlertsPage = False
         self.lock = QReadWriteLock() #lock to synchronize the use of shared resource between threads
+
+        self.notiLock = QReadWriteLock()
+        self.desktopNoti = desktopNoti
+        self.teleNoti = teleNoti
+    
+    def changeDetails(self, desktopNoti, teleNoti):
+        self.notiLock.lockForWrite()
+        self.desktopNoti = desktopNoti
+        self.teleNoti = teleNoti
+        self.notiLock.unlock()
 
     #get the list of symbols
     def getStkSymbolsList(self):
@@ -787,7 +857,9 @@ class SpecialAlertsWorker(QObject):
 
     def deleteFromSymbolsList(self, symbol):
         self.lock.lockForWrite()
+        print(SpecialAlertsWorker.stkSymbolsList)
         SpecialAlertsWorker.stkSymbolsList.drop(symbol, inplace=True, axis=0)
+        print(SpecialAlertsWorker.stkSymbolsList)
         self.lock.unlock()
 
     def clearSymbolsList(self):
@@ -806,9 +878,12 @@ class SpecialAlertsWorker(QObject):
             print("Thank you for response")
     
     def sendNotiToDesktop(self, title, message):
-        self.noti.setFirstLine(title) 
-        self.noti.setSecondLine(message)
-        zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
+        self.notiLock.lockForRead()
+        if(self.desktopNoti):
+            self.noti.setFirstLine(title) 
+            self.noti.setSecondLine(message)
+            zroya.show(self.noti, on_action= self.myAction) #notificatoin sent to desktop
+        self.notiLock.unlock()
 
     def calAverage(self, data, avgType, avgLen = None):
         match avgType:
@@ -822,6 +897,15 @@ class SpecialAlertsWorker(QObject):
                 length = avgLen
                 Avg = talib.WMA(2*talib.WMA(data, timeperiod = length/2)-talib.WMA(data, timeperiod = length), timeperiod = math.floor(math.sqrt(length)))
                 return Avg
+
+    def isNetworkConnected(self):
+        try:
+            response = requests.get("http://www.google.com")
+            return True
+        except requests.ConnectionError:
+            return False
+        except Exception:
+            return False
 
     def setLastTriggerTime(self, symbol, type, lastTriggerTime):
         self.lock.lockForWrite()
@@ -931,13 +1015,13 @@ class SpecialAlertsWorker(QObject):
             weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk', progress= False)
             dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
-            currMP = weekDf['Close'].iloc[-1]
+            currMP = dailyDf['Close'].iloc[-1]
 
             if(weekDf.size >= 2):
                 prevWeekHigh = weekDf['High'].iloc[-2]
 
                 if (dailyDf['Open'].iloc[-1] <= prevWeekHigh or dailyDf['Close'].iloc[-2] <= prevWeekHigh) and currMP > prevWeekHigh:
-                        return True
+                    return True
                     
                     
                 return False
@@ -956,13 +1040,13 @@ class SpecialAlertsWorker(QObject):
             weekDf = yf.download(symbol + ".NS", period="1mo", interval = '1wk', progress= False)
             dailyDf = yf.download(symbol + ".NS", period = '2d', interval = '1d', progress= False)
 
-            currMP = weekDf['Close'].iloc[-1]
+            currMP = dailyDf['Close'].iloc[-1]
 
             if(weekDf.size >= 2):
                 prevWeekLow = weekDf['Low'].iloc[-2]
 
                 if (dailyDf['Open'].iloc[-1] >= prevWeekLow or dailyDf['Close'].iloc[-2] >= prevWeekLow) and currMP < prevWeekLow:
-                        return True
+                    return True
                     
                 return False
             else:
@@ -975,8 +1059,6 @@ class SpecialAlertsWorker(QObject):
 
     def check(self):
         while(self.isRunning):
-            symbols = SpecialAlertsWorker.stkSymbolsList
-
             i = 0
 
             self.lock.lockForRead()
@@ -986,31 +1068,47 @@ class SpecialAlertsWorker(QObject):
 
                 if self.isPriceCrossingPMH(symbol):
                     if self.checkLastTriggerTime(symbol, 'PMHTriggerTime'):
-                        self.sendNotiToDesktop(symbol, 'Price is greater than previous month high')
-                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous month high'), TeleApiWorker.loop)
+                        self.sendNotiToDesktop(symbol, ' Price is greater than previous month high')
+
+                        self.notiLock.lockForRead()
+                        if(self.teleNoti):
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +' Price is greater than previous month high'), TeleApiWorker.loop)
+                        self.notiLock.unlock()
 
                     self.setLastTriggerTime(symbol, 'PMHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
 
      
                 if self.isPriceLowerThanPML(symbol):
                     if self.checkLastTriggerTime(symbol, 'PMLTriggerTime'):
-                        self.sendNotiToDesktop(symbol, 'Price is lower than previous month low')
-                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous month low'), TeleApiWorker.loop)
+                        self.sendNotiToDesktop(symbol, ' Price is lower than previous month low')
+
+                        self.notiLock.lockForRead()
+                        if self.teleNoti :
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +' Price is lower than previous month low'), TeleApiWorker.loop)
+                        self.notiLock.unlock()
 
                     self.setLastTriggerTime(symbol, 'PMLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                 
                 if self.isPriceGreaterThanPWH(symbol):
                     if self.checkLastTriggerTime(symbol, 'PWHTriggerTime'):
-                        self.sendNotiToDesktop(symbol, 'Price is greater than previous week high')
-                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is greater than previous week high'), TeleApiWorker.loop)
+                        self.sendNotiToDesktop(symbol, ' Price is greater than previous week high')
+                        
+                        self.notiLock.lockForRead()
+                        if self.teleNoti :
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +' Price is greater than previous week high'), TeleApiWorker.loop)
+                        self.notiLock.unlock()
 
                     self.setLastTriggerTime(symbol, 'PWHTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                     
 
                 if self.isPriceLowerThanPWL(symbol):
                     if self.checkLastTriggerTime(symbol, 'PWLTriggerTime'):
-                        self.sendNotiToDesktop(symbol, 'Price is lower than previous week low')
-                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +'Price is lower than previous week low'), TeleApiWorker.loop)
+                        self.sendNotiToDesktop(symbol, ' Price is lower than previous week low')
+
+                        self.notiLock.lockForRead()
+                        if self.teleNoti :
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(symbol +' Price is lower than previous week low'), TeleApiWorker.loop)
+                        self.notiLock.unlock()
 
                     self.setLastTriggerTime(symbol, 'PWLTriggerTime', datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
 
@@ -1024,7 +1122,17 @@ class SpecialAlertsWorker(QObject):
 
             
     def getAlertsTriggeredStkList(self):
+        isNetNotConnectedMsgSend = False
+
         while(self.isSpecialAlertsPage):
+            if(not self.isNetworkConnected()): #if network is not connected
+                if(not isNetNotConnectedMsgSend):
+                    self.sigShowMsg.emit('Please check your internet connection')
+                    isNetNotConnectedMsgSend = True
+                continue
+            
+            isNetNotConnectedMsgSend = False
+
             today = datetime(datetime.now().year, datetime.now().month, datetime.now().day, 0, 0, 0, 0)
             temp = {'stkSymbol': [], 
                                     'PMHBroken': [], 'PMLBroken': [],                             
@@ -1073,13 +1181,12 @@ class SpecialAlertsWorker(QObject):
             temp = pd.DataFrame(temp)
             self.sigSpecialAlerts.emit(temp)
 
-            print('getAlertsTriggeredStkList called')
             time.sleep(5)
+            print('getAlertsTriggeredStkList called')
         
-        self.finished.emit()
         print('getAlertsTriggeredStkList finished')
+        self.finished.emit()
 
-        
 class MyOrdersWorker(QObject):
     myOrders = { "status": "success", "data": []}   #static variable to share holdings for all objects
     isRunning = True
@@ -1297,7 +1404,7 @@ class MyOrdersWorker(QObject):
         isNetNotConnectedMsgSend = False
         
         while(self.isMyOrdersPage):
-            if(not HoldingsWorker.isNetConnected): #if network is not connected
+            if(not MyOrdersWorker.isNetConnected): #if network is not connected
                 if(not isNetNotConnectedMsgSend):
                     self.sigShowMsg.emit('Please check your internet connection')
                     isNetNotConnectedMsgSend = True
