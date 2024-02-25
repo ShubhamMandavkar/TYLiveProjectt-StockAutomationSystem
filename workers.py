@@ -321,57 +321,7 @@ class AlertWorker(QObject):
 
                             alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                             self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
-                    case 'Price > PrevMonthHigh':
-                        stk = yf.Ticker(alert['stkSymbol']+".NS")
-                        df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
-
-                        Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
-                                alert['timeFrame'], alert['len1'])
-
-                        currMP = df['Close'].iloc[-1]
-                        prevHigh = max(df['Close'][-2], df['Close'][-3])
-                        if Avg[-1] > Avg[-2] and Avg[-2] > Avg[-3]: #uptrend
-                            if currMP > prevHigh and self.checkLastTriggerTime(alert):
-                                print(alert['stkName'], 'Breaks the previous month high of')
-
-                                title = alert['stkSymbol']
-                                msg = str(str(alert['stkName']) + ' Breaks the previous month high')
-                                self.sendNotiToDesktop(title, msg)
-                                
-                                self.notiLock.lockForRead()
-                                if self.teleNoti :
-                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                                self.notiLock.unlock()
-
-                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
-                    case 'Price < PrevMonthLow':
-                        stk = yf.Ticker(alert['stkSymbol']+".NS")
-                        df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
-                        
-                        Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
-                                alert['timeFrame'],   alert['len1'])
-
-                        currMP = df['Close'].iloc[-1]
-                        prevLow = min(df['Close'][-2], df['Close'][-3])
-                        if Avg[-1] < Avg[-2] and Avg[-2] < Avg[-3]: #downtrend
-                            if currMP < prevLow and self.checkLastTriggerTime(alert):
-                                print(alert['stkName'], 'Breaks the previous month low')
-
-                                title = alert['stkSymbol']
-                                msg = str(str(alert['stkName']) + ' Breaks the previous month low')
-                                self.sendNotiToDesktop(title, msg)
-                                
-                                self.notiLock.lockForRead()
-                                if self.teleNoti :
-                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                                self.notiLock.unlock()
-
-                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
+                            
                     case 'In Between':
                         stk = yf.Ticker(alert['stkSymbol']+".NS")
                         df = stk.history(period="max", interval = self.tf[alert['timeFrame']])

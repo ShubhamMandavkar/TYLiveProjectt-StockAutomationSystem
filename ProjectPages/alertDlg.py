@@ -76,8 +76,6 @@ class AlertDlg(QDialog):
             self.ui.cmbAlertCond.addItem('Crossing Up')
             self.ui.cmbAlertCond.addItem('Crossing Down')
             self.ui.cmbAlertCond.addItem('In Between')
-            self.ui.cmbAlertCond.addItem('Price > PrevMonthHigh')
-            self.ui.cmbAlertCond.addItem('Price < PrevMonthLow')
             
             self.ui.lblTimeFrame.setVisible(True)
             self.ui.cmbTimeFrame.setVisible(True)

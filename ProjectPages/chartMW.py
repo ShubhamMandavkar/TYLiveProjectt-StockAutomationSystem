@@ -1,6 +1,3 @@
-from cProfile import label
-from re import S
-from turtle import update, width
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigCavas
@@ -389,7 +386,6 @@ class Chart(QMainWindow):
     def addConnectors(self):
         self.ui.cmbTimeFrame.currentTextChanged.connect(self.changeTimeFrame)
         self.ui.cmbIndicators.textActivated.connect(self.showIndicatorsDetailsDlg) 
-        self.ui.cmbIndicatorsAdded.textActivated.connect(self.deleteIndicator)
 
         # Connect the function to the motion_notify_event
         self.stkChart.fig.canvas.mpl_connect('motion_notify_event', self.on_mouse_move2)   
@@ -423,10 +419,8 @@ class Chart(QMainWindow):
 
             query = f"""select * from chart_state"""
             cursor.execute(query)
-            self.ui.cmbIndicatorsAdded.clear()
             for indicator, len, width, color in cursor:
                 self.stkChart.addIndicator(indicator, len, width, color)
-                self.ui.cmbIndicatorsAdded.addItem(indicator + '.' + str(len))
 
             cursor.close()
         except mysql.connector.Error as err:
@@ -472,8 +466,6 @@ class Chart(QMainWindow):
                 cursor.execute(query)
                 con.commit()
 
-                #show the indicator in the added indicators combobox
-                self.ui.cmbIndicatorsAdded.addItem(indicator + '.' + str(length))
             except mysql.connector.Error as err:
                 if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                     print("Something is wrong with your user name or password")
@@ -488,46 +480,6 @@ class Chart(QMainWindow):
 
         self.dlgIndicatorDetails.ui.btnOk.clicked.connect(saveDetails)
 
-    def deleteIndicator(self):
-        indicator , length = self.ui.cmbIndicatorsAdded.currentText().split('.')
-        ind = self.ui.cmbIndicatorsAdded.currentIndex()
-        self.dlgDeleteIndicator = DeleteIndicatorDlg(indicator, int(length))
-        self.dlgDeleteIndicator.show()
-
-        #delete from Database
-        def deleteIndicatorFrmDB():
-            try:
-                con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
-                cursor = con.cursor()
-
-                query = f"""delete from chart_state where indicator = '{indicator}' and length = {length}"""
-                cursor.execute(query)
-                con.commit()
-
-                self.dlgDeleteIndicator.close()
-
-                self.stkChart.plotChart(self.stkChart.timeFrame, self.stkChart.period)
-                self.renderChartState() 
-                self.stkChart.showSignals()
-                #show legend
-                self.stkChart.ax.legend(loc = 'upper left', fontsize="9")
-
-            except mysql.connector.Error as err:
-                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                    print("Something is wrong with your user name or password")
-                elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                    print("Database does not exist")
-                else:
-                    print("error:",err)
-            finally:
-                cursor.close()
-                con.close()
-
-        def closeDlg():
-            self.dlgDeleteIndicator.close()
-
-        self.dlgDeleteIndicator.ui.btnDelete.clicked.connect(deleteIndicatorFrmDB)
-        self.dlgDeleteIndicator.ui.btnCancel.clicked.connect(closeDlg)
 
     def addEventHandlignToLegend(self):
         pickRadius = 5

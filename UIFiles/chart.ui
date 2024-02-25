@@ -67,118 +67,6 @@
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblTimeFrame">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Time Frame</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="lblIndicators">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Indicators</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lblIndicatorsAdded">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Indicators Added</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <widget class="QComboBox" name="cmbIndicators">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <item>
-             <property name="text">
-              <string>None</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Exponential Moving Average</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Hull Moving Average</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cmbIndicatorsAdded">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <widget class="QPushButton" name="btnSearch">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton{
-	background-color: #2AAA8A;
-	color: rgb(255, 255, 255);
-	border-radius : 10px;
-	padding: 5px;	
-}
-
-QPushButton:hover{
-	background-color: rgb(46, 186, 151);
-	color: rgb(0, 0, 0);
-}</string>
-            </property>
-            <property name="text">
-             <string>Search</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <widget class="QComboBox" name="cmbTimeFrame">
             <property name="minimumSize">
@@ -255,6 +143,60 @@ QPushButton:hover{
               <string>3 month</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QComboBox" name="cmbIndicators">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Exponential Moving Average</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hull Moving Average</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblTimeFrame">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Time Frame</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="lblIndicators">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Indicators</string>
+            </property>
            </widget>
           </item>
          </layout>
