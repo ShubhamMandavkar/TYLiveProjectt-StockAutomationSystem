@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'home.ui'
+## Form generated from reading UI file 'dashboard.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -20,13 +20,13 @@ from PySide6.QtWidgets import (QApplication, QFormLayout, QFrame, QGridLayout,
     QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
     QWidget)
 
-class Ui_Home(object):
-    def setupUi(self, Home):
-        if not Home.objectName():
-            Home.setObjectName(u"Home")
-        Home.resize(1148, 653)
-        Home.setStyleSheet(u"background-color: rgb(239, 239, 239);")
-        self.centralwidget = QWidget(Home)
+class Ui_Dashboard(object):
+    def setupUi(self, Dashboard):
+        if not Dashboard.objectName():
+            Dashboard.setObjectName(u"Dashboard")
+        Dashboard.resize(1148, 653)
+        Dashboard.setStyleSheet(u"background-color: rgb(239, 239, 239);")
+        self.centralwidget = QWidget(Dashboard)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -460,43 +460,43 @@ class Ui_Home(object):
 
         self.horizontalLayout.addWidget(self.frmContent)
 
-        Home.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(Home)
+        Dashboard.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(Dashboard)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 1148, 25))
-        Home.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(Home)
+        Dashboard.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(Dashboard)
         self.statusbar.setObjectName(u"statusbar")
-        Home.setStatusBar(self.statusbar)
+        Dashboard.setStatusBar(self.statusbar)
 
-        self.retranslateUi(Home)
+        self.retranslateUi(Dashboard)
 
-        QMetaObject.connectSlotsByName(Home)
+        QMetaObject.connectSlotsByName(Dashboard)
     # setupUi
 
-    def retranslateUi(self, Home):
-        Home.setWindowTitle(QCoreApplication.translate("Home", u"MainWindow", None))
-        self.btnMyAlerts.setText(QCoreApplication.translate("Home", u"MyAlerts", None))
-        self.btnSpecialAlerts.setText(QCoreApplication.translate("Home", u"SpecialAlerts", None))
-        self.btnMyOrders.setText(QCoreApplication.translate("Home", u"MyOrders", None))
-        self.btnHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
-        self.btnWatchlists.setText(QCoreApplication.translate("Home", u"Watchlists", None))
-        self.btnCustomDetails.setText(QCoreApplication.translate("Home", u"CustomDetails", None))
-        self.btnSearch.setText(QCoreApplication.translate("Home", u"Search", None))
-        self.label.setText(QCoreApplication.translate("Home", u"Dashboard", None))
-        self.lblOrders.setText(QCoreApplication.translate("Home", u"Orders", None))
-        self.lblPendingsVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblRejected.setText(QCoreApplication.translate("Home", u"Rejected", None))
-        self.lblRejectedVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblPendings.setText(QCoreApplication.translate("Home", u"Pendings", None))
-        self.lblClosedVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblClosed.setText(QCoreApplication.translate("Home", u"Closed", None))
-        self.lblHoldings.setText(QCoreApplication.translate("Home", u"Holdings", None))
-        self.lblCurrentValue.setText(QCoreApplication.translate("Home", u"Current Value", None))
-        self.lblPandL.setText(QCoreApplication.translate("Home", u"P & L", None))
-        self.lblToltalInv.setText(QCoreApplication.translate("Home", u"Total Investment", None))
-        self.lbalCurrentValueVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblTotalInvVal.setText(QCoreApplication.translate("Home", u"0", None))
-        self.lblPandLVal.setText(QCoreApplication.translate("Home", u"0", None))
+    def retranslateUi(self, Dashboard):
+        Dashboard.setWindowTitle(QCoreApplication.translate("Dashboard", u"MainWindow", None))
+        self.btnMyAlerts.setText(QCoreApplication.translate("Dashboard", u"MyAlerts", None))
+        self.btnSpecialAlerts.setText(QCoreApplication.translate("Dashboard", u"SpecialAlerts", None))
+        self.btnMyOrders.setText(QCoreApplication.translate("Dashboard", u"MyOrders", None))
+        self.btnHoldings.setText(QCoreApplication.translate("Dashboard", u"Holdings", None))
+        self.btnWatchlists.setText(QCoreApplication.translate("Dashboard", u"Watchlists", None))
+        self.btnCustomDetails.setText(QCoreApplication.translate("Dashboard", u"CustomDetails", None))
+        self.btnSearch.setText(QCoreApplication.translate("Dashboard", u"Search", None))
+        self.label.setText(QCoreApplication.translate("Dashboard", u"Dashboard", None))
+        self.lblOrders.setText(QCoreApplication.translate("Dashboard", u"Orders", None))
+        self.lblPendingsVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
+        self.lblRejected.setText(QCoreApplication.translate("Dashboard", u"Rejected", None))
+        self.lblRejectedVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
+        self.lblPendings.setText(QCoreApplication.translate("Dashboard", u"Pendings", None))
+        self.lblClosedVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
+        self.lblClosed.setText(QCoreApplication.translate("Dashboard", u"Closed", None))
+        self.lblHoldings.setText(QCoreApplication.translate("Dashboard", u"Holdings", None))
+        self.lblCurrentValue.setText(QCoreApplication.translate("Dashboard", u"Current Value", None))
+        self.lblPandL.setText(QCoreApplication.translate("Dashboard", u"P & L", None))
+        self.lblToltalInv.setText(QCoreApplication.translate("Dashboard", u"Total Investment", None))
+        self.lbalCurrentValueVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
+        self.lblTotalInvVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
+        self.lblPandLVal.setText(QCoreApplication.translate("Dashboard", u"0", None))
     # retranslateUi
 

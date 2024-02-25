@@ -1,55 +1,41 @@
 # This Python file uses the following encoding: utf-8
-import asyncio
 import sys
 from PySide6.QtCore import  QThread
 from PySide6.QtWidgets import QApplication, QMainWindow
-import requests
 
 # Important:
 # You need to run the following command to generate the ui_form.py file
 #     pyside6-uic form.ui -o ui_form.py, or
 #     pyside2-uic form.ui -o ui_form.py 
 
-from UIFiles.ui_home import Ui_Home
-from ProjectPages.searchDlg import SearchDlg
-from ProjectPages.myAlertsMW import MyAlerts
-from ProjectPages.specialAlertsMW import SpecialAlerts
-from ProjectPages.holdingsMW import Holdings
-from ProjectPages.watchlistsMW import Watchlists
-from ProjectPages.customDetailsMW import CustomDetails
-from ProjectPages.stockDetailsMW import StockDetails
-from ProjectPages.messageDlg import MessageDlg
-from ProjectPages.buyOrderDlg import BuyOrderDlg
-from ProjectPages.sellOrderDlg import SellOrderDlg
-from ProjectPages.myOrdersMW import MyOrders
-from workers import AlertWorker, HoldingsWorker, MyOrdersWorker, SpecialAlertsWorker, TeleApiWorker
+from UIFiles.ui_login import Ui_Login
+from ProjectPages.dashboardMW import Dashboard
 
 import mysql.connector
 from mysql.connector import errorcode
 
-#TODOO: need to resolve holding crash issue when 2 holdings window created app crashes
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_Login()
+        self.ui.setupUi(self)
+        self.setWindowTitle('Login')
 
-class UserDetails:
-    def __init__(self):
-        self.apiKey = ''
-        self.apiSecretKey = ''
-        self.profitThreshold = 100000
-        self.deskNoti = True
-        self.teleNoti = True
+        self.addConnectors()
     
-    def getUserDetails(self):
+    def addConnectors(self):
+        self.ui.btnLogin.clicked.connect(self.login)
+
+    def validateUser(self, uName, password):
+        userPass = None
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey, profitThreshold, deskNoti, teleNoti from customer_details where userId = '{'shubh'}'"""
+            query = f"""select userPass from customer_details where userId = '{uName}'"""
             cursor.execute(query)
-            for (key, sKey, profitThld, deskNoti, teleNoti) in cursor:
-                self.apiKey = key
-                self.apiSecretKey = sKey 
-                self.profitThreshold = profitThld     
-                self.deskNoti = deskNoti      
-                self.teleNoti = teleNoti
+            for (uPass, ) in cursor:
+                userPass = uPass
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -62,186 +48,26 @@ class UserDetails:
             cursor.close()
             con.close()
 
-class Navigation: 
-    holdings = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
-    stkDetails  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
-    myOrders  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
-    specialAlerts  = [] #it is used to store multiple instances of stkDetails pages if single variable used and we attept to open another instance then program crashes due to thread running in background
+        if(userPass == None or password != userPass):
+            return False
+        
+        return True
 
-    def showSearchDialog(self):
-        self.dlgSearch = SearchDlg()
-        self.dlgSearch.show()
-        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.showStkDetails)
-        self.dlgSearch.ui.tblvSuggestions.doubleClicked.connect(self.dlgSearch.close)
+    def showDashboard(self, userName):
+        self.dashboard = Dashboard(userName)
+        self.dashboard.show()
 
-    def showStkDetails(self):
-        modelIndexls = self.dlgSearch.ui.tblvSuggestions.selectedIndexes() #return list of QModelIndices i.e. columns in a row
-        stkSym = modelIndexls[0].data(0)
-        stkName = modelIndexls[1].data(0)
+    def login(self):
+        userName = self.ui.leUserName.text()
+        password = self.ui.lePassword.text()
 
-        try:
-            self.stkDetails.append(StockDetails(stkSym, stkName)) 
-            self.stkDetails[-1].show()
-        except requests.exceptions.ConnectionError as e:
-            dlg = MessageDlg('Please check your internet connection')
-            dlg.show()
-            print('Please check your internet connection')
-        except Exception as e:
-            print('Exception occur in stockDetails.py', e)
-      
-    def showMyAlertsWindow(self):
-        self.myAlerts = MyAlerts()
-        self.myAlerts.show()
-
-    def showSpecialAlertsWindow(self):
-        self.specialAlerts.append(SpecialAlerts())
-        self.specialAlerts[-1].show()
-
-    def showMyOrdersWindow(self):
-        self.myOrders.append(MyOrders()) 
-
-    def showHoldingsWindow(self):
-        self.holdings.append(Holdings()) 
-        self.holdings[-1].show()
-    
-    def showWatchlistsWindow(self):
-        self.watchlists = Watchlists()
-        self.watchlists.show()
-      
-    def showCustomDetailsWindow(self):
-        self.customDetails = CustomDetails()
-        self.customDetails.ui.btnSave.clicked.connect(widget.userDetails.getUserDetails())
-        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsFetchingWorkerDetails)
-        self.customDetails.ui.btnSave.clicked.connect(chnageHoldingsProcessingWorkerDetails)
-        self.customDetails.ui.btnSave.clicked.connect(changeAlertWorderDetails)
-        self.customDetails.show()
-
-class MainWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.ui = Ui_Home()
-        self.ui.setupUi(self)
-        self.setWindowTitle('Dashboard')
-
-        self.userDetails = UserDetails()
-        self.userDetails.getUserDetails()
-
-        #navigation class
-        self.nav = Navigation()
-
-        self.addConnectors()
-    
-    def addConnectors(self):
-        #navigation code
-        self.ui.btnSearch.clicked.connect(self.nav.showSearchDialog)
-        self.ui.btnMyAlerts.clicked.connect(self.nav.showMyAlertsWindow)
-        self.ui.btnSpecialAlerts.clicked.connect(self.nav.showSpecialAlertsWindow)
-        self.ui.btnMyOrders.clicked.connect(self.nav.showMyOrdersWindow)
-        self.ui.btnHoldings.clicked.connect(self.nav.showHoldingsWindow)
-        self.ui.btnWatchlists.clicked.connect(self.nav.showWatchlistsWindow)
-        self.ui.btnCustomDetails.clicked.connect(self.nav.showCustomDetailsWindow)
-
-    '''method called when user clicks on buy button of notification sent on windows'''
-    def showBuyOrderWidget(self, stkSymbol): 
-        print('buyOrderWidget shown')
-        self.orderWidget = BuyOrderDlg(stkSymbol)
-        self.orderWidget.show()
-
-    '''method called when user clicks on sell button of notification sent on windows'''
-    def showSellOrderWidget(self): 
-        self.orderWidget = SellOrderDlg()
-        self.orderWidget.show()
-
-    def showHoldingDetails(self, holdDetails):
-        self.ui.lblTotalInvVal.setText(str(round(holdDetails['investedValue'].iloc[0], 2)))
-        self.ui.lbalCurrentValueVal.setText(str(round(holdDetails['currentValue'].iloc[0], 2)))
-        self.ui.lblPandLVal.setText(str(round(holdDetails['profitAndLoss'].iloc[0], 2)))
-
-    def showMyOrdersDetails(self, myOrdersDetails):
-        self.ui.lblPendingsVal.setText(str(myOrdersDetails['pendingOrdersCnt'].iloc[0]))
-        self.ui.lblClosedVal.setText(str(myOrdersDetails['closedOrdersCnt'].iloc[0]))
-        self.ui.lblRejectedVal.setText(str(myOrdersDetails['rejectedOrdersCnt'].iloc[0]))
-
-
-def chnageHoldingsFetchingWorkerDetails():
-    widget.userDetails.getUserDetails()
-    holdingsFetchingWorker.changeDetails(widget.userDetails.apiKey, widget.userDetails.apiSecretKey) 
-
-def chnageHoldingsProcessingWorkerDetails():
-    widget.userDetails.getUserDetails()
-    holdingsProcessWorker.changeDetails(profitTh= widget.userDetails.profitThreshold) 
-
-def changeAlertWorderDetails():
-    alertWorker.changeDetails(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
-
-def changeSpecialAlertWorderDetails():
-    specialAlertWorker.changeDetails(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
+        if(self.validateUser(userName, password)):
+            self.close()
+            self.showDashboard(userName)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = MainWindow()
-
-    alertWorker = AlertWorker(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
-    alertThread = QThread()
-    alertWorker.moveToThread(alertThread)
-    alertWorker.isRunning = True 
-
-    alertThread.started.connect(AlertWorker.getAlertList)
-    alertThread.started.connect(alertWorker.processAlerts)
-    alertWorker.sigShowBuyOrderWidget.connect(widget.showBuyOrderWidget)
-    alertWorker.sigShowSellOrderWidget.connect(widget.showSellOrderWidget)
-
-    #worker to fetch holdings details
-    holdingsFetchingWorker = HoldingsWorker(widget.userDetails.apiKey, widget.userDetails.apiSecretKey)
-
-    #Thread to fetch holdings continuously
-    holdingsFetchingThread = QThread()
-    holdingsFetchingWorker.moveToThread(holdingsFetchingThread)
-
-    holdingsFetchingThread.started.connect(holdingsFetchingWorker.fetchHoldings)
-
-    #worker to process holdings 
-    holdingsProcessWorker = HoldingsWorker(profitTh= widget.userDetails.profitThreshold)
-    holdingsProcessWorker.sigHoldDetails.connect(widget.showHoldingDetails)
-    #Thread to process holdings
-    holdingsProcessThread = QThread()
-    holdingsProcessWorker.moveToThread(holdingsProcessThread)
-    holdingsProcessThread.started.connect(holdingsProcessWorker.processHoldings)
-    
-    #worker to fetch MyOrders 
-    myOrdersFetchingWorker = MyOrdersWorker()
-    myOrdersFetchingWorker.sigMyOrdersDetails.connect(widget.showMyOrdersDetails)
-    #Thread to fetching MyOrders
-    myOrdersFetchingThread = QThread()
-    myOrdersFetchingWorker.moveToThread(myOrdersFetchingThread)
-    myOrdersFetchingThread.started.connect(myOrdersFetchingWorker.fetchMyOrders)
-
     widget.show()
-    holdingsFetchingThread.start()
-    holdingsProcessThread.start()
-
-    myOrdersFetchingThread.start()
-
-    loop = asyncio.new_event_loop() 
-    teleApiWorker = TeleApiWorker(loop)
-    teleApiThread = QThread() #this thread runs event loop required to send message on telegram
-    teleApiWorker.moveToThread(teleApiThread)
-
-    teleApiThread.started.connect(teleApiWorker.startEventLoop)
-    teleApiWorker.finished.connect(teleApiThread.quit)
-    teleApiWorker.finished.connect(teleApiWorker.deleteLater)
-    teleApiThread.finished.connect(teleApiThread.deleteLater)
-    teleApiThread.finished.connect(lambda: print('thread finished completely'))
-    teleApiThread.start()
-    
-    alertThread.start() #this thread should be started later than the teleApiThread
-
-    specialAlertWorker = SpecialAlertsWorker(widget.userDetails.deskNoti, widget.userDetails.teleNoti)
-    specialAlertThread = QThread()
-    specialAlertWorker.moveToThread(specialAlertThread)
-
-    specialAlertThread.started.connect(specialAlertWorker.getStkSymbolsList)
-    specialAlertThread.started.connect(specialAlertWorker.check)
-    specialAlertThread.start()
 
     sys.exit(app.exec())

@@ -65,58 +65,17 @@ class Ui_customDetails(object):
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.frame_5)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.lbProfitThrld = QLabel(self.frame_5)
-        self.lbProfitThrld.setObjectName(u"lbProfitThrld")
-        font1 = QFont()
-        font1.setPointSize(10)
-        self.lbProfitThrld.setFont(font1)
-        self.lbProfitThrld.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout.addWidget(self.lbProfitThrld, 2, 0, 1, 1)
-
-        self.lblApiSecretKey = QLabel(self.frame_5)
-        self.lblApiSecretKey.setObjectName(u"lblApiSecretKey")
-        self.lblApiSecretKey.setFont(font1)
-        self.lblApiSecretKey.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout.addWidget(self.lblApiSecretKey, 1, 0, 1, 1)
-
-        self.lblTelegramNoti = QLabel(self.frame_5)
-        self.lblTelegramNoti.setObjectName(u"lblTelegramNoti")
-        self.lblTelegramNoti.setFont(font1)
-        self.lblTelegramNoti.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout.addWidget(self.lblTelegramNoti, 5, 0, 1, 1)
-
-        self.lblDesktopNoti = QLabel(self.frame_5)
-        self.lblDesktopNoti.setObjectName(u"lblDesktopNoti")
-        self.lblDesktopNoti.setFont(font1)
-        self.lblDesktopNoti.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout.addWidget(self.lblDesktopNoti, 4, 0, 1, 1)
-
-        self.cbTelegramNoti = QCheckBox(self.frame_5)
-        self.cbTelegramNoti.setObjectName(u"cbTelegramNoti")
+        self.dsbProfitThrld = QDoubleSpinBox(self.frame_5)
+        self.dsbProfitThrld.setObjectName(u"dsbProfitThrld")
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.cbTelegramNoti.sizePolicy().hasHeightForWidth())
-        self.cbTelegramNoti.setSizePolicy(sizePolicy)
-        self.cbTelegramNoti.setMinimumSize(QSize(0, 40))
-        self.cbTelegramNoti.setMaximumSize(QSize(16777215, 40))
-        self.cbTelegramNoti.setStyleSheet(u"QCheckBox{\n"
-"	color: rgb(0, 0, 0);\n"
-"	background-color: rgb(255, 255, 255);\n"
-"}")
-
-        self.gridLayout.addWidget(self.cbTelegramNoti, 5, 1, 1, 1)
-
-        self.dsbProfitThrld = QDoubleSpinBox(self.frame_5)
-        self.dsbProfitThrld.setObjectName(u"dsbProfitThrld")
         sizePolicy.setHeightForWidth(self.dsbProfitThrld.sizePolicy().hasHeightForWidth())
         self.dsbProfitThrld.setSizePolicy(sizePolicy)
         self.dsbProfitThrld.setMinimumSize(QSize(0, 40))
         self.dsbProfitThrld.setMaximumSize(QSize(16777215, 40))
+        font1 = QFont()
+        font1.setPointSize(10)
         self.dsbProfitThrld.setFont(font1)
         self.dsbProfitThrld.setStyleSheet(u"QDoubleSpinBox{\n"
 "	color: rgb(0, 0, 0);\n"
@@ -127,18 +86,46 @@ class Ui_customDetails(object):
 
         self.gridLayout.addWidget(self.dsbProfitThrld, 2, 1, 1, 1)
 
+        self.lblQuantity = QLabel(self.frame_5)
+        self.lblQuantity.setObjectName(u"lblQuantity")
+        font2 = QFont()
+        font2.setPointSize(10)
+        font2.setBold(True)
+        self.lblQuantity.setFont(font2)
+        self.lblQuantity.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.lblQuantity, 3, 0, 1, 1)
+
         self.cbDesktopNoti = QCheckBox(self.frame_5)
         self.cbDesktopNoti.setObjectName(u"cbDesktopNoti")
         sizePolicy.setHeightForWidth(self.cbDesktopNoti.sizePolicy().hasHeightForWidth())
         self.cbDesktopNoti.setSizePolicy(sizePolicy)
         self.cbDesktopNoti.setMinimumSize(QSize(0, 40))
         self.cbDesktopNoti.setMaximumSize(QSize(16777215, 40))
+        font3 = QFont()
+        font3.setPointSize(9)
+        self.cbDesktopNoti.setFont(font3)
+        self.cbDesktopNoti.setLayoutDirection(Qt.RightToLeft)
         self.cbDesktopNoti.setStyleSheet(u"QCheckBox{\n"
 "	color: rgb(0, 0, 0);\n"
 "	background-color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QCheckBox::indicator {\n"
+"     width: 20px;\n"
+"     height: 20px;\n"
 "}")
+        self.cbDesktopNoti.setIconSize(QSize(20, 20))
+        self.cbDesktopNoti.setTristate(False)
 
-        self.gridLayout.addWidget(self.cbDesktopNoti, 4, 1, 1, 1)
+        self.gridLayout.addWidget(self.cbDesktopNoti, 5, 0, 1, 1)
+
+        self.lblApiKey = QLabel(self.frame_5)
+        self.lblApiKey.setObjectName(u"lblApiKey")
+        self.lblApiKey.setFont(font2)
+        self.lblApiKey.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.lblApiKey, 0, 0, 1, 1)
 
         self.leApiSecretKey = QLineEdit(self.frame_5)
         self.leApiSecretKey.setObjectName(u"leApiSecretKey")
@@ -156,33 +143,19 @@ class Ui_customDetails(object):
 
         self.gridLayout.addWidget(self.leApiSecretKey, 1, 1, 1, 1)
 
-        self.lblApiKey = QLabel(self.frame_5)
-        self.lblApiKey.setObjectName(u"lblApiKey")
-        self.lblApiKey.setFont(font1)
-        self.lblApiKey.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.lblDesktopNoti = QLabel(self.frame_5)
+        self.lblDesktopNoti.setObjectName(u"lblDesktopNoti")
+        self.lblDesktopNoti.setFont(font2)
+        self.lblDesktopNoti.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
-        self.gridLayout.addWidget(self.lblApiKey, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.lblDesktopNoti, 5, 1, 1, 1)
 
-        self.lblQuantity = QLabel(self.frame_5)
-        self.lblQuantity.setObjectName(u"lblQuantity")
-        self.lblQuantity.setFont(font1)
-        self.lblQuantity.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.lbProfitThrld = QLabel(self.frame_5)
+        self.lbProfitThrld.setObjectName(u"lbProfitThrld")
+        self.lbProfitThrld.setFont(font2)
+        self.lbProfitThrld.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.gridLayout.addWidget(self.lblQuantity, 3, 0, 1, 1)
-
-        self.leApiKey = QLineEdit(self.frame_5)
-        self.leApiKey.setObjectName(u"leApiKey")
-        self.leApiKey.setMinimumSize(QSize(0, 40))
-        self.leApiKey.setMaximumSize(QSize(16777215, 40))
-        self.leApiKey.setFont(font1)
-        self.leApiKey.setStyleSheet(u"QLineEdit{\n"
-"	color: rgb(0, 0, 0);\n"
-"	background-color: rgb(239, 239, 239);\n"
-"	border : 1px solid black;\n"
-"	border-radius : 5px;\n"
-"}")
-
-        self.gridLayout.addWidget(self.leApiKey, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.lbProfitThrld, 2, 0, 1, 1)
 
         self.sbQuantity = QSpinBox(self.frame_5)
         self.sbQuantity.setObjectName(u"sbQuantity")
@@ -199,6 +172,53 @@ class Ui_customDetails(object):
 "}")
 
         self.gridLayout.addWidget(self.sbQuantity, 3, 1, 1, 1)
+
+        self.lblApiSecretKey = QLabel(self.frame_5)
+        self.lblApiSecretKey.setObjectName(u"lblApiSecretKey")
+        self.lblApiSecretKey.setFont(font2)
+        self.lblApiSecretKey.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.lblApiSecretKey, 1, 0, 1, 1)
+
+        self.leApiKey = QLineEdit(self.frame_5)
+        self.leApiKey.setObjectName(u"leApiKey")
+        self.leApiKey.setMinimumSize(QSize(0, 40))
+        self.leApiKey.setMaximumSize(QSize(16777215, 40))
+        self.leApiKey.setFont(font1)
+        self.leApiKey.setStyleSheet(u"QLineEdit{\n"
+"	color: rgb(0, 0, 0);\n"
+"	background-color: rgb(239, 239, 239);\n"
+"	border : 1px solid black;\n"
+"	border-radius : 5px;\n"
+"}")
+
+        self.gridLayout.addWidget(self.leApiKey, 0, 1, 1, 1)
+
+        self.lblTelegramNoti = QLabel(self.frame_5)
+        self.lblTelegramNoti.setObjectName(u"lblTelegramNoti")
+        self.lblTelegramNoti.setFont(font2)
+        self.lblTelegramNoti.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.lblTelegramNoti, 7, 1, 1, 1)
+
+        self.cbTelegramNoti = QCheckBox(self.frame_5)
+        self.cbTelegramNoti.setObjectName(u"cbTelegramNoti")
+        sizePolicy.setHeightForWidth(self.cbTelegramNoti.sizePolicy().hasHeightForWidth())
+        self.cbTelegramNoti.setSizePolicy(sizePolicy)
+        self.cbTelegramNoti.setMinimumSize(QSize(0, 40))
+        self.cbTelegramNoti.setMaximumSize(QSize(16777215, 40))
+        self.cbTelegramNoti.setLayoutDirection(Qt.RightToLeft)
+        self.cbTelegramNoti.setStyleSheet(u"QCheckBox{\n"
+"	color: rgb(0, 0, 0);\n"
+"	background-color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QCheckBox::indicator {\n"
+"     width: 20px;\n"
+"     height: 20px;\n"
+"}")
+
+        self.gridLayout.addWidget(self.cbTelegramNoti, 7, 0, 1, 1)
 
 
         self.verticalLayout_2.addWidget(self.frame_5)
@@ -251,14 +271,14 @@ class Ui_customDetails(object):
     def retranslateUi(self, customDetails):
         customDetails.setWindowTitle(QCoreApplication.translate("customDetails", u"MainWindow", None))
         self.lblHeading.setText(QCoreApplication.translate("customDetails", u"Custom Details", None))
-        self.lbProfitThrld.setText(QCoreApplication.translate("customDetails", u"Profit Threshold : ", None))
-        self.lblApiSecretKey.setText(QCoreApplication.translate("customDetails", u"API Secret Key : ", None))
-        self.lblTelegramNoti.setText(QCoreApplication.translate("customDetails", u"Telegram Notification : ", None))
-        self.lblDesktopNoti.setText(QCoreApplication.translate("customDetails", u"Desktop Notification : ", None))
-        self.cbTelegramNoti.setText("")
+        self.lblQuantity.setText(QCoreApplication.translate("customDetails", u"Quantity : ", None))
         self.cbDesktopNoti.setText("")
         self.lblApiKey.setText(QCoreApplication.translate("customDetails", u"API Key : ", None))
-        self.lblQuantity.setText(QCoreApplication.translate("customDetails", u"Quantity : ", None))
+        self.lblDesktopNoti.setText(QCoreApplication.translate("customDetails", u"Desktop Notification ", None))
+        self.lbProfitThrld.setText(QCoreApplication.translate("customDetails", u"Profit Threshold : ", None))
+        self.lblApiSecretKey.setText(QCoreApplication.translate("customDetails", u"API Secret Key : ", None))
+        self.lblTelegramNoti.setText(QCoreApplication.translate("customDetails", u"Telegram Notification ", None))
+        self.cbTelegramNoti.setText("")
         self.btnSave.setText(QCoreApplication.translate("customDetails", u"Save", None))
     # retranslateUi
 
