@@ -29,7 +29,8 @@ class ListModel(QAbstractListModel):
         return len(self._data)  
 
 class UserDetails:
-    def __init__(self):
+    def __init__(self, userName):
+        self.userName = userName
         self.apiKey = ''
         self.apiSecretKey = ''
     
@@ -38,7 +39,7 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{'shubh'}'"""
+            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
             for (key, sKey) in cursor:
                 self.apiKey = key
@@ -192,7 +193,7 @@ def fetchAllOrders2(userDetails):
 
 
 class MyOrders(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, userName,  parent=None):
         super().__init__(parent)
         self.ui = Ui_myOrders()
         self.ui.setupUi(self)
@@ -200,12 +201,11 @@ class MyOrders(QMainWindow):
         self.ui.lsvAllOrders.hide()
         self.ui.lsvPendingOrders.hide()
 
-        self.userDetails = UserDetails()
+        self.userDetails = UserDetails(userName)
         self.userDetails.getUserDetails()
+
         self.addConnectors()
         self.show()  #show the gui window
-
-        # self.loadAllOrders()
 
         #worker to fetch MyOrders 
         self.myOrdersWorker = MyOrdersWorker()
@@ -228,26 +228,11 @@ class MyOrders(QMainWindow):
     def addConnectors(self):
         self.ui.lsvAllOrders.doubleClicked.connect(self.showOrderDetails)
         self.ui.lsvPendingOrders.doubleClicked.connect(self.showPendingOrderDetails)
-
-    def fetchAllOrders(self, userDetails):
-        try:
-            algomojo = api(api_key = userDetails.apiKey, api_secret= userDetails.apiSecretKey)
-
-            orders = algomojo.OrderBook(broker='tc')
-            return orders
-        except requests.exceptions.ConnectionError:
-            return {"status": "error", 'error_msg': 'Please check your internet connection'}
-        except Exception as e:
-            print('Exception : ', e)
-            return {"status": "error", 'error_msg': e}     
-
-    def loadAllOrders(self):
-        # self.myOrders = fetchAllOrders2(self.userDetails)
-        self.myOrders = self.fetchAllOrders(self.userDetails)
-
-        if(self.myOrders['status'] == 'success'):
-            orders = pd.DataFrame(self.myOrders['data'])
-            orders.drop(['ws_msg'], axis = 1, inplace= True)
+    
+    def showOrders(self, orders):
+        if(len(orders) != 0):
+            self.ui.lblNoOrders.hide()
+            self.ui.lsvAllOrders.setVisible(True)
 
             successfulOrders = orders['status'] == 'completed'
             rejectedOrders = orders['status'] == 'rejected'
@@ -269,49 +254,19 @@ class MyOrders(QMainWindow):
             pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
             pendingOrders.reset_index(inplace=True) #reset the index after removing records with na values
 
-            pendingOrdersModel = ListModel(pendingOrders)
-            self.ui.lsvPendingOrders.setModel(pendingOrdersModel)
-        else:
-            self.showMessage(self.myOrders['error_msg'])
-            print('MyOrders :', self.myOrders['error_msg'])
-    
-    def showOrders(self, orders):
-        orders.drop(['ws_msg'], axis = 1, inplace= True)
-
-        successfulOrders = orders['status'] == 'completed'
-        rejectedOrders = orders['status'] == 'rejected'
-        cancelledOrders = orders['status'] == 'cancelled'
-        pendingOrders = orders['status'] == 'pending'
-        openOrders = orders['status'] == 'open'
-
-        # allOrders = orders.where(successfulOrders | rejectedOrders | cancelledOrders) #filter successful or rejected orders
-        allOrders = orders
-        # allOrders = orders.where(successfulOrders)  
-        allOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
-        allOrders.reset_index(inplace=True) #reset the index after removing records with na values
-
-        if(len(allOrders) != 0):
-            self.ui.lblNoOrders.hide()
-            self.ui.lsvAllOrders.setVisible(True)
-
-            allOrdersModel = ListModel(allOrders)
-            self.ui.lsvAllOrders.setModel(allOrdersModel)
+            if(len(pendingOrders) != 0):
+                self.ui.lblNoPendingOrders.hide()
+                self.ui.lsvPendingOrders.setVisible(True)
+                
+                pendingOrdersModel = ListModel(pendingOrders)
+                self.ui.lsvPendingOrders.setModel(pendingOrdersModel)
+            else:
+                self.ui.lblNoPendingOrders.setVisible(True)
+                self.ui.lsvPendingOrders.hide()
         else:
             self.ui.lblNoOrders.setVisible(True)
             self.ui.lsvAllOrders.hide()
 
-        pendingOrders = orders.where(pendingOrders | openOrders) #filter open or pending orders
-        # allOrders = orders.where(successfulOrders)  
-        pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
-        pendingOrders.reset_index(inplace=True) #reset the index after removing records with na values
-
-        if(len(pendingOrders) != 0):
-            self.ui.lblNoPendingOrders.hide()
-            self.ui.lsvPendingOrders.setVisible(True)
-            
-            pendingOrdersModel = ListModel(pendingOrders)
-            self.ui.lsvPendingOrders.setModel(pendingOrdersModel)
-        else:
             self.ui.lblNoPendingOrders.setVisible(True)
             self.ui.lsvPendingOrders.hide()
 
@@ -320,7 +275,7 @@ class MyOrders(QMainWindow):
         row = modelIndexls[0].row()
         order = self.ui.lsvAllOrders.model()._data.iloc[row]
 
-        self.orderDetails = OrderDetailsDlg(order)
+        self.orderDetails = OrderDetailsDlg(self.userDetails.userName, order)
         self.orderDetails.show()
 
     def showPendingOrderDetails(self):
@@ -328,7 +283,7 @@ class MyOrders(QMainWindow):
         row = modelIndexls[0].row()
         order = self.ui.lsvPendingOrders.model()._data.iloc[row]
 
-        self.orderDetails = OrderDetailsDlg(order)
+        self.orderDetails = OrderDetailsDlg(self.userDetails.userName, order)
         self.orderDetails.show()
 
     def showMessage(self, msg):
@@ -338,7 +293,5 @@ class MyOrders(QMainWindow):
     def closeEvent(self, event):
         print('closing myOrders window')
         self.myOrdersWorker.isMyOrdersPage = False
-        # TableModel.order = None
-        # TableModel.Ncol = None
         event.accept()
         print('called closeWindow')

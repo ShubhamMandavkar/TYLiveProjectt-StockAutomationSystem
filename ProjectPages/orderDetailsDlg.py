@@ -5,12 +5,13 @@ from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderDlg import MyException, SellOrderDlg
 
 class OrderDetailsDlg(QDialog):
-    def __init__(self, order, parent=None):
+    def __init__(self, userName, order, parent=None):
         super().__init__(parent)
         self.ui = Ui_OrderDetailsDlg()
         self.ui.setupUi(self)
         self.setWindowTitle('Order')
         self.order = order
+        self.userName = userName
 
         self.setDetails()
         if(self.order['status'] != 'open' and self.order['status'] != 'pending'):
@@ -58,7 +59,7 @@ class OrderDetailsDlg(QDialog):
             print('Modified buy order')
         else:
             try:
-                self.orderDlg = SellOrderDlg(symbol)
+                self.orderDlg = SellOrderDlg(self.userName, symbol)
                 self.orderDlg.setOrderDetails(self.order)
                 self.orderDlg.validateQuantity()
                 self.orderDlg.ui.btnOrder.clicked.disconnect(self.orderDlg.placeSellOrder)

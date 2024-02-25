@@ -14,7 +14,8 @@ class MyException(Exception):
         self.msg = message
 
 class UserDetails:
-    def __init__(self):
+    def __init__(self, userName):
+        self.userName = userName
         self.apiKey = ''
         self.apiSecretKey = ''
         self.getUserDetails()
@@ -24,7 +25,7 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{'shubh'}'"""
+            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
             for (key, sKey) in cursor:
                 self.apiKey = key
@@ -42,12 +43,12 @@ class UserDetails:
             con.close()
 
 class BuyOrderDlg(QDialog):
-    def __init__(self, stkSymbol, parent=None):
+    def __init__(self, userName, stkSymbol, parent=None):
         super().__init__(parent)
         self.ui = Ui_OrderDlg()
         self.ui.setupUi(self)
         self.setWindowTitle('Buy Details')
-
+        
         self.ui.lblAvailQuantity.setVisible(False)
         self.ui.lblAvailQuantityVal.setVisible(False)
         self.ui.lblStkSymbol.setText(stkSymbol)
@@ -55,8 +56,8 @@ class BuyOrderDlg(QDialog):
         self.ui.btnOrder.setDisabled(True)
 
 
+        self.userDetails = UserDetails(userName)
         self.addConnectors()
-        self.userDetails = UserDetails()
 
     def addConnectors(self):
         self.ui.btnOrder.clicked.connect(self.close)

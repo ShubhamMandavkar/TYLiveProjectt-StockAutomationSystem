@@ -13,7 +13,7 @@ from ProjectPages.buyOrderDlg import BuyOrderDlg
 from ProjectPages.sellOrderDlg import MyException, SellOrderDlg
 
 class StockDetails(QMainWindow):
-    def __init__(self, stkSym, stkName, parent=None):
+    def __init__(self, userName, stkSym, stkName, parent=None):
         super().__init__(parent)
         self.ui = Ui_stockDetails()
         self.ui.setupUi(self)
@@ -21,6 +21,7 @@ class StockDetails(QMainWindow):
         self.ui.lblChange.hide()
         self.ui.lblChangeVal.hide()
 
+        self.userName = userName
         self.stkSymbol = stkSym
         self.stkName = stkName
 
@@ -78,14 +79,14 @@ class StockDetails(QMainWindow):
 
     def showBuyOrderWidget(self):
         try:
-            self.orderWidget = BuyOrderDlg(self.stkSymbol)
+            self.orderWidget = BuyOrderDlg(self.userName, self.stkSymbol)
             self.orderWidget.show()
         except MyException as e:
             self.showMessage(e.msg)
     
     def showSellOrderWidget(self):
         try: 
-            self.orderWidget = SellOrderDlg(self.stkSymbol)
+            self.orderWidget = SellOrderDlg(self.userName, self.stkSymbol)
             self.orderWidget.show()
         except MyException as e:
             self.showMessage(e.msg)

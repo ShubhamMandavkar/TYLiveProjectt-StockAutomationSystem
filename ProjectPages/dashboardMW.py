@@ -70,6 +70,8 @@ class Dashboard(QMainWindow):
         self.setWindowTitle('Dashboard')
 
         self.userDetails = UserDetails(userName)
+        self.userDetails.getUserDetails()
+
         self.addConnectors()
         self.startWorkers()
     
@@ -82,9 +84,6 @@ class Dashboard(QMainWindow):
         self.ui.btnHoldings.clicked.connect(self.showHoldingsWindow)
         self.ui.btnWatchlists.clicked.connect(self.showWatchlistsWindow)
         self.ui.btnCustomDetails.clicked.connect(self.showCustomDetailsWindow)
-
-    def startWorkers(self):
-        pass
 
     def startWorkers(self):
         self.alertWorker = AlertWorker(self.userDetails.deskNoti, self.userDetails.teleNoti)
@@ -125,7 +124,7 @@ class Dashboard(QMainWindow):
         # self.holdingsFetchingThread.start()
         # self.holdingsProcessThread.start()
 
-        # self.myOrdersFetchingThread.start()
+        self.myOrdersFetchingThread.start()
 
         self.loop = asyncio.new_event_loop() 
         self.teleApiWorker = TeleApiWorker(self.loop)
@@ -162,7 +161,7 @@ class Dashboard(QMainWindow):
         stkName = modelIndexls[1].data(0)
 
         try:
-            self.stkDetails.append(StockDetails(stkSym, stkName)) 
+            self.stkDetails.append(StockDetails(self.userDetails.userName, stkSym, stkName)) 
             self.stkDetails[-1].show()
         except requests.exceptions.ConnectionError as e:
             dlg = MessageDlg('Please check your internet connection')
@@ -180,7 +179,7 @@ class Dashboard(QMainWindow):
         self.specialAlerts[-1].show()
 
     def showMyOrdersWindow(self):
-        self.myOrders.append(MyOrders()) 
+        self.myOrders.append(MyOrders(self.userDetails.userName)) 
 
     def showHoldingsWindow(self):
         self.holdings.append(Holdings()) 
@@ -191,8 +190,8 @@ class Dashboard(QMainWindow):
         self.watchlists.show()
       
     def showCustomDetailsWindow(self):
-        self.customDetails = CustomDetails()
-        self.customDetails.ui.btnSave.clicked.connect(self.userDetails.getUserDetails())
+        self.customDetails = CustomDetails(self.userDetails.userName)
+        self.customDetails.ui.btnSave.clicked.connect(self.userDetails.getUserDetails)
         self.customDetails.ui.btnSave.clicked.connect(self.changeWorkerDetails)
         self.customDetails.show()
 
@@ -204,7 +203,7 @@ class Dashboard(QMainWindow):
 
     '''method called when user clicks on sell button of notification sent on windows'''
     def showSellOrderWidget(self): 
-        self.orderWidget = SellOrderDlg()
+        self.orderWidget = SellOrderDlg(self.userDetails.userName)
         self.orderWidget.show()
 
     def showHoldingDetails(self, holdDetails):
@@ -219,6 +218,6 @@ class Dashboard(QMainWindow):
     
     def changeWorkerDetails(self):
         self.holdingsFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey) 
-        self.holdingsProcessWorker.changeDetails(profitTh= self.userDetails.profitThreshold)
+        self.holdingsProcessWorker.changeDetails(profitTh= self.userDetails.profitThreshold, desktopNoti= self.userDetails.deskNoti, teleNoti= self.userDetails.teleNoti)
         self.alertWorker.changeDetails(self.userDetails.deskNoti, self.userDetails.teleNoti)
         self.specialAlertWorker.changeDetails(self.userDetails.deskNoti, self.userDetails.teleNoti)

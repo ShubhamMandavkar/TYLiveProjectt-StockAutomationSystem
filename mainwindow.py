@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 #     pyside2-uic form.ui -o ui_form.py 
 
 from UIFiles.ui_login import Ui_Login
+from ProjectPages.messageDlg import MessageDlg
 from ProjectPages.dashboardMW import Dashboard
 
 import mysql.connector
@@ -48,7 +49,12 @@ class MainWindow(QMainWindow):
             cursor.close()
             con.close()
 
-        if(userPass == None or password != userPass):
+        if(userPass == None ):
+            self.showMessage('Invalid UserName')
+            return False
+
+        if password != userPass:
+            self.showMessage('Wrong Password')
             return False
         
         return True
@@ -64,6 +70,10 @@ class MainWindow(QMainWindow):
         if(self.validateUser(userName, password)):
             self.close()
             self.showDashboard(userName)
+
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -66,6 +66,8 @@ class AlertWorker(QObject):
         self.teleNoti = teleNoti
     
     def changeDetails(self, desktopNoti, teleNoti):
+        print('changeDetails called')
+        print(desktopNoti, teleNoti)
         self.notiLock.lockForWrite()
         self.desktopNoti = desktopNoti
         self.teleNoti = teleNoti
@@ -1363,27 +1365,27 @@ class MyOrdersWorker(QObject):
                 
                 self.lock.lockForRead()
                 if(MyOrdersWorker.myOrders['status'] == 'success'):
-                    orders = pd.DataFrame(MyOrdersWorker.myOrders['data'])
-                    orders.drop(['ws_msg'], axis = 1, inplace= True)
+                    print(MyOrdersWorker.myOrders)
+                    # orders.drop(['ws_msg'], axis = 1, inplace= True)
 
-                    successfulOrdersFilter = orders['status'] == 'completed'
-                    rejectedOrdersFilter = orders['status'] == 'rejected'
-                    cancelledOrdersFilter = orders['status'] == 'cancelled'
-                    pendingOrdersFilter = orders['status'] == 'pending'
-                    openOrdersFilter = orders['status'] == 'open'
+                    successfulOrdersFilter = MyOrdersWorker.myOrders['status'] == 'completed'
+                    rejectedOrdersFilter = MyOrdersWorker.myOrders['status'] == 'rejected'
+                    cancelledOrdersFilter = MyOrdersWorker.myOrders['status'] == 'cancelled'
+                    pendingOrdersFilter = MyOrdersWorker.myOrders['status'] == 'pending'
+                    openOrdersFilter = MyOrdersWorker.myOrders['status'] == 'open'
 
                     '''for Pending orders'''
-                    pendingOrders = orders.where(pendingOrdersFilter) #filter pending orders
+                    pendingOrders = MyOrdersWorker.myOrders.where(pendingOrdersFilter) #filter pending orders
                     pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.pendingOrdersCnt = len(pendingOrders)
 
                     '''for Closed orders'''
-                    closedOrders = orders.where(successfulOrdersFilter) #filter pending orders
+                    closedOrders = MyOrdersWorker.myOrders.where(successfulOrdersFilter) #filter pending orders
                     closedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.closedOrdersCnt = len(closedOrders)
 
                     '''for Rejected orders'''
-                    rejectedOrders = orders.where(rejectedOrdersFilter) #filter pending orders
+                    rejectedOrders = MyOrdersWorker.myOrders.where(rejectedOrdersFilter) #filter pending orders
                     rejectedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.rejectedOrdersCnt = len(rejectedOrders)
 
@@ -1412,8 +1414,6 @@ class MyOrdersWorker(QObject):
 
             self.lock.lockForRead()
             if(MyOrdersWorker.myOrders['status'] == 'success'):
-                print('success')
-                print(MyOrdersWorker.myOrders)
                 self.sigChngMyOrdersData.emit(pd.DataFrame(MyOrdersWorker.myOrders['data']))
 
                 self.isApiInvalidMsgShown = False
