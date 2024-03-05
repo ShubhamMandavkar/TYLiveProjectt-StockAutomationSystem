@@ -73,6 +73,9 @@
 	border-radius : 5px;
 }</string>
            </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="maximum">
             <number>5000</number>
            </property>
@@ -298,6 +301,9 @@
 	border : 1px solid black;
 	border-radius : 5px;
 }</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
            </property>
            <property name="maximum">
             <number>5000</number>

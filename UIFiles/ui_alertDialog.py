@@ -63,6 +63,7 @@ class Ui_dlgAlert(object):
 "	border : 1px solid black;\n"
 "	border-radius : 5px;\n"
 "}")
+        self.sbLen1.setMinimum(1)
         self.sbLen1.setMaximum(5000)
 
         self.gridLayout.addWidget(self.sbLen1, 5, 2, 1, 1)
@@ -173,6 +174,7 @@ class Ui_dlgAlert(object):
 "	border : 1px solid black;\n"
 "	border-radius : 5px;\n"
 "}")
+        self.sbLen2.setMinimum(1)
         self.sbLen2.setMaximum(5000)
 
         self.gridLayout.addWidget(self.sbLen2, 6, 2, 1, 1)

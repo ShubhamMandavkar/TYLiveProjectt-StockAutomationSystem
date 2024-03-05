@@ -12,12 +12,10 @@ import talib
 import yfinance as yf
 import pandas as pd
 from algomojo.pyapi import *
-import copy
 from telethon import TelegramClient
 from apiDetails import apiId, apiHashId
 import asyncio
 import requests
-import numpy as np
 
 class TeleApiWorker(QObject):
     finished = Signal()
@@ -223,25 +221,37 @@ class AlertWorker(QObject):
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
-                            stk = yf.Ticker(alert['stkSymbol']+".NS")
-                            df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
-                            Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
+                            try:
+                                stk = yf.Ticker(alert['stkSymbol']+".NS")
+                                df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
+                                Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
 
-                            if currPrice > Avg[-1] and self.checkLastTriggerTime(alert):
-                                print(alert['stkName'], 'price is greater than EMA', alert['len1'])
-
-                                title = alert['stkSymbol']
-                                msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
-                                self.sendNotiToDesktop(title, msg)
-                            
-                                self.notiLock.lockForRead()
-                                if self.teleNoti :
-                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                                self.notiLock.unlock()
-
-                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
                                 
+
+                                if currPrice > Avg[-1] and self.checkLastTriggerTime(alert):
+                                    alertType = ''
+                                    if(alert['alertType'] == 'MA'):
+                                        alertType = 'MA'
+                                    elif(alert['alertType'] == 'Price + EMA'):
+                                        alertType = 'EMA'
+                                    elif(alert['alertType'] == 'Price + HMA'):
+                                        alertType = 'HMA'
+
+                                    print(alert['stkName'], 'price is greater than EMA', alert['len1'])
+
+                                    title = alert['stkSymbol']
+                                    msg = str(str(alert['stkName']) + ' price is greater than '+ alertType + str(alert['len1']))
+                                    self.sendNotiToDesktop(title, msg)
+                                
+                                    self.notiLock.lockForRead()
+                                    if self.teleNoti :
+                                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                    self.notiLock.unlock()
+
+                                    alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                    self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
+                            except Exception as e : 
+                                print('Exception in Alertworker Less than')    
                     case 'Less Than':
                         if alert['alertType'] == 'Price':
                             if currPrice < alert['alertVal'] and self.checkLastTriggerTime(alert):
@@ -260,15 +270,100 @@ class AlertWorker(QObject):
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
 
                         elif alert['alertType'] == 'MA' or alert['alertType'] == 'Price + EMA' or alert['alertType'] == 'Price + HMA':
+                            try :
+                                stk = yf.Ticker(alert['stkSymbol']+".NS")
+                                df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
+                                Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
+
+                                if currPrice < Avg[-1] and self.checkLastTriggerTime(alert):
+                                    alertType = ''
+                                    if(alert['alertType'] == 'MA'):
+                                        alertType = 'MA'
+                                    elif(alert['alertType'] == 'Price + EMA'):
+                                        alertType = 'EMA'
+                                    elif(alert['alertType'] == 'Price + HMA'):
+                                        alertType = 'HMA'
+
+                                    print(alert['stkName'], 'price is greater than EMA', alert['len1'])
+
+                                    title = alert['stkSymbol']
+                                    msg = str(str(alert['stkName']) + ' price is greater than ' + alertType + str(alert['len1']))
+                                    self.sendNotiToDesktop(title, msg)
+                                    
+                                    self.notiLock.lockForRead()
+                                    if self.teleNoti :
+                                        asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                    self.notiLock.unlock()
+
+                                    alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                    self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
+                            except Exception as e : 
+                                print('Exception in Alertworker Less than')
+                    case 'Crossing Up':
+                        try:
                             stk = yf.Ticker(alert['stkSymbol']+".NS")
                             df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
+
                             Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
 
-                            if currPrice < Avg[-1] and self.checkLastTriggerTime(alert):
-                                print(alert['stkName'], 'price is greater than EMA', alert['len1'])
+                            if((df['Open'].iloc[-1] < Avg[-1] or df['Close'].iloc[-2] < Avg[-2]) and df['Close'] > Avg[-1] and self.checkLastTriggerTime(alert)):
+                                print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
 
                                 title = alert['stkSymbol']
-                                msg = str(str(alert['stkName']) + ' price is greater than EMA' + str(alert['len1']))
+                                msg = str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal']))
+                                self.sendNotiToDesktop(title, msg)
+
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
+
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
+                        except Exception as e : 
+                            print('Exception in Alertworker crossing up')
+
+                    case 'Crossing Down':
+                        try:
+                            stk = yf.Ticker(alert['stkSymbol']+".NS")
+                            df = stk.history(period="max", interval = self.tf[alert['len1']])
+
+                            Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
+                                    alert['timeFrame'],   alert['len1'])
+
+                            if((df['Open'].iloc[-1] > Avg[-1] or df['Close'].iloc[-2] > Avg[-2]) and df['Close'] < Avg[-1] and self.checkLastTriggerTime(alert)):
+                                print(alert['stkName'], 'crosses down the price ', alert['alertVal'])
+
+                                title = alert['stkSymbol']
+                                msg = str(str(alert['stkName']) + ' crosses down the price ' + str(alert['alertVal']))
+                                self.sendNotiToDesktop(title, msg)
+
+                                self.notiLock.lockForRead()
+                                if self.teleNoti :
+                                    asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
+                                self.notiLock.unlock()
+
+                                alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+                                self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
+                        except Exception as e : 
+                            print('Exception in Alertworker crossing down')
+                                
+                    case 'In Between':
+                        try:
+                            stk = yf.Ticker(alert['stkSymbol']+".NS")
+                            df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
+
+                            #EMAs        
+                            Avg1 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
+                                    alert['timeFrame'],   alert['len1'])
+                            Avg2 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
+                                    alert['timeFrame'],   alert['len2'])
+                            currMP = df['Close'].iloc[-1] 
+                            if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]) and self.checkLastTriggerTime(alert):
+                                print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
+
+                                title = alert['stkSymbol']
+                                msg = str('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
                                 self.sendNotiToDesktop(title, msg)
                                 
                                 self.notiLock.lockForRead()
@@ -278,75 +373,8 @@ class AlertWorker(QObject):
 
                                 alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
                                 self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
-                    case 'Crossing Up':
-                        stk = yf.Ticker(alert['stkSymbol']+".NS")
-                        df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
-
-                        Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], alert['timeFrame'], alert['len1'])
-
-                        if((df['Open'][-1] < Avg[-1] or df['Close'][-2] < Avg[-2]) and df['Close'] > Avg[-1] and self.checkLastTriggerTime(alert)):
-                            print(alert['stkName'], 'crosses up the price ', alert['alertVal'])
-
-                            title = alert['stkSymbol']
-                            msg = str(str(alert['stkName']) + ' crosses up the price ' + str(alert['alertVal']))
-                            self.sendNotiToDesktop(title, msg)
-
-                            self.notiLock.lockForRead()
-                            if self.teleNoti :
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                            self.notiLock.unlock()
-
-                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
-                    case 'Crossing Down':
-                        stk = yf.Ticker(alert['stkSymbol']+".NS")
-                        df = stk.history(period="max", interval = self.tf[alert['len1']])
-
-                        Avg = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
-                                alert['timeFrame'],   alert['len1'])
-
-                        if((df['Open'][-1] > Avg[-1] or df['Close'][-2] > Avg[-2]) and df['Close'] < Avg[-1] and self.checkLastTriggerTime(alert)):
-                            print(alert['stkName'], 'crosses down the price ', alert['alertVal'])
-
-                            title = alert['stkSymbol']
-                            msg = str(str(alert['stkName']) + ' crosses down the price ' + str(alert['alertVal']))
-                            self.sendNotiToDesktop(title, msg)
-
-                            self.notiLock.lockForRead()
-                            if self.teleNoti :
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                            self.notiLock.unlock()
-
-                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-                            
-                    case 'In Between':
-                        stk = yf.Ticker(alert['stkSymbol']+".NS")
-                        df = stk.history(period="max", interval = self.tf[alert['timeFrame']])
-
-                        #EMAs        
-                        Avg1 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
-                                alert['timeFrame'],   alert['len1'])
-                        Avg2 = self.calAverage(df['Close'].to_numpy(), alert['alertType'], 
-                                alert['timeFrame'],   alert['len2'])
-                        currMP = df['Close'].iloc[-1] 
-                        if (currMP < Avg1[-1] and currMP > Avg2[-1]) or (currMP > Avg1[-1] and currMP < Avg2[-1]) and self.checkLastTriggerTime(alert):
-                            print('Price of ' , alert['stkName'], 'is in between', 'EMA'+str(alert['len1']), 'and', 'EMA'+str(alert['len2']))
-
-                            title = alert['stkSymbol']
-                            msg = str('Price of ' + str(alert['stkName']) + ' is in between ' + 'EMA'+ str(alert['len1']) + ' and ' + 'EMA'+str(alert['len2']))
-                            self.sendNotiToDesktop(title, msg)
-                            
-                            self.notiLock.lockForRead()
-                            if self.teleNoti :
-                                asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(msg), TeleApiWorker.loop)
-                            self.notiLock.unlock()
-
-                            alert['lastTriggerTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
-                            self.setLastTriggerTime(alert, alert['lastTriggerTime']) #change in database
-
+                        except Exception as e : 
+                            print('Exception in Alertworker In Between')
             print("processAlerts Called")  
             time.sleep(5)
 
@@ -368,7 +396,7 @@ class HoldingsWorker(QObject):
     sigShowMsg = Signal(str)
     finished = Signal() 
 
-    def __init__(self, key='', sKey='', profitTh = 100000, brCode='tc', desktopNoti = False, teleNoti = False):
+    def __init__(self, key='', sKey='', brCode='tc', profitTh = 100000, desktopNoti = False, teleNoti = False):
         super().__init__()
         self.lock = QReadWriteLock()
         self.notiLock = QReadWriteLock()
@@ -388,7 +416,7 @@ class HoldingsWorker(QObject):
         #to show holdings in holdings page
         self.isHoldingsPage = False
 
-    def changeDetails(self, key='', sKey='', profitTh = 100000, brCode = 'tc', desktopNoti = False, teleNoti = False):
+    def changeDetails(self, key='', sKey='', brCode = 'tc', profitTh = 100000, desktopNoti = False, teleNoti = False):
         self.lock.lockForWrite()
         self.apiKey = key
         self.apiSecretKey = sKey
@@ -435,11 +463,11 @@ class HoldingsWorker(QObject):
 
         return lastTriggerTime < currTime
 
-    def fetchHoldings(self, brCode = 'tc'):
+    def fetchHoldings(self):
         while(HoldingsWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=brCode)))
+                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=self.brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
                 # print(HoldingsWorker.holdings['error_msg'])
@@ -453,6 +481,7 @@ class HoldingsWorker(QObject):
 
                 HoldingsWorker.isNetConnected = True
             except requests.exceptions.ConnectionError:
+                self.lock.unlock()
                 HoldingsWorker.isNetConnected = False
             except Exception as e:
                 print(e)
@@ -460,6 +489,8 @@ class HoldingsWorker(QObject):
 
             print('HoldingsfetchingThread called')
             time.sleep(5)
+        
+        print('HoldingFetchingThred finished')
 
     def myAction(nId, actionId):
         if(actionId == 0):
@@ -514,7 +545,7 @@ class HoldingsWorker(QObject):
         return round(val, 2)
 
     def getHoldingsTableModel(self):
-        self.isApiInvalidMsgShown = False 
+        isApiInvalidMsgShown = False 
         isNetNotConnectedMsgSend = False
         
         while(self.isHoldingsPage):
@@ -538,13 +569,13 @@ class HoldingsWorker(QObject):
                 else:
                     self.sigNoHoldData.emit()
                 
-                self.isApiInvalidMsgShown = False
+                isApiInvalidMsgShown = False
             else:
-                if(not self.isApiInvalidMsgShown):
+                if(not isApiInvalidMsgShown):
                     #show message
                     self.sigShowMsg.emit(HoldingsWorker.holdings['error_msg'])
                     self.sigNoHoldData.emit()
-                    self.isApiInvalidMsgShown = True
+                    isApiInvalidMsgShown = True
 
             self.lock.unlock()
             isNetNotConnectedMsgSend = False
@@ -695,7 +726,7 @@ class StockWorker(QObject):
             try:
                 stkDf = yf.download(self.stkSymbol + '.NS', period='1d', interval='1d', progress= False)
                 stk = yf.Ticker(self.stkSymbol + '.NS')
-                stkInfo = stk.info
+                stkInfo = stk.info  #causing crash in offline mode when closing stockDetails page
                 if not stkDf.empty :
                     self.sigShowStkDetails.emit(pd.DataFrame({'Open': stkDf['Open'], 
                                                         'High': stkDf['High'], 
@@ -703,7 +734,9 @@ class StockWorker(QObject):
                                                         'Close': stkDf['Close'], 
                                                         'Volume': stkDf['Volume'], 
                                                         'fiftyTwoWeekHigh': stkInfo['fiftyTwoWeekHigh'], 
+                                                        # 'fiftyTwoWeekHigh': 500, 
                                                         'fiftyTwoWeekLow': stkInfo['fiftyTwoWeekLow'] 
+                                                        # 'fiftyTwoWeekLow': 400 
                                                         }))
                     
                 isNetNotConnectedMsgSend = False    
@@ -712,13 +745,12 @@ class StockWorker(QObject):
                     self.sigShowMsg.emit('Please check your internet connection')   
                     isNetNotConnectedMsgSend = True                                 
             except Exception as e:
-                # self.sigShowMsg.emit('Exception in stkDetailsWorker' + str(e))
                 print('Exception in stkDetailsWorker', e)
 
             time.sleep(5)
 
-        self.finished.emit()
         print('fetchStockDetails thread ended')
+        self.finished.emit()
 
 class SpecialAlertsWorker(QObject):
     sigSpecialAlerts = Signal(pd.DataFrame) #signal to emit specialAlerts satisfying stocks list
@@ -1305,45 +1337,48 @@ class MyOrdersWorker(QObject):
         }
         return orders
         
-    def fetchMyOrders(self, brCode = 'tc'):
+    def fetchMyOrders(self):
         while(MyOrdersWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker=brCode)))
+                MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker = self.brCode)))
                 # MyOrdersWorker.myOrders = self.fetchAllOrders2()
                 self.lock.unlock()
                 
                 self.lock.lockForRead()
                 if(MyOrdersWorker.myOrders['status'] == 'success'):
-                    print(MyOrdersWorker.myOrders)
+                    orders = pd.DataFrame(MyOrdersWorker.myOrders['data'])
                     # orders.drop(['ws_msg'], axis = 1, inplace= True)
 
-                    successfulOrdersFilter = MyOrdersWorker.myOrders['status'] == 'completed'
-                    rejectedOrdersFilter = MyOrdersWorker.myOrders['status'] == 'rejected'
-                    cancelledOrdersFilter = MyOrdersWorker.myOrders['status'] == 'cancelled'
-                    pendingOrdersFilter = MyOrdersWorker.myOrders['status'] == 'pending'
-                    openOrdersFilter = MyOrdersWorker.myOrders['status'] == 'open'
+                    successfulOrdersFilter = orders['status'] == 'completed'
+                    rejectedOrdersFilter = orders['status'] == 'rejected'
+                    cancelledOrdersFilter = orders['status'] == 'cancelled'
+                    pendingOrdersFilter = orders['status'] == 'pending'
+                    openOrdersFilter = orders['status'] == 'open'
 
                     '''for Pending orders'''
-                    pendingOrders = MyOrdersWorker.myOrders.where(pendingOrdersFilter) #filter pending orders
+                    pendingOrders = orders.where(pendingOrdersFilter) #filter pending orders
                     pendingOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.pendingOrdersCnt = len(pendingOrders)
 
                     '''for Closed orders'''
-                    closedOrders = MyOrdersWorker.myOrders.where(successfulOrdersFilter) #filter pending orders
+                    closedOrders = orders.where(successfulOrdersFilter) #filter pending orders
                     closedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.closedOrdersCnt = len(closedOrders)
 
                     '''for Rejected orders'''
-                    rejectedOrders = MyOrdersWorker.myOrders.where(rejectedOrdersFilter) #filter pending orders
+                    rejectedOrders = orders.where(rejectedOrdersFilter) #filter pending orders
                     rejectedOrders.dropna(axis= 0, inplace= True) #after filtering the resultant df will place Na values in place of other records threfore remove records containing na values
                     self.rejectedOrdersCnt = len(rejectedOrders)
 
                     self.sigMyOrdersDetails.emit( pd.DataFrame({'pendingOrdersCnt': [self.pendingOrdersCnt], 'closedOrdersCnt': [self.closedOrdersCnt], 'rejectedOrdersCnt': [self.rejectedOrdersCnt]})) #emit data to show on home page
                 
+                else:
+                    print(MyOrdersWorker.myOrders['error_msg'])
                 self.lock.unlock()
                 MyOrdersWorker.isNetConnected = True
             except requests.exceptions.ConnectionError:
+                self.lock.unlock()
                 MyOrdersWorker.isNetConnected = False
             except Exception as e:
                 print(e)
@@ -1352,7 +1387,7 @@ class MyOrdersWorker(QObject):
             time.sleep(5)
     
     def getMyOrdersTableModel(self):
-        self.isApiInvalidMsgShown = False 
+        isApiInvalidMsgShown = False 
         isNetNotConnectedMsgSend = False
         
         while(self.isMyOrdersPage):
@@ -1366,12 +1401,12 @@ class MyOrdersWorker(QObject):
             if(MyOrdersWorker.myOrders['status'] == 'success'):
                 self.sigChngMyOrdersData.emit(pd.DataFrame(MyOrdersWorker.myOrders['data']))
 
-                self.isApiInvalidMsgShown = False
+                isApiInvalidMsgShown = False
             else:
-                if(not self.isApiInvalidMsgShown):
+                if(not isApiInvalidMsgShown):
                     #show message
                     self.sigShowMsg.emit(MyOrdersWorker.myOrders['error_msg'])
-                    self.isApiInvalidMsgShown = True
+                    isApiInvalidMsgShown = True
             
             self.lock.unlock()
             isNetNotConnectedMsgSend = False

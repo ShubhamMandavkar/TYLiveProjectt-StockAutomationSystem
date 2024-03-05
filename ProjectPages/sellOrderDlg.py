@@ -13,6 +13,7 @@ class UserDetails:
         self.userName = userName
         self.apiKey = ''
         self.apiSecretKey = ''
+        self.brCode = 'tc'
         self.getUserDetails()
     
     def getUserDetails(self):
@@ -20,11 +21,12 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{self.userName}'"""
+            query = f"""select apiKey, apiSecretKey, brCode from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
-            for (key, sKey) in cursor:
+            for (key, sKey, brCode) in cursor:
                 self.apiKey = key
-                self.apiSecretKey = sKey            
+                self.apiSecretKey = sKey     
+                self.brCode = brCode       
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -71,7 +73,7 @@ class SellOrderDlg(QDialog):
 
     def getHoldings(self):
         try:
-            self.holdings = json.loads(json.dumps(self.algomojo.Holdings('tc')))
+            self.holdings = json.loads(json.dumps(self.algomojo.Holdings(self.userDetails.brCode)))
             '''self.holdings = {"status": "success",
                             "data":[
                                 {"exchange": "NSE",
@@ -125,17 +127,17 @@ class SellOrderDlg(QDialog):
                                     # }
                                 }]
                             }'''
+            
+            if(self.holdings['status'] == 'success'):
+                self.holdings = pd.DataFrame(self.holdings['data'])
+            else: 
+                raise MyException(self.holdings['error_msg'])
+
         except requests.exceptions.ConnectionError:
             raise MyException('Please check your internet connection')
         except Exception as e:
             print('Exception in SellOrderDlg : ', e)
             raise MyException(str(e))
-
-        if(self.holdings['status'] == 'success'):
-            self.holdings = pd.DataFrame(self.holdings['data'])
-        else: 
-            raise MyException('API EXCEPTION : ' + self.holdings['error_msg'])
-
 
     def setQuantity(self):
         self.stkHoldingDetails = self.holdings.loc[self.holdings['symbol'] == self.stkSymbol+'-EQ']
@@ -167,7 +169,7 @@ class SellOrderDlg(QDialog):
         self.ui.dsbPriceValue.setValue(order['price'])
 
     def placeSellOrder(self):
-        broker = 'tc'
+        broker = self.userDetails.brCode
         strategy = 'MyStrategy'
         exchange = 'NSE'
         symbol = self.ui.lblStkSymbol.text()+'-EQ'
@@ -199,7 +201,7 @@ class SellOrderDlg(QDialog):
     def modifyOrder(self, order):
             self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
 
-            broker = 'tc'
+            broker = self.userDetails.brCode
             strategy = 'MyStrategy'
             exchange = 'NSE'
             symbol = order['symbol'][0]

@@ -57,7 +57,8 @@ class TableModel(QAbstractTableModel):
 
     def addRow(self, row):
         self.lock.lockForRead()
-        print(self._data)
+        print(row)
+        # print(self._data)
         isPresent = row['Symbol'].isin(self._data['Symbol']).iloc[0]
         self.lock.unlock()
 

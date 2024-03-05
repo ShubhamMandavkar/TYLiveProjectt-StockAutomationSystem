@@ -18,6 +18,7 @@ class UserDetails:
         self.userName = userName
         self.apiKey = ''
         self.apiSecretKey = ''
+        self.brCode = 'tc'
         self.getUserDetails()
     
     def getUserDetails(self):
@@ -25,11 +26,12 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey from customer_details where userId = '{self.userName}'"""
+            query = f"""select apiKey, apiSecretKey, brCode from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
-            for (key, sKey) in cursor:
+            for (key, sKey, brCode) in cursor:
                 self.apiKey = key
-                self.apiSecretKey = sKey            
+                self.apiSecretKey = sKey  
+                self.brCode = brCode          
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -81,7 +83,7 @@ class BuyOrderDlg(QDialog):
     def placeBuyOrder(self):
         self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
 
-        broker = 'tc'
+        broker = self.userDetails.brCode
         strategy = 'MyStrategy'
         exchange = 'NSE'
         symbol = self.ui.lblStkSymbol.text() + '-EQ'
@@ -114,7 +116,7 @@ class BuyOrderDlg(QDialog):
     def modifyOrder(self, order):
         self.algomojo = api(api_key = self.userDetails.apiKey, api_secret= self.userDetails.apiSecretKey)
 
-        broker = 'tc'
+        broker = self.userDetails.brCode
         strategy = 'MyStrategy'
         exchange = 'NSE'
         symbol = order['symbol'][0]

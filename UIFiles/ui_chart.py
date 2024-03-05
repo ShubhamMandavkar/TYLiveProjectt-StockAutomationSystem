@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QMainWindow, QMenuBar,
-    QSizePolicy, QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFormLayout, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QMainWindow,
+    QMenuBar, QSizePolicy, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_Chart(object):
     def setupUi(self, Chart):
         if not Chart.objectName():
             Chart.setObjectName(u"Chart")
-        Chart.resize(729, 444)
+        Chart.resize(988, 527)
         self.centralwidget = QWidget(Chart)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -47,9 +48,26 @@ class Ui_Chart(object):
         self.frame_3.setMaximumSize(QSize(16777215, 100))
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
-        self.gridLayout = QGridLayout(self.frame_3)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.cmbTimeFrame = QComboBox(self.frame_3)
+        self.horizontalLayout_2 = QHBoxLayout(self.frame_3)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.frame = QFrame(self.frame_3)
+        self.frame.setObjectName(u"frame")
+        self.frame.setMinimumSize(QSize(300, 0))
+        self.frame.setMaximumSize(QSize(350, 16777215))
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.formLayout = QFormLayout(self.frame)
+        self.formLayout.setObjectName(u"formLayout")
+        self.lblTimeFrame = QLabel(self.frame)
+        self.lblTimeFrame.setObjectName(u"lblTimeFrame")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.lblTimeFrame.setFont(font)
+
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.lblTimeFrame)
+
+        self.cmbTimeFrame = QComboBox(self.frame)
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.addItem("")
@@ -63,34 +81,43 @@ class Ui_Chart(object):
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.addItem("")
         self.cmbTimeFrame.setObjectName(u"cmbTimeFrame")
-        self.cmbTimeFrame.setMinimumSize(QSize(0, 30))
-        font = QFont()
-        font.setPointSize(10)
-        self.cmbTimeFrame.setFont(font)
+        self.cmbTimeFrame.setMinimumSize(QSize(200, 35))
+        self.cmbTimeFrame.setMaximumSize(QSize(200, 16777215))
+        font1 = QFont()
+        font1.setPointSize(10)
+        self.cmbTimeFrame.setFont(font1)
 
-        self.gridLayout.addWidget(self.cmbTimeFrame, 0, 1, 1, 1)
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.cmbTimeFrame)
 
-        self.cmbIndicators = QComboBox(self.frame_3)
+
+        self.horizontalLayout_2.addWidget(self.frame)
+
+        self.frame_4 = QFrame(self.frame_3)
+        self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setMinimumSize(QSize(500, 0))
+        self.frame_4.setFrameShape(QFrame.StyledPanel)
+        self.frame_4.setFrameShadow(QFrame.Raised)
+        self.formLayout_2 = QFormLayout(self.frame_4)
+        self.formLayout_2.setObjectName(u"formLayout_2")
+        self.lblIndicators = QLabel(self.frame_4)
+        self.lblIndicators.setObjectName(u"lblIndicators")
+        self.lblIndicators.setFont(font)
+
+        self.formLayout_2.setWidget(0, QFormLayout.LabelRole, self.lblIndicators)
+
+        self.cmbIndicators = QComboBox(self.frame_4)
         self.cmbIndicators.addItem("")
         self.cmbIndicators.addItem("")
         self.cmbIndicators.addItem("")
         self.cmbIndicators.setObjectName(u"cmbIndicators")
-        self.cmbIndicators.setMinimumSize(QSize(0, 30))
-        self.cmbIndicators.setFont(font)
+        self.cmbIndicators.setMinimumSize(QSize(250, 35))
+        self.cmbIndicators.setMaximumSize(QSize(250, 16777215))
+        self.cmbIndicators.setFont(font1)
 
-        self.gridLayout.addWidget(self.cmbIndicators, 0, 4, 1, 1)
+        self.formLayout_2.setWidget(0, QFormLayout.FieldRole, self.cmbIndicators)
 
-        self.lblTimeFrame = QLabel(self.frame_3)
-        self.lblTimeFrame.setObjectName(u"lblTimeFrame")
-        self.lblTimeFrame.setFont(font)
 
-        self.gridLayout.addWidget(self.lblTimeFrame, 0, 0, 1, 1)
-
-        self.lblIndicators = QLabel(self.frame_3)
-        self.lblIndicators.setObjectName(u"lblIndicators")
-        self.lblIndicators.setFont(font)
-
-        self.gridLayout.addWidget(self.lblIndicators, 0, 3, 1, 1)
+        self.horizontalLayout_2.addWidget(self.frame_4)
 
 
         self.verticalLayout.addWidget(self.frame_3)
@@ -116,6 +143,7 @@ class Ui_Chart(object):
         self.lblClose = QLabel(self.frmCandleDetails)
         self.lblClose.setObjectName(u"lblClose")
         self.lblClose.setMaximumSize(QSize(20, 16777215))
+        self.lblClose.setFont(font)
         self.lblClose.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.Gridlayout.addWidget(self.lblClose, 0, 7, 1, 1)
@@ -127,12 +155,14 @@ class Ui_Chart(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lblOpenVal.sizePolicy().hasHeightForWidth())
         self.lblOpenVal.setSizePolicy(sizePolicy)
+        self.lblOpenVal.setFont(font1)
 
         self.Gridlayout.addWidget(self.lblOpenVal, 0, 2, 1, 1)
 
         self.lblLow = QLabel(self.frmCandleDetails)
         self.lblLow.setObjectName(u"lblLow")
         self.lblLow.setMaximumSize(QSize(20, 16777215))
+        self.lblLow.setFont(font)
         self.lblLow.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.Gridlayout.addWidget(self.lblLow, 0, 5, 1, 1)
@@ -140,16 +170,17 @@ class Ui_Chart(object):
         self.lblHigh = QLabel(self.frmCandleDetails)
         self.lblHigh.setObjectName(u"lblHigh")
         self.lblHigh.setMaximumSize(QSize(20, 16777215))
+        self.lblHigh.setFont(font)
         self.lblHigh.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.Gridlayout.addWidget(self.lblHigh, 0, 3, 1, 1)
 
         self.lblStkName = QLabel(self.frmCandleDetails)
         self.lblStkName.setObjectName(u"lblStkName")
-        font1 = QFont()
-        font1.setPointSize(14)
-        font1.setBold(True)
-        self.lblStkName.setFont(font1)
+        font2 = QFont()
+        font2.setPointSize(14)
+        font2.setBold(True)
+        self.lblStkName.setFont(font2)
 
         self.Gridlayout.addWidget(self.lblStkName, 0, 0, 1, 1)
 
@@ -157,6 +188,7 @@ class Ui_Chart(object):
         self.lblHighVal.setObjectName(u"lblHighVal")
         sizePolicy.setHeightForWidth(self.lblHighVal.sizePolicy().hasHeightForWidth())
         self.lblHighVal.setSizePolicy(sizePolicy)
+        self.lblHighVal.setFont(font1)
 
         self.Gridlayout.addWidget(self.lblHighVal, 0, 4, 1, 1)
 
@@ -164,6 +196,7 @@ class Ui_Chart(object):
         self.lblOpen.setObjectName(u"lblOpen")
         self.lblOpen.setMinimumSize(QSize(25, 0))
         self.lblOpen.setMaximumSize(QSize(25, 16777215))
+        self.lblOpen.setFont(font)
         self.lblOpen.setLayoutDirection(Qt.LeftToRight)
         self.lblOpen.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
@@ -173,6 +206,7 @@ class Ui_Chart(object):
         self.lblLowVal.setObjectName(u"lblLowVal")
         sizePolicy.setHeightForWidth(self.lblLowVal.sizePolicy().hasHeightForWidth())
         self.lblLowVal.setSizePolicy(sizePolicy)
+        self.lblLowVal.setFont(font1)
 
         self.Gridlayout.addWidget(self.lblLowVal, 0, 6, 1, 1)
 
@@ -183,6 +217,7 @@ class Ui_Chart(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.lblCloseVal.sizePolicy().hasHeightForWidth())
         self.lblCloseVal.setSizePolicy(sizePolicy1)
+        self.lblCloseVal.setFont(font1)
 
         self.Gridlayout.addWidget(self.lblCloseVal, 0, 8, 1, 1)
 
@@ -202,7 +237,7 @@ class Ui_Chart(object):
         Chart.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(Chart)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 729, 25))
+        self.menubar.setGeometry(QRect(0, 0, 988, 25))
         Chart.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(Chart)
         self.statusbar.setObjectName(u"statusbar")
@@ -218,6 +253,7 @@ class Ui_Chart(object):
 
     def retranslateUi(self, Chart):
         Chart.setWindowTitle(QCoreApplication.translate("Chart", u"MainWindow", None))
+        self.lblTimeFrame.setText(QCoreApplication.translate("Chart", u"Time Frame", None))
         self.cmbTimeFrame.setItemText(0, QCoreApplication.translate("Chart", u"1 minute", None))
         self.cmbTimeFrame.setItemText(1, QCoreApplication.translate("Chart", u"2 minute", None))
         self.cmbTimeFrame.setItemText(2, QCoreApplication.translate("Chart", u"5 minute", None))
@@ -231,12 +267,11 @@ class Ui_Chart(object):
         self.cmbTimeFrame.setItemText(10, QCoreApplication.translate("Chart", u"1 month", None))
         self.cmbTimeFrame.setItemText(11, QCoreApplication.translate("Chart", u"3 month", None))
 
+        self.lblIndicators.setText(QCoreApplication.translate("Chart", u"Indicators", None))
         self.cmbIndicators.setItemText(0, QCoreApplication.translate("Chart", u"None", None))
         self.cmbIndicators.setItemText(1, QCoreApplication.translate("Chart", u"Exponential Moving Average", None))
         self.cmbIndicators.setItemText(2, QCoreApplication.translate("Chart", u"Hull Moving Average", None))
 
-        self.lblTimeFrame.setText(QCoreApplication.translate("Chart", u"Time Frame", None))
-        self.lblIndicators.setText(QCoreApplication.translate("Chart", u"Indicators", None))
         self.lblClose.setText(QCoreApplication.translate("Chart", u"C", None))
         self.lblOpenVal.setText(QCoreApplication.translate("Chart", u"0.0", None))
         self.lblLow.setText(QCoreApplication.translate("Chart", u"L", None))

@@ -1,9 +1,11 @@
 
 from PySide6.QtWidgets import QMainWindow
 
+from ProjectPages.messageDlg import MessageDlg
+from UIFiles.ui_customDetails import Ui_customDetails
+
 import mysql.connector
 from mysql.connector import errorcode
-from UIFiles.ui_customDetails import Ui_customDetails
 
 class UserDetails:
     def __init__(self, userName):
@@ -85,6 +87,7 @@ class CustomDetails(QMainWindow):
             cursor.execute(query)
             con.commit()
             print(cursor.rowcount, " row updated")
+            self.showMessage('Data updated successfully...')
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -96,4 +99,6 @@ class CustomDetails(QMainWindow):
         else:
             con.close()
 
-
+    def showMessage(self, msg):
+        self.msgDlg = MessageDlg(msg)
+        self.msgDlg.show()

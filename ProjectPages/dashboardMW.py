@@ -27,6 +27,7 @@ class UserDetails:
         self.userName = userName
         self.apiKey = ''
         self.apiSecretKey = ''
+        self.brCode = 'tc'
         self.profitThreshold = 100000
         self.deskNoti = True
         self.teleNoti = True
@@ -36,11 +37,12 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey, profitThreshold, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
+            query = f"""select apiKey, apiSecretKey, brCode, profitThreshold, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
-            for (key, sKey, profitThld, deskNoti, teleNoti) in cursor:
+            for (key, sKey, brCode, profitThld, deskNoti, teleNoti) in cursor:
                 self.apiKey = key
                 self.apiSecretKey = sKey 
+                self.brCode = brCode
                 self.profitThreshold = profitThld     
                 self.deskNoti = deskNoti      
                 self.teleNoti = teleNoti
@@ -97,7 +99,7 @@ class Dashboard(QMainWindow):
         self.alertWorker.sigShowSellOrderWidget.connect(self.showSellOrderWidget)
 
         #worker to fetch holdings details
-        self.holdingsFetchingWorker = HoldingsWorker(self.userDetails.apiKey, self.userDetails.apiSecretKey)
+        self.holdingsFetchingWorker = HoldingsWorker(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode)
 
         #Thread to fetch holdings continuously
         self.holdingsFetchingThread = QThread()
@@ -114,17 +116,14 @@ class Dashboard(QMainWindow):
         self.holdingsProcessThread.started.connect(self.holdingsProcessWorker.processHoldings)
         
         #worker to fetch MyOrders 
-        self.myOrdersFetchingWorker = MyOrdersWorker()
+        self.myOrdersFetchingWorker = MyOrdersWorker(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode)
         self.myOrdersFetchingWorker.sigMyOrdersDetails.connect(self.showMyOrdersDetails)
         #Thread to fetching MyOrders
         self.myOrdersFetchingThread = QThread()
         self.myOrdersFetchingWorker.moveToThread(self.myOrdersFetchingThread)
         self.myOrdersFetchingThread.started.connect(self.myOrdersFetchingWorker.fetchMyOrders)
 
-        # self.holdingsFetchingThread.start()
-        # self.holdingsProcessThread.start()
 
-        self.myOrdersFetchingThread.start()
 
         self.loop = asyncio.new_event_loop() 
         self.teleApiWorker = TeleApiWorker(self.loop)
@@ -136,9 +135,7 @@ class Dashboard(QMainWindow):
         self.teleApiWorker.finished.connect(self.teleApiWorker.deleteLater)
         self.teleApiThread.finished.connect(self.teleApiThread.deleteLater)
         self.teleApiThread.finished.connect(lambda: print('thread finished completely'))
-        self.teleApiThread.start()
         
-        self.alertThread.start() #this thread should be started later than the teleApiThread
 
         self.specialAlertWorker = SpecialAlertsWorker(self.userDetails.deskNoti, self.userDetails.teleNoti)
         self.specialAlertThread = QThread()
@@ -146,7 +143,13 @@ class Dashboard(QMainWindow):
 
         self.specialAlertThread.started.connect(self.specialAlertWorker.getStkSymbolsList)
         self.specialAlertThread.started.connect(self.specialAlertWorker.check)
-        # self.specialAlertThread.start()
+
+        self.teleApiThread.start()
+        self.holdingsFetchingThread.start()
+        self.holdingsProcessThread.start()
+        self.alertThread.start() #this thread should be started later than the teleApiThread
+        self.specialAlertThread.start()
+        self.myOrdersFetchingThread.start()
 
 
     def showSearchDialog(self):
@@ -217,7 +220,9 @@ class Dashboard(QMainWindow):
         self.ui.lblRejectedVal.setText(str(myOrdersDetails['rejectedOrdersCnt'].iloc[0]))
     
     def changeWorkerDetails(self):
-        self.holdingsFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey) 
+        self.holdingsFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode) 
         self.holdingsProcessWorker.changeDetails(profitTh= self.userDetails.profitThreshold, desktopNoti= self.userDetails.deskNoti, teleNoti= self.userDetails.teleNoti)
+
+        self.myOrdersFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode)
         self.alertWorker.changeDetails(self.userDetails.deskNoti, self.userDetails.teleNoti)
         self.specialAlertWorker.changeDetails(self.userDetails.deskNoti, self.userDetails.teleNoti)

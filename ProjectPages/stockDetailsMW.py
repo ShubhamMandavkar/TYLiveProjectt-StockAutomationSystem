@@ -83,6 +83,8 @@ class StockDetails(QMainWindow):
             self.orderWidget.show()
         except MyException as e:
             self.showMessage(e.msg)
+        except Exception as e:
+            print(e)
     
     def showSellOrderWidget(self):
         try: 
@@ -90,7 +92,9 @@ class StockDetails(QMainWindow):
             self.orderWidget.show()
         except MyException as e:
             self.showMessage(e.msg)
-    
+        except Exception as e:
+            print(e)
+
     def showAlertDialog(self):
         self.dlgAlert = AlertDlg(self.stkSymbol, self.stkName)
 
