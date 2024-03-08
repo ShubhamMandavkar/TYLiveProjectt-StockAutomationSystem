@@ -498,6 +498,12 @@ class HoldingsWorker(QObject):
         elif(actionId == 1):
             print("Thank you for response")
 
+    def sendDeskNotification(self, title, msg):
+        self.noti.setFirstLine(title)
+        self.noti.setSecondLine(msg)
+        zroya.show(self.noti, on_action= self.myAction)
+        # zroya.show(self.noti)
+
     def processHoldings(self):
         while(HoldingsWorker.isRunning):
             self.lock.lockForRead()
@@ -514,15 +520,14 @@ class HoldingsWorker(QObject):
                     tempCurrentValue += holding['hld_val']
                     tempProfitAndLoss += holding['PL']
 
+                    #code to check for pofit booking
                     if(((holding['invest_val']+(holding['invest_val'] * self.profitThreshold)/100) <= holding['hld_val']) and self.checkLastNotiSend(holding['symbol'])):
                         print('Above given% profit')
                         
                         self.notiLock.lockForRead()
                         if(self.desktopNoti):
-                            self.noti.setFirstLine("Stock Profit Notification")
-                            self.noti.setSecondLine(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")
-                            # zroya.show(self.noti, on_action= self.myActio)
-                            zroya.show(self.noti)
+                            self.sendDeskNotification("Stock Profit Notification", holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")
+
 
                             HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
 
@@ -530,7 +535,20 @@ class HoldingsWorker(QObject):
                             asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(str(holding['symbol'] + "'s Stock profit above " + str(self.profitThreshold) + "% threshold!!!")), TeleApiWorker.loop)
                         self.notiLock.unlock()
 
-                    
+
+                    #code to check for average
+                    if(holding['ltp'] < holding['average_price'] - (holding['average_price']*(5*0.01)) and self.checkLastNotiSend(holding['symbol'])):
+                        print('Average', holding['symbol'],'stock ?')
+                        self.notiLock.lockForRead()
+                        if(self.desktopNoti):
+                            self.sendDeskNotification("Stock Averaging Notification", holding['symbol'] + "'s Stock price 5% below average price!!!")
+
+                            HoldingsWorker.lastNotificationSentTime.loc[holding['symbol'], 'lastNotiSent'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') #converting datetime to string
+
+                        if self.teleNoti :
+                            asyncio.run_coroutine_threadsafe(TeleApiWorker.sendMessage(str(holding['symbol'] + "'s Stock price 5% below average price!!!")), TeleApiWorker.loop)
+                        self.notiLock.unlock()
+
             
             self.investedValue = tempInvestedValue
             self.currentValue = tempCurrentValue
