@@ -286,7 +286,7 @@ class StockChart(FigCavas):
             else:
                 PWHSignal.append(np.nan)
 
-            if weekDf['Low'].iloc[i] < self.df['Low'].iloc[j] :
+            if weekDf['Low'].iloc[i] > self.df['Low'].iloc[j] :
                 PWLSignal.append(self.df['Low'].iloc[j] - 10) # +5 added to show signal little bit above candle
             else:
                 PWLSignal.append(np.nan)

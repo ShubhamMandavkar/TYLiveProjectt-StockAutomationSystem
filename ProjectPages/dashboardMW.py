@@ -37,13 +37,14 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey, brCode, profitThreshold, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
+            query = f"""select apiKey, apiSecretKey, brCode, profitThreshold, averageThreshold, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
-            for (key, sKey, brCode, profitThld, deskNoti, teleNoti) in cursor:
+            for (key, sKey, brCode, profitThld, averageThld, deskNoti, teleNoti) in cursor:
                 self.apiKey = key
                 self.apiSecretKey = sKey 
                 self.brCode = brCode
-                self.profitThreshold = profitThld     
+                self.profitThreshold = profitThld   
+                self.averageThreshold = averageThld  
                 self.deskNoti = deskNoti      
                 self.teleNoti = teleNoti
 
@@ -108,7 +109,7 @@ class Dashboard(QMainWindow):
         self.holdingsFetchingThread.started.connect(self.holdingsFetchingWorker.fetchHoldings)
 
         #worker to process holdings 
-        self.holdingsProcessWorker = HoldingsWorker(profitTh= self.userDetails.profitThreshold)
+        self.holdingsProcessWorker = HoldingsWorker(profitTh= self.userDetails.profitThreshold, avgTh=self.userDetails.averageThreshold, desktopNoti=self.userDetails.deskNoti, teleNoti=self.userDetails.teleNoti)
         self.holdingsProcessWorker.sigHoldDetails.connect(self.showHoldingDetails)
         #Thread to process holdings
         self.holdingsProcessThread = QThread()
@@ -221,7 +222,7 @@ class Dashboard(QMainWindow):
     
     def changeWorkerDetails(self):
         self.holdingsFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode) 
-        self.holdingsProcessWorker.changeDetails(profitTh= self.userDetails.profitThreshold, desktopNoti= self.userDetails.deskNoti, teleNoti= self.userDetails.teleNoti)
+        self.holdingsProcessWorker.changeDetails(profitTh= self.userDetails.profitThreshold, avgTh = self.userDetails.averageThreshold, desktopNoti= self.userDetails.deskNoti, teleNoti= self.userDetails.teleNoti)
 
         self.myOrdersFetchingWorker.changeDetails(self.userDetails.apiKey, self.userDetails.apiSecretKey, self.userDetails.brCode)
         self.alertWorker.changeDetails(self.userDetails.deskNoti, self.userDetails.teleNoti)

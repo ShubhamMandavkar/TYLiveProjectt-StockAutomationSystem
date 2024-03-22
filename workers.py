@@ -396,13 +396,14 @@ class HoldingsWorker(QObject):
     sigShowMsg = Signal(str)
     finished = Signal() 
 
-    def __init__(self, key='', sKey='', brCode='tc', profitTh = 100000, desktopNoti = False, teleNoti = False):
+    def __init__(self, key='', sKey='', brCode='tc', profitTh = 100000, avgTh= 100000, desktopNoti = False, teleNoti = False):
         super().__init__()
         self.lock = QReadWriteLock()
         self.notiLock = QReadWriteLock()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.profitThreshold = profitTh
+        self.avgThreshold = avgTh
         self.brCode = brCode
 
         self.desktopNoti = desktopNoti #tells whether to send notification to desktop or not
@@ -416,12 +417,13 @@ class HoldingsWorker(QObject):
         #to show holdings in holdings page
         self.isHoldingsPage = False
 
-    def changeDetails(self, key='', sKey='', brCode = 'tc', profitTh = 100000, desktopNoti = False, teleNoti = False):
+    def changeDetails(self, key='', sKey='', brCode = 'tc', profitTh = 100000, avgTh= 100000, desktopNoti = False, teleNoti = False):
         self.lock.lockForWrite()
         self.apiKey = key
         self.apiSecretKey = sKey
         self.brCode = brCode
         self.profitThreshold = profitTh
+        self.avgThreshold = avgTh
         self.algomojo = api(api_key = self.apiKey, api_secret= self.apiSecretKey)
         self.lock.unlock()
 
@@ -467,14 +469,14 @@ class HoldingsWorker(QObject):
         while(HoldingsWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=self.brCode)))
+                # HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=self.brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
                 # print(HoldingsWorker.holdings['error_msg'])
                 # print(HoldingsWorker.holdings['error_type'])
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
-                # HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
+                HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
                 self.lock.unlock()
 
                 self.tempFunction()
@@ -537,7 +539,7 @@ class HoldingsWorker(QObject):
 
 
                     #code to check for average
-                    if(holding['ltp'] < holding['average_price'] - (holding['average_price']*(5*0.01)) and self.checkLastNotiSend(holding['symbol'])):
+                    if(holding['ltp'] < holding['average_price'] - (holding['average_price']*(self.avgThreshold*0.01)) and self.checkLastNotiSend(holding['symbol'])):
                         print('Average', holding['symbol'],'stock ?')
                         self.notiLock.lockForRead()
                         if(self.desktopNoti):

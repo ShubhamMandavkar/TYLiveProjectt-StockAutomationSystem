@@ -22,13 +22,13 @@ class UserDetails:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
 
-            query = f"""select apiKey, apiSecretKey, profitThreshold, quantity, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
+            query = f"""select apiKey, apiSecretKey, profitThreshold, averageThreshold, deskNoti, teleNoti from customer_details where userId = '{self.userName}'"""
             cursor.execute(query)
-            for (key, sKey, profitThld, quantity, deskNoti, teleNoti) in cursor:
+            for (key, sKey, profitThld, averageThld, deskNoti, teleNoti) in cursor:
                 self.apiKey = key
                 self.apiSecretKey = sKey 
                 self.profitThreshold = profitThld  
-                self.quantity = quantity   
+                self.averageThreshold = averageThld  
                 self.deskNoti = deskNoti      
                 self.teleNoti = teleNoti
 
@@ -63,7 +63,7 @@ class CustomDetails(QMainWindow):
         self.ui.leApiKey.setText(self.userDetails.apiKey)
         self.ui.leApiSecretKey.setText(self.userDetails.apiSecretKey)
         self.ui.dsbProfitThrld.setValue(self.userDetails.profitThreshold)
-        self.ui.sbQuantity.setValue(self.userDetails.quantity)
+        self.ui.dsbAverageThrld.setValue(self.userDetails.averageThreshold)
         self.ui.cbDesktopNoti.setChecked(self.userDetails.deskNoti)
         self.ui.cbTelegramNoti.setChecked(self.userDetails.teleNoti)
         
@@ -72,8 +72,7 @@ class CustomDetails(QMainWindow):
         apiKey = self.ui.leApiKey.text()
         apiSecretKey = self.ui.leApiSecretKey.text()
         profitTh = self.ui.dsbProfitThrld.value()
-        quantity = self.ui.sbQuantity.value()
-
+        averageTh = self.ui.dsbAverageThrld.value()
         deskNoti = int(self.ui.cbDesktopNoti.isChecked())
         teleNoti = int(self.ui.cbTelegramNoti.isChecked())
 
@@ -81,7 +80,7 @@ class CustomDetails(QMainWindow):
         try:
             con = mysql.connector.connect(host = "localhost", user = "root", password = "123456", database='ty_live_proj_stock_automation_sys')
             cursor = con.cursor()
-            query = f"""UPDATE customer_details SET apiKey = '{apiKey}', apiSecretKey = '{apiSecretKey}',    profitThreshold = {profitTh}, quantity = {quantity}, deskNoti = {deskNoti}, teleNoti = {teleNoti} WHERE userId = '{self.userDetails.userName}'"""
+            query = f"""UPDATE customer_details SET apiKey = '{apiKey}', apiSecretKey = '{apiSecretKey}',    profitThreshold = {profitTh}, averageThreshold = {averageTh}, deskNoti = {deskNoti}, teleNoti = {teleNoti} WHERE userId = '{self.userDetails.userName}'"""
 
             print(query)
             cursor.execute(query)
