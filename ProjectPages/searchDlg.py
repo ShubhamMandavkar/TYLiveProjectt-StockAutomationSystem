@@ -70,12 +70,12 @@ class SearchDlg(QDialog):
             query = f"""select * from stocks where stkSymbol like '{stkSym}%'"""
             cursor.execute(query)
 
-            data = []
+            data = {'Symbol':[], 'Name':[]}
             for symbol,name, *_ in cursor: #cursor returns tuple
-                data.append([symbol,name])
+                data['Symbol'].append(symbol)
+                data['Name'].append(name)
 
             data = pd.DataFrame(data)
-            data.columns = ['Symbol', 'Name']
             model = TableModel(data)    
             self.ui.tblvSuggestions.setModel(model) 
 
