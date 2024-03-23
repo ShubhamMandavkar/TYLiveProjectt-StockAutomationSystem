@@ -29,6 +29,7 @@ class UserDetails:
         self.apiSecretKey = ''
         self.brCode = 'tc'
         self.profitThreshold = 100000
+        self.averageThreshold = 100000
         self.deskNoti = True
         self.teleNoti = True
     

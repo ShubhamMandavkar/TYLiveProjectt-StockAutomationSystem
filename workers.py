@@ -469,14 +469,14 @@ class HoldingsWorker(QObject):
         while(HoldingsWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                # HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=self.brCode)))
+                HoldingsWorker.holdings = json.loads(json.dumps(self.algomojo.Holdings(broker=self.brCode)))
                 
                 # print(HoldingsWorker.holdings['status'])
                 # print(HoldingsWorker.holdings['error_msg'])
                 # print(HoldingsWorker.holdings['error_type'])
 
                 # HoldingsWorker.holdings = self.algomojo.Holdings(broker=brCode) #use above if this not work
-                HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
+                # HoldingsWorker.holdings = json.loads(getHoldings2()) #testing purpose only
                 self.lock.unlock()
 
                 self.tempFunction()
@@ -1361,8 +1361,8 @@ class MyOrdersWorker(QObject):
         while(MyOrdersWorker.isRunning):
             try :
                 self.lock.lockForWrite()
-                MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker = self.brCode)))
-                # MyOrdersWorker.myOrders = self.fetchAllOrders2()
+                # MyOrdersWorker.myOrders = json.loads(json.dumps(self.algomojo.OrderBook(broker = self.brCode)))
+                MyOrdersWorker.myOrders = self.fetchAllOrders2()
                 self.lock.unlock()
                 
                 self.lock.lockForRead()
